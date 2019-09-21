@@ -3,6 +3,9 @@ package ie.dbs.myplants;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,9 +21,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
     private EditText emailAddress;
-    private EditText password;
+    private EditText passwordField;
     private Button submitButton;
     private Button registerButton;
     private static final String TAG="LoginActivity";
@@ -29,68 +31,83 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        mAuth = FirebaseAuth.getInstance();
         emailAddress=findViewById(R.id.email);
-        password=findViewById(R.id.password);
+        passwordField=findViewById(R.id.password);
         submitButton=findViewById(R.id.submit);
         registerButton=findViewById(R.id.register);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createAccount(emailAddress.getText().toString(), password.getText().toString());
+                signIn(emailAddress.getText().toString(), passwordField.getText().toString());
+            }
+        });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
     }
 
-    private boolean validateForm() {
-        boolean valid = true;
-
-        String email = emailAddress.getText().toString();
-        if (TextUtils.isEmpty(email)) {
-            emailAddress.setError("Required.");
-            valid = false;
-        } else {
-            emailAddress.setError(null);
-        }
-
-        String myPassword = password.getText().toString();
-        if (TextUtils.isEmpty(myPassword)) {
-            password.setError("Required.");
-            valid = false;
-        } else {
-            password.setError(null);
-        }
-
-        return valid;
-    }
-
-    private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
-        if (!validateForm()) {
+    //signIn with email and password
+    private void signIn(String email, String password) {
+        Log.d(TAG, "signIn:" + email);
+        if (!Utils.validateForm(emailAddress,passwordField)) {
             return;
         }
 
-        //showProgressDialog();
-
-        mAuth.createUserWithEmailAndPassword(email, password)
+        Utils.mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            Utils.user = mAuth.getCurrentUser();
-                            //updateUI(user);
+                            Log.d(TAG, "signInWithEmail:success");
+                            Utils.user = Utils.mAuth.getCurrentUser();
+                            if (Utils.user.isEmailVerified())
+                            {
+                                Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(LoginActivity.this, "User signed in successfully",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                            else
+                            {
+                                AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.this);
+                                builder.setTitle("Email not verified");
+                                builder.setMessage("Please verify your email address");
+                                builder.setPositiveButton("Send email", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Utils.user.sendEmailVerification();
+                                    }
+                                });
+                                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        finish();
+                                    }
+                                });
+                                builder.show();
+                            }
+
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
                     }
                 });
     }
+
+
+
+
+
+
 }
