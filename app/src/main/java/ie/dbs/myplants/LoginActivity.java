@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,7 +25,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText emailAddress;
     private EditText passwordField;
     private Button submitButton;
-    private Button registerButton;
+    private TextView register;
+    private TextView forgotPassword;
     private static final String TAG="LoginActivity";
 
     @Override
@@ -34,7 +36,8 @@ public class LoginActivity extends AppCompatActivity {
         emailAddress=findViewById(R.id.email);
         passwordField=findViewById(R.id.password);
         submitButton=findViewById(R.id.submit);
-        registerButton=findViewById(R.id.register);
+        register=findViewById(R.id.register);
+        forgotPassword=findViewById(R.id.forgotPassword);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,12 +46,61 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
+        register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email=emailAddress.getText().toString();
+                if(email.isEmpty())
+                {
+                    final AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.this);
+                    builder.setTitle("Error");
+                    builder.setMessage("Please fill in email address");
+                    builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent=new Intent(LoginActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    builder.show();
+                }
+                else {
+                    Utils.mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.this);
+                                builder.setTitle("Verification email sent");
+                                builder.setMessage("You need to verify your email address to continue, please check your inbox");
+                                builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        finish();
+                                    }
+                                });
+                                //Toast.makeText(LoginActivity.this, "An email has been sent to you.", Toast.LENGTH_SHORT).show();
+                                //finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                   // Toast.makeText(LoginActivity.this, "An email was sent to change your password",
+                           //Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(LoginActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
 
