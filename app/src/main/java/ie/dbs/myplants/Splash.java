@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -19,6 +20,8 @@ public class Splash extends Activity {
         setContentView(R.layout.activity_splash);
         Utils.mAuth = FirebaseAuth.getInstance();
         Utils.user=Utils.mAuth.getCurrentUser();
+        Utils.MyVersion= Build.VERSION.SDK_INT;
+        Utils.applicationContext=getApplicationContext();
         if(Utils.user==null)
         {
             Intent intent=new Intent(Splash.this, LoginActivity.class);
