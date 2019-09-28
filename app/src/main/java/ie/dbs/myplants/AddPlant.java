@@ -1,5 +1,6 @@
 package ie.dbs.myplants;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -13,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.CursorJoiner;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -20,16 +22,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.FileNotFoundException;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class AddPlant extends AppCompatActivity {
     private Button takePicture;
@@ -37,6 +42,7 @@ public class AddPlant extends AppCompatActivity {
     private Button save;
     private Button cancel;
     public static final int PICK_IMAGE_FROM_GALLERY=5;
+    public static final int REQUEST_IMAGE_CAPTURE=6;
     private ArrayList<Uri> mArrayUri;
     private String imageEncoded;
     private ImageView preview;
@@ -53,7 +59,7 @@ public class AddPlant extends AppCompatActivity {
         save=findViewById(R.id.saveImages);
         cancel=findViewById(R.id.cancel);
 
-
+        Utils.AskForPermission(Manifest.permission.CAMERA, AddPlant.this);
         addFromGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,19 +69,20 @@ public class AddPlant extends AppCompatActivity {
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
-                /*Intent getIntent= new Intent(Intent.ACTION_GET_CONTENT);
-                getIntent.setType("image/*");
-                getIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_FROM_GALLERY);
+            }
+        });
 
-                Intent pickIntent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickIntent.setType("image/*");
-                pickIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        takePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-                Intent chooserIntent=Intent.createChooser(getIntent, "Select Image");
-                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+                if(ContextCompat.checkSelfPermission(Utils.applicationContext, Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                }
 
-                startActivityForResult(chooserIntent, PICK_IMAGE_FROM_GALLERY);*/
             }
         });
 
@@ -109,17 +116,16 @@ public class AddPlant extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Utils.AskForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,AddPlant.this);
-               // int plantNameIterator=Utils.checkHowManyFilesInDirectory(Utils.homeDirectory);
                 for(int i=0;i<mArrayUri.size();i++)
                 {
                     try {
                         InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(i));
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        //plantNameIterator++;
-                        Utils.createDirectoryAndSaveFile(bitmap/*, "plant"+plantNameIterator+".jpg"*/);
+                        Utils.createDirectoryAndSaveFile(bitmap);
                     }
                     catch (Exception ex)
-                    {ex.printStackTrace();}
+                    {ex.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Couldn't save picture", Toast.LENGTH_SHORT).show();}
                 }
 
             }
@@ -131,7 +137,7 @@ public class AddPlant extends AppCompatActivity {
                 final AlertDialog dialog=new AlertDialog.Builder(AddPlant.this).create();
                 dialog.setTitle("Are you sure?");
                 dialog.setMessage("Cancel saving pictures?");
-                dialog.setButton(1,"Yes", new DialogInterface.OnClickListener() {
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Intent intent=new Intent(AddPlant.this, MainActivity.class);
@@ -139,11 +145,12 @@ public class AddPlant extends AppCompatActivity {
                         finish();
                     }
                 });
-                dialog.setButton(2,"No", new DialogInterface.OnClickListener() {
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,"No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialog.dismiss();                 }
                 });
+                dialog.show();
             }
         });
 
@@ -154,108 +161,115 @@ public class AddPlant extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try{
-        if (requestCode == PICK_IMAGE_FROM_GALLERY && resultCode == RESULT_OK
-                && null != data) {
+        try {
+            //if picking image from gallery selected
+            if (requestCode == PICK_IMAGE_FROM_GALLERY && resultCode == RESULT_OK
+                    && null != data) {
+                try {
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    if (data.getData() != null) {
+                        mArrayUri.clear();
+                        Uri ImageUri = data.getData();
+                        mArrayUri.add(ImageUri);
+                        Cursor cursor = getContentResolver().query(ImageUri, filePathColumn, null, null, null);
+                        if(cursor!=null)
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        imageEncoded = cursor.getString(columnIndex);
+                        cursor.close();
+                        Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
+                        preview.setImageBitmap(bitmap);
+                    } else {
+                        if (data.getClipData() != null) {
+                            ClipData mClipData = data.getClipData();
+                            mArrayUri.clear();
+                            for (int i = 0; i < mClipData.getItemCount(); i++) {
 
-            String [] filePathColumn={MediaStore.Images.Media.DATA};
-            if(data.getData()!=null)
-            {
-                mArrayUri.clear();
-                Uri ImageUri=data.getData();
-                mArrayUri.add(ImageUri);
-                Cursor cursor=getContentResolver().query(ImageUri, filePathColumn, null, null, null);
-                cursor.moveToFirst();
-                int columnIndex=cursor.getColumnIndex(filePathColumn[0]);
-                imageEncoded=cursor.getString(columnIndex);
-                cursor.close();
-                Bitmap bitmap= BitmapFactory.decodeFile(imageEncoded);
-                preview.setImageBitmap(bitmap);
-            }
-         else {
-            if (data.getClipData() != null) {
-                ClipData mClipData = data.getClipData();
-                mArrayUri.clear();
-                for (int i = 0; i < mClipData.getItemCount(); i++) {
+                                ClipData.Item item = mClipData.getItemAt(i);
+                                Uri uri = item.getUri();
+                                mArrayUri.add(uri);
+                                Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
+                                if(cursor!=null)
+                                cursor.moveToFirst();
+                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                imageEncoded = cursor.getString(columnIndex);
+                                cursor.close();
+                                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(0));
+                                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                preview.setImageBitmap(bitmap);
 
-                    ClipData.Item item = mClipData.getItemAt(i);
-                    Uri uri = item.getUri();
-                    mArrayUri.add(uri);
-                    Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageEncoded  = cursor.getString(columnIndex);
-                    cursor.close();
-                    InputStream inputStream=getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(0));
-                    Bitmap bitmap=BitmapFactory.decodeStream(inputStream);
-                    preview.setImageBitmap(bitmap);
-
-                }
-                Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
-            }
-        }
-    } else {
-        Toast.makeText(this, "You haven't picked Image",
-                Toast.LENGTH_LONG).show();
-    }
-} catch (Exception e) {
-        Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-        .show();
-        }
-
-
-                   /* imagesUriArrayList.clear();
-
-                    for (int i = 0; i < data.getClipData().getItemCount(); i++) {
-                        imagesUriArrayList.add(data.getData());
+                            }
+                            Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
+                        }
                     }
-                    Log.v("SIZE", imagesUriArrayList.size() + "");
-                    String[]filePathColumn= {MediaStore.Images.Media.DATA};
-
-                    Cursor cursor=getContentResolver().query(imagesUriArrayList.get(1), filePathColumn, null, null,
-                        null);
-                    cursor.moveToFirst();
-                    int columnIndex=cursor.getColumnIndex(filePathColumn[0]);
-                    String picturePath=cursor.getString(columnIndex);
-                    cursor.close();
-                    Bitmap bitmap=BitmapFactory.decodeFile(picturePath);
-                    //bitmap = Bitmap.createScaledBitmap(bitmap,150, 150, true);
-                    ImageView imageView=(ImageView)findViewById(R.id.preview);
-
-                    imageView.setImageBitmap(bitmap);*/
-                   /* adapter = new DataAdapter(MainActivity.this, imagesUriArrayList);
-                    imageresultRecycletview.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();*/
-
-
-        }
-        /*if (requestCode==PICK_IMAGE_FROM_GALLERY && resultCode== Activity.RESULT_OK) {
-            if (data==null)
-            {
-                Log.v("Image Picker", "No Data Sent Back");
-                return;
-            }
-            try {
-                Uri selectedImage=data.getData();
-                String[]filePathColumn= {MediaStore.Images.Media.DATA};
-
-                Cursor cursor=getContentResolver().query(selectedImage, filePathColumn, null, null,
-                        null);
-                cursor.moveToFirst();
-                int columnIndex=cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath=cursor.getString(columnIndex);
-                cursor.close();
-
-                Bitmap bitmap= BitmapFactory.decodeFile(picturePath);
-                ImageView imageView=(ImageView)findViewById(R.id.preview);
-
-                imageView.setImageBitmap(bitmap);
-
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            catch (Exception ex)
-            {
-                ex.printStackTrace();
             }
-        }*/
+            //if taking pic from camera selected
+            else if(requestCode==REQUEST_IMAGE_CAPTURE && resultCode== RESULT_OK && data!=null)
+            {
+                try {
+                    Bundle extras = data.getExtras();
+                    if(extras.get("data")!=null) {
+                        Bitmap bitmap = (Bitmap) extras.get("data");
+                        preview.setImageBitmap(bitmap);
+                        mArrayUri.clear();
+                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                        if (bytes!=null)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                        String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
+                        mArrayUri.add(Uri.parse(path));
+                    }
+                } catch (Exception ex)
+                {ex.printStackTrace();}
+            }
+            else {
+                Toast.makeText(this, "You haven't picked Image",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.user_menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.logout: {
+                final AlertDialog dialog=new AlertDialog.Builder(AddPlant.this).create();
+                dialog.setTitle("Logout");
+                dialog.setMessage("Are you sure?");
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Utils.mAuth.signOut();
+                        Intent intent=new Intent(AddPlant.this,LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,"No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+                break;
+            }
+
+            default:
+                break;
+        }
+        return true;
+    }
 }

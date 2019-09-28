@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MyPlants</string>
     <string name="splash_app_name">My Plants</string>
+    <string name="add_plant_activity_name">Add Plants</string>
+    <string name="user_menu_settings">Settings</string>
+    <string name="user_menu_logout">Logout</string>
 </resources>
