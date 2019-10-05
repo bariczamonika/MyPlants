@@ -1,275 +1,157 @@
 package ie.dbs.myplants;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.Date;
 
 public class AddPlant extends AppCompatActivity {
-    private Button takePicture;
-    private Button addFromGallery;
-    private Button save;
-    private Button cancel;
-    public static final int PICK_IMAGE_FROM_GALLERY=5;
-    public static final int REQUEST_IMAGE_CAPTURE=6;
-    private ArrayList<Uri> mArrayUri;
-    private String imageEncoded;
-    private ImageView preview;
-    int index=0;
 
+    //TODO recyclerview
+    //TODO save plant to database
+    //TODO view single plant
+    //TODO fertalizing 1 week, 2 weeks, 3 weeks, monthly, 6 weeks, 2 months
+    //TODO light conditions south facing, east facing, very sunny, sunny, shady
+    private EditText edit_text_plant_name;
+    private EditText edit_text_plant_description;
+    private EditText edit_text_plant_notes;
+    private Button btn_add_pic_to_plant;
+    private Button btn_plant_submit;
+    private Spinner spinner_watering_needs;
+    private Spinner spinner_fertilizing_needs;
+    private Spinner spinner_light_conditions;
+    private RadioGroup radioGroup_outdoor_plant;
+    private RadioButton radioButton_outdoor_plant_yes;
+    private RadioButton radioButton_outdoor_plant_no;
+    private String plant_name;
+    private String plant_description;
+    private String plant_notes;
+    private double plant_watering_needs;
+    private double plant_fertilizing_needs;
+    private Light_Condition plant_light_conditions;
+    private boolean plant_outdoor_plant;
+    private ImageView img_view_plant_profile_preview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_plant);
-        takePicture=findViewById(R.id.takePictureButton);
-        addFromGallery= findViewById(R.id.chooseFromGalleryButton);
-        preview=findViewById(R.id.preview);
-        mArrayUri=new ArrayList<>();
-        save=findViewById(R.id.saveImages);
-        cancel=findViewById(R.id.cancel);
+        setContentView(R.layout.activity_add_plant2);
+        edit_text_plant_name=(EditText)findViewById(R.id.edit_text_plant_name);
+        edit_text_plant_description=(EditText)findViewById(R.id.edit_text_plant_description);
+        edit_text_plant_notes=(EditText)findViewById(R.id.edit_text_plant_notes);
+        btn_add_pic_to_plant=(Button)findViewById(R.id.btn_add_profile_pic);
+        btn_plant_submit=(Button)findViewById(R.id.btn_plant_submit);
+        spinner_watering_needs=(Spinner)findViewById(R.id.spinner_watering_needs);
+        spinner_fertilizing_needs=(Spinner)findViewById(R.id.spinner_fertilizing_needs);
+        spinner_light_conditions=(Spinner)findViewById(R.id.spinner_light_conditions);
+        radioGroup_outdoor_plant=(RadioGroup)findViewById(R.id.radio_group_outdoor_plant);
+        radioButton_outdoor_plant_yes=(RadioButton)findViewById(R.id.radio_button_yes);
+        radioButton_outdoor_plant_no=(RadioButton)findViewById(R.id.radio_button_no);
+        img_view_plant_profile_preview=(ImageView)findViewById(R.id.img_view_plant_profile_preview);
+        plant_light_conditions=Light_Condition.Sunny;
+        setSpinners();
 
-        Utils.AskForPermission(Manifest.permission.CAMERA, AddPlant.this);
-        addFromGallery.setOnClickListener(new View.OnClickListener() {
+        btn_add_pic_to_plant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, AddPlant.this);
-                Intent intent=new Intent();
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_FROM_GALLERY);
+                Utils.temporary_plant=AddPlant();
+                Intent intent=new Intent(AddPlant.this, AddPictureToPlant.class);
+                startActivity(intent);
             }
         });
 
-        takePicture.setOnClickListener(new View.OnClickListener() {
+        btn_plant_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if(ContextCompat.checkSelfPermission(Utils.applicationContext, Manifest.permission.CAMERA)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                }
-
+                Plant myPlant=AddPlant();
+                Utils.databaseReference.push().setValue(myPlant); //pushing plant to db
             }
         });
-
-        preview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int size=mArrayUri.size();
-                //int index=0;
-                if(size>0) {
-                    if ((size > 1) && (index < size-1)) {
-                        index++;
-                    }
-                    else if((size>1)&& (index==size-1)) {
-                        index=0;
-                    }
-                    try {
-                        InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(index));
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        preview.setImageBitmap(bitmap);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                else Toast.makeText(AddPlant.this, "Please select an image first", Toast.LENGTH_SHORT).show();
-
-
-            }
-        });
-
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Utils.AskForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,AddPlant.this);
-                for(int i=0;i<mArrayUri.size();i++)
-                {
-                    try {
-                        InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(i));
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        Utils.createDirectoryAndSaveFile(bitmap);
-                    }
-                    catch (Exception ex)
-                    {ex.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Couldn't save picture", Toast.LENGTH_SHORT).show();}
-                }
-
-            }
-        });
-
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final AlertDialog dialog=new AlertDialog.Builder(AddPlant.this).create();
-                dialog.setTitle("Are you sure?");
-                dialog.setMessage("Cancel saving pictures?");
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(AddPlant.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,"No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialog.dismiss();                 }
-                });
-                dialog.show();
-            }
-        });
-
-
-
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onResume() {
+        super.onResume();
         try {
-            //if picking image from gallery selected
-            if (requestCode == PICK_IMAGE_FROM_GALLERY && resultCode == RESULT_OK
-                    && null != data) {
-                try {
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                    if (data.getData() != null) {
-                        mArrayUri.clear();
-                        Uri ImageUri = data.getData();
-                        mArrayUri.add(ImageUri);
-                        Cursor cursor = getContentResolver().query(ImageUri, filePathColumn, null, null, null);
-                        if(cursor!=null)
-                        cursor.moveToFirst();
-                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        imageEncoded = cursor.getString(columnIndex);
-                        cursor.close();
-                        Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
-                        preview.setImageBitmap(bitmap);
-                    } else {
-                        if (data.getClipData() != null) {
-                            ClipData mClipData = data.getClipData();
-                            mArrayUri.clear();
-                            for (int i = 0; i < mClipData.getItemCount(); i++) {
+            String[] stringArray=getIntent().getStringArrayExtra("image");
+            File imgFile = new  File(stringArray[0]);
+            if(imgFile.exists()){
 
-                                ClipData.Item item = mClipData.getItemAt(i);
-                                Uri uri = item.getUri();
-                                mArrayUri.add(uri);
-                                Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-                                if(cursor!=null)
-                                cursor.moveToFirst();
-                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                imageEncoded = cursor.getString(columnIndex);
-                                cursor.close();
-                                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(0));
-                                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                preview.setImageBitmap(bitmap);
+                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                img_view_plant_profile_preview.setImageBitmap(bitmap);
+            }
 
-                            }
-                            Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            //if taking pic from camera selected
-            else if(requestCode==REQUEST_IMAGE_CAPTURE && resultCode== RESULT_OK && data!=null)
-            {
-                try {
-                    Bundle extras = data.getExtras();
-                    if(extras.get("data")!=null) {
-                        Bitmap bitmap = (Bitmap) extras.get("data");
-                        preview.setImageBitmap(bitmap);
-                        mArrayUri.clear();
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        if (bytes!=null)
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                        String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
-                        mArrayUri.add(Uri.parse(path));
-                    }
-                } catch (Exception ex)
-                {ex.printStackTrace();}
-            }
-            else {
-                Toast.makeText(this, "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
-        }
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.user_menu, menu);
-        return true;
-    }
+            setSpinners();
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId())
+            if (Utils.temporary_plant != null) {
+                edit_text_plant_name.setText(Utils.temporary_plant.getName());
+                edit_text_plant_notes.setText(Utils.temporary_plant.getNotes());
+                edit_text_plant_description.setText(Utils.temporary_plant.getDescription());
+                if (Utils.temporary_plant.getWateringNeeds() != 0.5)
+                    spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().intValue());
+                else
+                    spinner_watering_needs.setSelection(0);
+                if (Utils.temporary_plant.getFertilizingNeeds() != 0.5)
+                    spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().intValue());
+                else
+                    spinner_fertilizing_needs.setSelection(0);
+
+                spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
+                if(Utils.temporary_plant.isOutdoorPlant())
+                    radioButton_outdoor_plant_yes.setChecked(true);
+                else if(!Utils.temporary_plant.isOutdoorPlant())
+                    radioButton_outdoor_plant_no.setChecked(true);
+                else
+                    radioGroup_outdoor_plant.clearCheck();
+            }
+        }catch (Exception ex)
         {
-            case R.id.logout: {
-                final AlertDialog dialog=new AlertDialog.Builder(AddPlant.this).create();
-                dialog.setTitle("Logout");
-                dialog.setMessage("Are you sure?");
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Utils.mAuth.signOut();
-                        Intent intent=new Intent(AddPlant.this,LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,"No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                break;
-            }
-
-            default:
-                break;
+            Log.v("Error adding plant",ex.getMessage());
         }
-        return true;
+    }
+
+    private void setSpinners()
+    {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.plant_watering_needs_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_watering_needs.setAdapter(adapter);
+        spinner_fertilizing_needs.setAdapter(adapter);
+        ArrayAdapter<CharSequence> adapter1=new ArrayAdapter<CharSequence>(this,
+                R.layout.support_simple_spinner_dropdown_item, Utils.getLightConditionNames());
+        spinner_light_conditions.setAdapter(adapter1);
+    }
+
+    protected Plant AddPlant()
+    {
+        plant_name=edit_text_plant_name.getText().toString();
+        plant_description=edit_text_plant_description.getText().toString();
+        plant_notes=edit_text_plant_notes.getText().toString();
+        plant_watering_needs=Utils.convertSpinnerValueToInteger(spinner_watering_needs.getSelectedItem().toString());
+        plant_fertilizing_needs=Utils.convertSpinnerValueToInteger(spinner_fertilizing_needs.getSelectedItem().toString());
+        if(spinner_light_conditions.isSelected())
+            plant_light_conditions=Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString());
+        if(radioButton_outdoor_plant_yes.isChecked())
+            plant_outdoor_plant=true;
+        else if(radioButton_outdoor_plant_no.isChecked())
+            plant_outdoor_plant=false;
+        Plant myPlant=new Plant(plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
+                plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions);
+        return myPlant;
     }
 }

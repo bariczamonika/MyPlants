@@ -4,4 +4,53 @@
     <string name="add_plant_activity_name">Add Plants</string>
     <string name="user_menu_settings">Settings</string>
     <string name="user_menu_logout">Logout</string>
+    <string name="submit_button">Submit</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
+
+    //Login Activity
+    <string name="login_email">Email Address</string>
+    <string name="login_password">Password</string>
+    <string name="login_submit_button">Login</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_register">Register</string>
+
+    //Add picture to plant activity
+
+    <string name="pic_choose_from_gallery">Choose from gallery</string>
+    <string name="pic_take_picture">Take picture</string>
+    <string name="pic_save_image">Save image(s)</string>
+
+
+    //Add plant activity
+    <string name="plant_name">Plant\'s name</string>
+    <string name="plant_description">Description</string>
+    <string name="plant_watering_needs">How often your plant needs watering?</string>
+    <string name="plant_fertilizing_needs">How often your plant needs fertilising?</string>
+    <string name="plant_light_conditions">What light conditions does this plant prefer?</string>
+    <string name="plant_outdoor_plant">Is this an outdoor plant?</string>
+    <string name="plant_add_plant_title">Add a plant</string>
+    <string name="plant_notes">Notes</string>
+    <string-array name="plant_watering_needs_array">
+        <item>Twice daily</item>
+        <item>Daily</item>
+        <item>Every 2 days</item>
+        <item>Every 3 days</item>
+        <item>Every 4 days</item>
+        <item>Every 5 days</item>
+        <item>Every 6 days</item>
+        <item>Weekly</item>
+        <item>Every 8 days</item>
+        <item>Every 9 days</item>
+        <item>Every 10 days</item>
+        <item>Every 11 days</item>
+        <item>Every 12 days</item>
+        <item>Every 13 days</item>
+        <item>Every 2 weeks</item>
+        <item>Custom options</item>
+    </string-array>
+    <string name="plant_add_profile_picture">Add profile picture</string>
+
+
 </resources>

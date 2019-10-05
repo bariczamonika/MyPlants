@@ -23,11 +23,14 @@ import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,10 +39,9 @@ public class Utils {
     public static FirebaseAuth mAuth;
     public static int MyVersion;
     public static Context applicationContext;
-    public static boolean result=false;
-
-
-
+    public static FirebaseDatabase firebaseDatabase;
+    public static DatabaseReference databaseReference;
+    public static Plant temporary_plant;
 
     //asks for permission on SDK>16
     public static void AskForPermission(String myPermission, Activity whichActivity)
@@ -55,19 +57,19 @@ public class Utils {
     }
 
     //create custom directory and save file
-    public static void createDirectoryAndSaveFile(Bitmap imageToSave/*, String fileName*/) {
+    public static String createDirectoryAndSaveFile(Bitmap imageToSave, Context context) {
 
-       // int number=0;
-        File homeDirectory=new File(Environment.getDataDirectory() + "/MyPlants");
+        File homeDirectory=new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
         if (!homeDirectory.exists()) {
-            File plantDirectory = new File(Environment.getDownloadCacheDirectory().getPath() + "/MyPlants/");
+            File plantDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
             plantDirectory.mkdirs();
         }
-        File myFile=new File(Environment.getDownloadCacheDirectory().getPath() + "/MyPlants/");
+        File myFile=new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
 
-        String timestamp=SimpleDateFormat.getDateInstance().format(new Date());
+        String timestamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File file = new File(myFile, "picture"+
                 timestamp+".jpeg");
+        String imagePath=file.getAbsolutePath();
         if (file.exists()) {
             file.delete();
         }
@@ -76,7 +78,8 @@ public class Utils {
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
-            MediaScannerConnection.scanFile(applicationContext,
+            //TODO check mediascanner it's not showing in gallery
+            MediaScannerConnection.scanFile(context,
                     new String[] { file.toString() }, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
                         public void onScanCompleted(String path, Uri uri) {
@@ -88,6 +91,7 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return imagePath;
     }
 
     //validate login form
@@ -150,4 +154,33 @@ public class Utils {
 
         return valid;
     }
+
+    //convert spinners to integer values
+    public static double convertSpinnerValueToInteger(String spinnerValue)
+    {
+        String[] stringValues= applicationContext.getResources().getStringArray(R.array.plant_watering_needs_array);
+        double value=0;
+
+        for (int i=1;i<16;i++) {
+            if(stringValues[i].equals(spinnerValue))
+            {
+                value=i;
+                break;
+            }
+            else
+            {
+                value=0.5;
+            }
+        }
+
+        return value;
+    }
+
+    //convert Light condition enum to string array for spinners
+    public static String[] getLightConditionNames() {
+        return Arrays.toString(Light_Condition.values()).
+                replace('[',' ').replace(']',' ').split(", ");
+    }
+
+
 }
