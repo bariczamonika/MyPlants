@@ -52,5 +52,6 @@
     </string-array>
     <string name="plant_add_profile_picture">Add profile picture</string>
 
-
+//Mainactivity
+    <string name="all_my_plants">My Plants</string>
 </resources>

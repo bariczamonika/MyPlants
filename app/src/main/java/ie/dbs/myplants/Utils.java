@@ -8,6 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +21,7 @@ import android.telephony.emergency.EmergencyNumber;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -187,38 +193,38 @@ public class Utils {
                 replace('[',' ').replace(']',' ').split(", ");
     }
 
-    //check how many plants in db for plantID
-    public static void setPlantIterator()
-    {
-        try {
-            String userID=user.getUid();
-            DatabaseReference plantListRef = databaseReference.child("users").child(userID);
 
-            ValueEventListener valueEventListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    plantIterator = (int) dataSnapshot.getChildrenCount();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.v("database error", databaseError.getMessage());
-                }
-            };
-            plantListRef.addListenerForSingleValueEvent(valueEventListener);
-
-        }catch (NullPointerException ex)
-        {
-            Log.v("Null reference in DB", ex.getMessage());
-            plantIterator=0;
-        }
-    }
-
+    //push pictures to database
 public static void PushPicToDB(String plantID, boolean featured, String imagePath)
 {
     String userID=Utils.user.getUid();
     PlantImage plantImage=new PlantImage(imagePath,featured);
     Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).child("images").setValue(plantImage);
+}
+
+//retrieve image from saved position
+public static void getImageFromFile(String path, ImageView view)
+{
+    if(!path.equals("")) {
+        File imgFile = new File(path);
+        if (imgFile.exists()) {
+
+            Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            if(bitmap.getHeight()>bitmap.getWidth())
+            view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 90,
+                    120,false));
+            else
+                view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 120,
+                        80,false));
+        }
+    }
+    else
+    {
+        Drawable drawable=applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
+        Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+        view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 120,80,false));
+    }
+
 }
 
 

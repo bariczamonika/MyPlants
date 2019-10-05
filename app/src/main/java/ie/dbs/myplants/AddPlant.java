@@ -54,6 +54,7 @@ public class AddPlant extends AppCompatActivity {
     private Light_Condition plant_light_conditions;
     private boolean plant_outdoor_plant;
     private ImageView img_view_plant_profile_preview;
+    private String[] imgProfilePath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,13 +136,8 @@ public class AddPlant extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try {
-            String[] stringArray=getIntent().getStringArrayExtra("image");
-            File imgFile = new  File(stringArray[0]);
-            if(imgFile.exists()){
-
-                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                img_view_plant_profile_preview.setImageBitmap(bitmap);
-            }
+            imgProfilePath=getIntent().getStringArrayExtra("image");
+            Utils.getImageFromFile(imgProfilePath[0], img_view_plant_profile_preview);
 
             setSpinners();
 
@@ -205,8 +201,12 @@ public class AddPlant extends AppCompatActivity {
 
     private void addPlant(String plantID) {
         Plant myPlant=savePlantDetails();
+        if(imgProfilePath==null)
+            imgProfilePath=new String[]{""};
+        PlantAndProfilePic plantAndProfilePic=new PlantAndProfilePic(plant_name,imgProfilePath[0]);
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).setValue(myPlant);
+        Utils.databaseReference.child("users").child(userID).child("plantsAndPics").child(plantID).setValue(plantAndProfilePic);
     }
 
 

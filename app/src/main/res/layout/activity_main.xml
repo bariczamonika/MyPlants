@@ -10,14 +10,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/background_image">
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_plant_activity_name"
-        android:layout_marginTop="50dp"
-        android:id="@+id/addPlant"/>
+        android:layout_marginTop="10dp"
+        android:id="@+id/addPlant"
+        android:layout_marginRight="20sp"
+        android:layout_marginLeft="20sp"
+        android:textSize="15sp"
+        android:background="@drawable/rounded_edittext"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/all_my_plants"
+            android:fontFamily="cursive"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"/>
     </LinearLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/my_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:layout_marginTop="100sp"
+
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
