@@ -31,9 +31,7 @@ import java.util.Date;
 public class AddPlant extends AppCompatActivity {
 
     //TODO recyclerview
-    //TODO save plant to database
     //TODO view single plant
-    //TODO fertalizing 1 week, 2 weeks, 3 weeks, monthly, 6 weeks, 2 months
     //TODO light conditions south facing, east facing, very sunny, sunny, shady
     private EditText edit_text_plant_name;
     private EditText edit_text_plant_description;
@@ -128,6 +126,7 @@ public class AddPlant extends AppCompatActivity {
                 Intent intent=new Intent(AddPlant.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+                Utils.temporary_plant=null;
             }
         });
     }
@@ -149,11 +148,7 @@ public class AddPlant extends AppCompatActivity {
                     spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().intValue());
                 else
                     spinner_watering_needs.setSelection(0);
-                if (Utils.temporary_plant.getFertilizingNeeds() != 0.5)
                     spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().intValue());
-                else
-                    spinner_fertilizing_needs.setSelection(0);
-
                 spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
                 if(Utils.temporary_plant.isOutdoorPlant())
                     radioButton_outdoor_plant_yes.setChecked(true);
@@ -167,14 +162,17 @@ public class AddPlant extends AppCompatActivity {
             Log.v("Error adding plant",ex.getMessage());
         }
     }
-
+//TODO delete picture from phone if submit button not pressed
     private void setSpinners()
     {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.plant_watering_needs_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_watering_needs.setAdapter(adapter);
-        spinner_fertilizing_needs.setAdapter(adapter);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+                R.array.plant_fertilizing_needs_array, android.R.layout.simple_spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_fertilizing_needs.setAdapter(adapter2);
         ArrayAdapter<CharSequence> adapter1=new ArrayAdapter<CharSequence>(this,
                 R.layout.support_simple_spinner_dropdown_item, Utils.getLightConditionNames());
         spinner_light_conditions.setAdapter(adapter1);
@@ -185,8 +183,8 @@ public class AddPlant extends AppCompatActivity {
         plant_name=edit_text_plant_name.getText().toString();
         plant_description=edit_text_plant_description.getText().toString();
         plant_notes=edit_text_plant_notes.getText().toString();
-        plant_watering_needs=Utils.convertSpinnerValueToInteger(spinner_watering_needs.getSelectedItem().toString());
-        plant_fertilizing_needs=Utils.convertSpinnerValueToInteger(spinner_fertilizing_needs.getSelectedItem().toString());
+        plant_watering_needs=Utils.convertWateringSpinnerValueToInteger(spinner_watering_needs.getSelectedItem().toString());
+        plant_fertilizing_needs=Utils.convertFertilizingSpinnerValueToInteger(spinner_fertilizing_needs.getSelectedItem().toString());
         if(spinner_light_conditions.isSelected())
             plant_light_conditions=Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString());
         if(radioButton_outdoor_plant_yes.isChecked())

@@ -110,7 +110,6 @@ public class AddPictureToPlant extends AppCompatActivity {
             }
         });
 
-        //TODO save pictures only when plant is added
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

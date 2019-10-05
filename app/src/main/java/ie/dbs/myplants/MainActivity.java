@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adapter.notifyDataSetChanged();
+                //adapter.notifyDataSetChanged();
                 Intent intent = new Intent(MainActivity.this, AddPlant.class);
                 startActivity(intent);
                 finish();

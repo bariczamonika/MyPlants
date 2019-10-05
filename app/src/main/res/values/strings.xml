@@ -50,6 +50,16 @@
         <item>Every 2 weeks</item>
         <item>Custom options</item>
     </string-array>
+    <string-array name="plant_fertilizing_needs_array">
+        <item>Never</item>
+        <item>Weekly</item>
+        <item>Every two weeks</item>
+        <item>Every three weeks</item>
+        <item>Every month</item>
+        <item>Every 6 weeks</item>
+        <item>Every 2 months</item>
+        <item>Custom options</item>
+    </string-array>
     <string name="plant_add_profile_picture">Add profile picture</string>
 
 //Mainactivity

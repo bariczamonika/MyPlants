@@ -167,7 +167,7 @@ public class Utils {
     }
 
     //convert spinners to integer values
-    public static double convertSpinnerValueToInteger(String spinnerValue)
+    public static double convertWateringSpinnerValueToInteger(String spinnerValue)
     {
         String[] stringValues= applicationContext.getResources().getStringArray(R.array.plant_watering_needs_array);
         double value=0;
@@ -187,10 +187,33 @@ public class Utils {
         return value;
     }
 
+    //TODO do watering and fertilizing values with enums?
+    //convert spinners to integer values
+    public static double convertFertilizingSpinnerValueToInteger(String spinnerValue)
+    {
+        String[] stringValues= applicationContext.getResources().getStringArray(R.array.plant_fertilizing_needs_array);
+        double value=0;
+
+        for (int i=1;i<8;i++) {
+            if(stringValues[i].equals(spinnerValue))
+            {
+                value=i;
+                break;
+            }
+            else {
+                    value=0;
+            }
+
+            }
+        return value;
+    }
+
+    //TODO split two words in enum
     //convert Light condition enum to string array for spinners
     public static String[] getLightConditionNames() {
         return Arrays.toString(Light_Condition.values()).
-                replace('[',' ').replace(']',' ').split(", ");
+                replace('[',' ').replace(']',' ')
+                .replace('_', ' ').split(", ");
     }
 
 

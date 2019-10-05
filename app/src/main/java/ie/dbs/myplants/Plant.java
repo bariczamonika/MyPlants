@@ -3,7 +3,7 @@ package ie.dbs.myplants;
 import java.util.Date;
 
 enum Light_Condition {
-    Sunny(0), Shady(1), Dark(2);
+    Very_sunny(0),Sunny(1), Shady(2), South_facing(3), East_facing(4);
     public final int value;
     Light_Condition(int value) { this.value = value; }
 
