@@ -144,7 +144,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                 dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(AddPictureToPlant.this, MainActivity.class);
+                        Intent intent=new Intent(AddPictureToPlant.this, AddPlant.class);
                         startActivity(intent);
                         finish();
                     }
@@ -186,25 +186,42 @@ public class AddPictureToPlant extends AppCompatActivity {
                         preview.setImageBitmap(bitmap);
                     } else {
                         if (data.getClipData() != null) {
-                            ClipData mClipData = data.getClipData();
-                            mArrayUri.clear();
-                            for (int i = 0; i < mClipData.getItemCount(); i++) {
+                            boolean isProfile = getIntent().getBooleanExtra("IsProfilePicture", true);
+                            if (!isProfile) {
+                                ClipData mClipData = data.getClipData();
+                                mArrayUri.clear();
+                                for (int i = 0; i < mClipData.getItemCount(); i++) {
 
-                                ClipData.Item item = mClipData.getItemAt(i);
-                                Uri uri = item.getUri();
-                                mArrayUri.add(uri);
-                                Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-                                if(cursor!=null)
-                                cursor.moveToFirst();
-                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                imageEncoded = cursor.getString(columnIndex);
-                                cursor.close();
-                                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(0));
-                                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                preview.setImageBitmap(bitmap);
+                                    ClipData.Item item = mClipData.getItemAt(i);
+                                    Uri uri = item.getUri();
+                                    mArrayUri.add(uri);
+                                    Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
+                                    if (cursor != null)
+                                        cursor.moveToFirst();
+                                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                    imageEncoded = cursor.getString(columnIndex);
+                                    cursor.close();
+                                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(0));
+                                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                    preview.setImageBitmap(bitmap);
 
+                                }
+                                Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
                             }
-                            Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
+                        }
+                        else
+                        {
+                            AlertDialog alertDialog=new AlertDialog.Builder(AddPictureToPlant.this).create();
+                            alertDialog.setTitle("Alert");
+                            alertDialog.setMessage("You can only select one picture as a profile picture");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            alertDialog.show();
+
                         }
                     }
                 } catch (Exception ex) {

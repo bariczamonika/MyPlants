@@ -1,5 +1,7 @@
 package ie.dbs.myplants;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,6 +18,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import java.io.File;
 import java.util.Arrays;
@@ -66,10 +73,39 @@ public class AddPlant extends AppCompatActivity {
         plant_light_conditions=Light_Condition.Sunny;
         setSpinners();
 
+        String userID=Utils.user.getUid();
+        DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID);
+        plantListRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Utils.plantIterator=(int)dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         btn_add_pic_to_plant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Utils.temporary_plant=AddPlant();
+                Utils.temporary_plant=savePlantDetails();
                 Intent intent=new Intent(AddPlant.this, AddPictureToPlant.class);
                 startActivity(intent);
             }
@@ -78,8 +114,19 @@ public class AddPlant extends AppCompatActivity {
         btn_plant_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Plant myPlant=AddPlant();
-                Utils.databaseReference.push().setValue(myPlant); //pushing plant to db
+                if(Utils.plantIterator==null)
+                    Utils.plantIterator=0;
+                addPlant(Utils.plantIterator.toString());
+                String[] stringArray=getIntent().getStringArrayExtra("image");
+                if(getIntent().getStringArrayExtra("image")!=null)
+                {
+                    Utils.PushPicToDB(Utils.plantIterator.toString(), true, stringArray[0]);
+                }
+                Utils.plantIterator++;
+                Toast.makeText(AddPlant.this, "Plant saved successfully", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(AddPlant.this, MainActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
@@ -137,7 +184,7 @@ public class AddPlant extends AppCompatActivity {
         spinner_light_conditions.setAdapter(adapter1);
     }
 
-    protected Plant AddPlant()
+    private Plant savePlantDetails()
     {
         plant_name=edit_text_plant_name.getText().toString();
         plant_description=edit_text_plant_description.getText().toString();
@@ -154,4 +201,14 @@ public class AddPlant extends AppCompatActivity {
                 plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions);
         return myPlant;
     }
+
+
+    private void addPlant(String plantID) {
+        Plant myPlant=savePlantDetails();
+        String userID=Utils.user.getUid();
+        Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).setValue(myPlant);
+    }
+
+
+
 }

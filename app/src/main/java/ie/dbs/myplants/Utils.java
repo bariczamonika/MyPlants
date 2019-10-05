@@ -18,13 +18,17 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,6 +46,7 @@ public class Utils {
     public static FirebaseDatabase firebaseDatabase;
     public static DatabaseReference databaseReference;
     public static Plant temporary_plant;
+    public static Integer plantIterator;
 
     //asks for permission on SDK>16
     public static void AskForPermission(String myPermission, Activity whichActivity)
@@ -181,6 +186,40 @@ public class Utils {
         return Arrays.toString(Light_Condition.values()).
                 replace('[',' ').replace(']',' ').split(", ");
     }
+
+    //check how many plants in db for plantID
+    public static void setPlantIterator()
+    {
+        try {
+            String userID=user.getUid();
+            DatabaseReference plantListRef = databaseReference.child("users").child(userID);
+
+            ValueEventListener valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    plantIterator = (int) dataSnapshot.getChildrenCount();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.v("database error", databaseError.getMessage());
+                }
+            };
+            plantListRef.addListenerForSingleValueEvent(valueEventListener);
+
+        }catch (NullPointerException ex)
+        {
+            Log.v("Null reference in DB", ex.getMessage());
+            plantIterator=0;
+        }
+    }
+
+public static void PushPicToDB(String plantID, boolean featured, String imagePath)
+{
+    String userID=Utils.user.getUid();
+    PlantImage plantImage=new PlantImage(imagePath,featured);
+    Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).child("images").setValue(plantImage);
+}
 
 
 }
