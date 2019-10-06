@@ -19,20 +19,28 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class SinglePlant extends AppCompatActivity {
     private Plant myPlant;
     private TextView plant_name;
     private ImageView plant_images;
     private Button add_pic;
-    private PlantImage plantImage=new PlantImage();
+    private TextView picture_date;
+    private List<String> plantImages=new ArrayList<>();
+    private Map<String, String> plantImagesMap;
+    int index=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_plant);
         add_pic=findViewById(R.id.single_add_pic);
+        plant_images=findViewById(R.id.single_images);
+        picture_date=findViewById(R.id.picture_date);
         final String plantID=getIntent().getStringExtra("plantID");
         String userID = Utils.user.getUid();
+
+
         final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants").child(plantID);
         plantListRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -52,25 +60,47 @@ public class SinglePlant extends AppCompatActivity {
             }
         });
 
-        //TODO how to retrieve pics from db without an id?
+
+        //TODO something is wrong some pics are duplicates maybe the stringarray the intent sends back?
         final DatabaseReference plantImagesRef = Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).child("images");
         plantImagesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                plantImages.clear();
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
-                    String plantImageID=plantSnapshot.getKey();
-                    Log.v("plantImageID", plantImageID);
-                  /*  plantImage=dataSnapshot.getValue(PlantImage.class);
-                    Log.v("plantImage", plantImage.getPicturePath());
-                    plant_images=findViewById(R.id.single_images);
-                    Utils.getImageFromFile(plantImage.getPicturePath(),plant_images);*/
-                }
 
+                    PlantImage plantImage=plantSnapshot.getValue(PlantImage.class);
+                    plantImages.add(plantImage.getPicturePath());
+                    String picName=Utils.getPictureDateFromPicturePath(plantImage.getPicturePath());
+                    picture_date.setText(picName);
+                   // Log.v("plantImageID", plantImageID);
+                  /*  plantImage=dataSnapshot.getValue(PlantImage.class);
+                    Log.v("plantImage", plantImage.getPicturePath());*/
+
+                    Utils.getImageFromFile(plantImages.get(0),plant_images);
+                    index=0;
+                    Log.v("plantImagePaths", plantImages.toString());
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.v("Error retrieving plant", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+        plant_images.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (plantImages!=null)
+                {
+                    int size=plantImages.size();
+                    if(size>index+1)
+                        index=index+1;
+                    else if(size==index+1)
+                        index=0;
+                    Utils.getImageFromFile(plantImages.get(index), plant_images);
+                }
             }
         });
 
@@ -97,7 +127,10 @@ public class SinglePlant extends AppCompatActivity {
         if(stringArray!=null)
         {
             for (int i=0;i<stringArray.length;i++)
-            Utils.PushPicToDB(plantID, false, stringArray[i]);
+            Utils.PushPicToDB(plantID, stringArray[i]);
         }
     }
+
+
+
 }

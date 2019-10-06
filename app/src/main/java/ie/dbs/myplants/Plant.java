@@ -9,7 +9,7 @@ enum Light_Condition {
 
 }
 
-//TODO add profile pic image to java class
+
 public class Plant {
     private String plantID;
     private String name;
@@ -23,12 +23,14 @@ public class Plant {
     private Date lastReplanted;
     private boolean outdoorPlant;
     private Light_Condition lightCondition;
+    private String profilePicPath;
 
     public Plant() {
 
     }
 
-    public Plant(String plantID, String name, String description, Date dateAdded, String notes, Double wateringNeeds, Double fertilizingNeeds,  boolean outdoorPlant, Light_Condition lightCondition) {
+    public Plant(String plantID, String name, String description, Date dateAdded, String notes, Double wateringNeeds,
+                 Double fertilizingNeeds,  boolean outdoorPlant, Light_Condition lightCondition, String profilePicPath) {
         this.plantID=plantID;
         this.name = name;
         this.description = description;
@@ -38,6 +40,16 @@ public class Plant {
         this.fertilizingNeeds = fertilizingNeeds;
         this.outdoorPlant = outdoorPlant;
         this.lightCondition = lightCondition;
+        this.profilePicPath=profilePicPath;
+
+    }
+
+    public String getProfilePicPath() {
+        return profilePicPath;
+    }
+
+    public void setProfilePicPath(String profilePicPath) {
+        this.profilePicPath = profilePicPath;
     }
 
     public String getPlantID() {

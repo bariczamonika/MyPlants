@@ -45,7 +45,7 @@ public class AddPictureToPlant extends AppCompatActivity {
     private String plantID;
     int index=0;
 
-
+//TODO take out multiple images
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,7 +147,6 @@ public class AddPictureToPlant extends AppCompatActivity {
             }
         });
 
-        //TODO if youre going back to single plant
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -197,6 +196,9 @@ public class AddPictureToPlant extends AppCompatActivity {
                         imageEncoded = cursor.getString(columnIndex);
                         cursor.close();
                         Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
+                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                        if (bytes!=null)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
                         preview.setImageBitmap(bitmap);
                     } else {
                         if (!isProfilePic) {

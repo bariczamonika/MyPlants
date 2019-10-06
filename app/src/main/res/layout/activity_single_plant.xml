@@ -35,6 +35,11 @@
             android:layout_marginRight="10dp"
             android:id="@+id/single_images"
             />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/picture_date"
+            android:textColor="@color/colorWhite"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

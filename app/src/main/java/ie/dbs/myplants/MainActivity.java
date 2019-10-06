@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private Button addPlantButton;
     protected AlertDialog alertDialog;
     private ArrayList<Object> plants = new ArrayList<>();
-    FirebaseRecyclerOptions<PlantAndProfilePic> options;
-    FirebaseRecyclerAdapter<PlantAndProfilePic, PlantRecyclerAdapter> adapter;
+    FirebaseRecyclerOptions<Plant> options;
+    FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter> adapter;
     RecyclerView recyclerView;
 
 
@@ -63,13 +63,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         String userID = Utils.user.getUid();
-        final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plantsAndPics");
+        final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
         plantListRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 displayPlants();
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
-                    PlantAndProfilePic myPlant = plantSnapshot.getValue(PlantAndProfilePic.class);
+                    Plant myPlant = plantSnapshot.getValue(Plant.class);
                     plants.add(myPlant);
                 }
 
@@ -127,14 +127,14 @@ public class MainActivity extends AppCompatActivity {
     private void displayPlants()
     {
         String userID = Utils.user.getUid();
-        final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plantsAndPics");
-        options = new FirebaseRecyclerOptions.Builder<PlantAndProfilePic>()
-                .setQuery(plantListRef, PlantAndProfilePic.class).build();
-        adapter = new FirebaseRecyclerAdapter<PlantAndProfilePic, PlantRecyclerAdapter>(options) {
+        final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
+        options = new FirebaseRecyclerOptions.Builder<Plant>()
+                .setQuery(plantListRef, Plant.class).build();
+        adapter = new FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull PlantRecyclerAdapter holder, int position, @NonNull PlantAndProfilePic model) {
-                        holder.txt_name.setText(model.getPlantName());
-                        String myPath = model.getPath();
+                    protected void onBindViewHolder(@NonNull PlantRecyclerAdapter holder, int position, @NonNull Plant model) {
+                        holder.txt_name.setText(model.getName());
+                        String myPath = model.getProfilePicPath();
                         Utils.getImageFromFile(myPath, holder.img_avatar);
                         holder.plantID=model.getPlantID();
 

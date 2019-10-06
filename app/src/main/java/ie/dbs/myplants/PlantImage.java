@@ -5,14 +5,12 @@ import java.util.Date;
 
 public class PlantImage {
     private String picturePath;
-    private boolean featured;
 
     public PlantImage()
     {}
 
-    public PlantImage(String picturePath, boolean featured) {
+    public PlantImage(String picturePath) {
         this.picturePath = picturePath;
-        this.featured = featured;
     }
 
     public String getPicturePath() {
@@ -25,11 +23,4 @@ public class PlantImage {
         this.picturePath = picturePath;
     }
 
-    public boolean isFeatured() {
-        return featured;
-    }
-
-    public void setFeatured(boolean featured) {
-        this.featured = featured;
-    }
 }

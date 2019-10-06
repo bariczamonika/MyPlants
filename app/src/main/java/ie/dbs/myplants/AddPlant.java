@@ -30,9 +30,7 @@ import java.util.Date;
 
 public class AddPlant extends AppCompatActivity {
 
-    //TODO recyclerview
     //TODO view single plant
-    //TODO light conditions south facing, east facing, very sunny, sunny, shady
     private EditText edit_text_plant_name;
     private EditText edit_text_plant_description;
     private EditText edit_text_plant_notes;
@@ -120,7 +118,7 @@ public class AddPlant extends AppCompatActivity {
                 String[] stringArray=getIntent().getStringArrayExtra("image");
                 if(getIntent().getStringArrayExtra("image")!=null)
                 {
-                    Utils.PushPicToDB(Utils.plantIterator.toString(), true, stringArray[0]);
+                    Utils.PushPicToDB(Utils.plantIterator.toString(), stringArray[0]);
                 }
                 Utils.plantIterator++;
                 Toast.makeText(AddPlant.this, "Plant saved successfully", Toast.LENGTH_SHORT).show();
@@ -163,7 +161,6 @@ public class AddPlant extends AppCompatActivity {
             Log.v("Error adding plant",ex.getMessage());
         }
     }
-//TODO delete picture from phone if submit button not pressed
     private void setSpinners()
     {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -194,8 +191,13 @@ public class AddPlant extends AppCompatActivity {
             plant_outdoor_plant=true;
         else if(radioButton_outdoor_plant_no.isChecked())
             plant_outdoor_plant=false;
-        Plant myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
-                plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions);
+        Plant myPlant=new Plant();
+        if (imgProfilePath==null)
+        myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
+                plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, "");
+        else
+            myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
+                    plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);
         return myPlant;
     }
 
@@ -204,12 +206,16 @@ public class AddPlant extends AppCompatActivity {
         Plant myPlant=savePlantDetails();
         if(imgProfilePath==null)
             imgProfilePath=new String[]{""};
-        PlantAndProfilePic plantAndProfilePic=new PlantAndProfilePic(plantID, plant_name,imgProfilePath[0]);
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).setValue(myPlant);
-        Utils.databaseReference.child("users").child(userID).child("plantsAndPics").child(plantID).setValue(plantAndProfilePic);
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Utils.deletePic(imgProfilePath[0]);
+        Intent intent=new Intent(AddPlant.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
