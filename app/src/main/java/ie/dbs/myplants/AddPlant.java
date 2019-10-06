@@ -106,6 +106,7 @@ public class AddPlant extends AppCompatActivity {
             public void onClick(View view) {
                 Utils.temporary_plant=savePlantDetails();
                 Intent intent=new Intent(AddPlant.this, AddPictureToPlant.class);
+                intent.putExtra("IsProfilePicture",true);
                 startActivity(intent);
             }
         });
@@ -180,6 +181,8 @@ public class AddPlant extends AppCompatActivity {
 
     private Plant savePlantDetails()
     {
+        if(Utils.plantIterator==null)
+            Utils.plantIterator=0;
         plant_name=edit_text_plant_name.getText().toString();
         plant_description=edit_text_plant_description.getText().toString();
         plant_notes=edit_text_plant_notes.getText().toString();
@@ -191,7 +194,7 @@ public class AddPlant extends AppCompatActivity {
             plant_outdoor_plant=true;
         else if(radioButton_outdoor_plant_no.isChecked())
             plant_outdoor_plant=false;
-        Plant myPlant=new Plant(plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
+        Plant myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
                 plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions);
         return myPlant;
     }
@@ -201,7 +204,7 @@ public class AddPlant extends AppCompatActivity {
         Plant myPlant=savePlantDetails();
         if(imgProfilePath==null)
             imgProfilePath=new String[]{""};
-        PlantAndProfilePic plantAndProfilePic=new PlantAndProfilePic(plant_name,imgProfilePath[0]);
+        PlantAndProfilePic plantAndProfilePic=new PlantAndProfilePic(plantID, plant_name,imgProfilePath[0]);
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).setValue(myPlant);
         Utils.databaseReference.child("users").child(userID).child("plantsAndPics").child(plantID).setValue(plantAndProfilePic);

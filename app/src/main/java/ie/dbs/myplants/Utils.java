@@ -222,23 +222,25 @@ public static void PushPicToDB(String plantID, boolean featured, String imagePat
 {
     String userID=Utils.user.getUid();
     PlantImage plantImage=new PlantImage(imagePath,featured);
-    Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).child("images").setValue(plantImage);
+    Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).child("images").push().setValue(plantImage);
 }
 
 //retrieve image from saved position
 public static void getImageFromFile(String path, ImageView view)
 {
-    if(!path.equals("")) {
-        File imgFile = new File(path);
-        if (imgFile.exists()) {
+    if(path!=null) {
+        if (!path.equals("")) {
+            File imgFile = new File(path);
+            if (imgFile.exists()) {
 
-            Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            if(bitmap.getHeight()>bitmap.getWidth())
-            view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 90,
-                    120,false));
-            else
-                view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 120,
-                        80,false));
+                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                if (bitmap.getHeight() > bitmap.getWidth())
+                    view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 90,
+                            120, false));
+                else
+                    view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 120,
+                            80, false));
+            }
         }
     }
     else

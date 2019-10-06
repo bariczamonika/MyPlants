@@ -56,10 +56,8 @@ public class MainActivity extends AppCompatActivity {
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //adapter.notifyDataSetChanged();
                 Intent intent = new Intent(MainActivity.this, AddPlant.class);
                 startActivity(intent);
-                finish();
             }
         });
 
@@ -84,16 +82,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-       /* recyclerView.hasFixedSize();
-        recyclerView.setItemViewCacheSize(20);
-        recyclerView.setDrawingCacheEnabled(true);
-        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        RecyclerView.Adapter mAdapter=new PlantRecyclerAdapter(plants);
-        recyclerView.setAdapter(mAdapter);*/
     }
 
     @Override
@@ -135,19 +123,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private ArrayList<String> collectPlantNames(Map<String, Object> plants) {
-
-        ArrayList<String> plantNames = new ArrayList<>();
-
-        for (Map.Entry<String, Object> entry : plants.entrySet()) {
-
-            Map singlePlant = (Map) entry.getValue();
-
-            plantNames.add((String) singlePlant.get("name"));
-        }
-        return plantNames;
-
-    }
 
     private void displayPlants()
     {
@@ -161,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
                         holder.txt_name.setText(model.getPlantName());
                         String myPath = model.getPath();
                         Utils.getImageFromFile(myPath, holder.img_avatar);
+                        holder.plantID=model.getPlantID();
+
                     }
 
                     @NonNull
@@ -181,4 +158,11 @@ public class MainActivity extends AppCompatActivity {
             adapter.stopListening();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayPlants();
+        if(adapter!=null)
+        adapter.startListening();
+    }
 }

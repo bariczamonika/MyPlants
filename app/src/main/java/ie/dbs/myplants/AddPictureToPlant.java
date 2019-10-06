@@ -41,6 +41,8 @@ public class AddPictureToPlant extends AppCompatActivity {
     private ArrayList<Uri> mArrayUri;
     private String imageEncoded;
     private ImageView preview;
+    private boolean isProfilePic;
+    private String plantID;
     int index=0;
 
 
@@ -54,6 +56,7 @@ public class AddPictureToPlant extends AppCompatActivity {
         mArrayUri=new ArrayList<>();
         save=(Button)findViewById(R.id.saveImages);
         cancel=(Button)findViewById(R.id.cancel);
+        plantID=getIntent().getStringExtra("plantID");
 
         Utils.AskForPermission(Manifest.permission.CAMERA, AddPictureToPlant.this);
         Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, AddPictureToPlant.this);
@@ -121,10 +124,20 @@ public class AddPictureToPlant extends AppCompatActivity {
                         InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(i));
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         imagePath[i]=Utils.createDirectoryAndSaveFile(bitmap, AddPictureToPlant.this);
-                        Intent intent=new Intent(AddPictureToPlant.this, AddPlant.class);
-                        intent.putExtra("image", imagePath);
-                        startActivity(intent);
-                        finish();
+                        if(isProfilePic) {
+                            Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
+                            intent.putExtra("image", imagePath);
+                            startActivity(intent);
+                            finish();
+                        }
+                        else
+                        {
+                            Intent intent=new Intent(AddPictureToPlant.this, SinglePlant.class);
+                            intent.putExtra("image", imagePath);
+                            intent.putExtra("plantID", plantID);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
                     catch (Exception ex)
                     {Log.v("error saving pic", ex.getMessage());
@@ -134,6 +147,7 @@ public class AddPictureToPlant extends AppCompatActivity {
             }
         });
 
+        //TODO if youre going back to single plant
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -165,6 +179,7 @@ public class AddPictureToPlant extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
+            isProfilePic=getIntent().getBooleanExtra("IsProfilePicture", true);
             //if picking image from gallery selected
             if (requestCode == PICK_IMAGE_FROM_GALLERY && resultCode == RESULT_OK
                     && null != data) {
@@ -184,9 +199,9 @@ public class AddPictureToPlant extends AppCompatActivity {
                         Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
                         preview.setImageBitmap(bitmap);
                     } else {
+                        if (!isProfilePic) {
                         if (data.getClipData() != null) {
-                            boolean isProfile = getIntent().getBooleanExtra("IsProfilePicture", true);
-                            if (!isProfile) {
+
                                 ClipData mClipData = data.getClipData();
                                 mArrayUri.clear();
                                 for (int i = 0; i < mClipData.getItemCount(); i++) {
