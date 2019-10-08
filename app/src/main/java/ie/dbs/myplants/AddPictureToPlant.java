@@ -45,7 +45,6 @@ public class AddPictureToPlant extends AppCompatActivity {
     private String plantID;
     int index=0;
 
-//TODO take out multiple images
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +67,15 @@ public class AddPictureToPlant extends AppCompatActivity {
 
                 Intent intent=new Intent();
                 intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_FROM_GALLERY);
+                Intent pickIntent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickIntent.setType("image/*");
+
+                Intent chooserIntent=Intent.createChooser(intent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+                startActivityForResult(chooserIntent, PICK_IMAGE_FROM_GALLERY);
+
             }
         });
 
@@ -184,7 +189,6 @@ public class AddPictureToPlant extends AppCompatActivity {
                     && null != data) {
                 try {
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                    //TODO why is it not updating automatically when only one pic is selected
                     if (data.getData() != null) {
                         mArrayUri.clear();
                         Uri ImageUri = data.getData();
@@ -197,48 +201,8 @@ public class AddPictureToPlant extends AppCompatActivity {
                         cursor.close();
                         Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
                         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        if (bytes!=null)
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
                         preview.setImageBitmap(bitmap);
-                    } else {
-                        if (!isProfilePic) {
-                        if (data.getClipData() != null) {
-
-                                ClipData mClipData = data.getClipData();
-                                mArrayUri.clear();
-                                for (int i = 0; i < mClipData.getItemCount(); i++) {
-
-                                    ClipData.Item item = mClipData.getItemAt(i);
-                                    Uri uri = item.getUri();
-                                    mArrayUri.add(uri);
-                                    Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-                                    if (cursor != null)
-                                        cursor.moveToFirst();
-                                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                    imageEncoded = cursor.getString(columnIndex);
-                                    cursor.close();
-                                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(0));
-                                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                    preview.setImageBitmap(bitmap);
-
-                                }
-                                Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
-                            }
-                        }
-                        else
-                        {
-                            AlertDialog alertDialog=new AlertDialog.Builder(AddPictureToPlant.this).create();
-                            alertDialog.setTitle("Alert");
-                            alertDialog.setMessage("You can only select one picture as a profile picture");
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            alertDialog.show();
-
-                        }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -254,7 +218,6 @@ public class AddPictureToPlant extends AppCompatActivity {
                         preview.setImageBitmap(bitmap);
                         mArrayUri.clear();
                         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        if (bytes!=null)
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
                         String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
                         mArrayUri.add(Uri.parse(path));

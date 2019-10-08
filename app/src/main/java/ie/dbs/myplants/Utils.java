@@ -39,6 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,33 +228,25 @@ public static void PushPicToDB(String plantID, String imagePath)
 }
 
 //retrieve image from saved position
-public static void getImageFromFile(String path, final ImageView view)
+public static Bitmap getImageFromFile(String path)
 {
+    Drawable drawable=applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
+    Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+    bitmap=Bitmap.createScaledBitmap(bitmap, 400,280,false);
 
     if(path!=null) {
         if (!path.equals("")) {
             final File imgFile = new File(path);
             if (imgFile.exists()) {
-                         Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                         bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         if (bitmap.getHeight() > bitmap.getWidth())
-                            view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 300,
-                                    400, false));
+                            bitmap=Bitmap.createScaledBitmap(bitmap, 300,400,false);
                         else
-                            view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 400,
-                                    280, false));
-
-
-
-
+                            bitmap=Bitmap.createScaledBitmap(bitmap, 400,280,false);
             }
         }
     }
-    else
-    {
-        Drawable drawable=applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
-        Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
-        view.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 120,80,false));
-    }
+    return bitmap;
 
 }
 

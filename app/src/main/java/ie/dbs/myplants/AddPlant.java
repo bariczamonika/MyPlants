@@ -5,8 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,9 +21,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-
-import java.io.File;
-import java.util.Arrays;
 import java.util.Date;
 
 public class AddPlant extends AppCompatActivity {
@@ -135,8 +130,7 @@ public class AddPlant extends AppCompatActivity {
         super.onResume();
         try {
             imgProfilePath=getIntent().getStringArrayExtra("image");
-            Utils.getImageFromFile(imgProfilePath[0], img_view_plant_profile_preview);
-
+            img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
             setSpinners();
 
             if (Utils.temporary_plant != null) {
@@ -191,7 +185,7 @@ public class AddPlant extends AppCompatActivity {
             plant_outdoor_plant=true;
         else if(radioButton_outdoor_plant_no.isChecked())
             plant_outdoor_plant=false;
-        Plant myPlant=new Plant();
+        Plant myPlant;
         if (imgProfilePath==null)
         myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
                 plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, "");

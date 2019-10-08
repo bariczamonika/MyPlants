@@ -2,12 +2,14 @@ package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 public class MainActivity extends AppCompatActivity {
     private Button addPlantButton;
-    protected AlertDialog alertDialog;
     private ArrayList<Object> plants = new ArrayList<>();
     FirebaseRecyclerOptions<Plant> options;
     FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter> adapter;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),3);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.hasFixedSize();
@@ -135,9 +137,13 @@ public class MainActivity extends AppCompatActivity {
                     protected void onBindViewHolder(@NonNull PlantRecyclerAdapter holder, int position, @NonNull Plant model) {
                         holder.txt_name.setText(model.getName());
                         String myPath = model.getProfilePicPath();
-                        Utils.getImageFromFile(myPath, holder.img_avatar);
+                        Bitmap bitmap=Utils.getImageFromFile(myPath);
+                        if(bitmap.getWidth()>bitmap.getHeight())
+                            bitmap=Bitmap.createBitmap(bitmap, 0,0,bitmap.getHeight(), bitmap.getHeight());
+                        else
+                            bitmap=Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(), bitmap.getWidth());
+                        holder.img_avatar.setImageBitmap(bitmap);
                         holder.plantID=model.getPlantID();
-
                     }
 
                     @NonNull
