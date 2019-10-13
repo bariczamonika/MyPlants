@@ -1,51 +1,37 @@
 package ie.dbs.myplants;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
-import android.telephony.emergency.EmergencyNumber;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+
 
 public class Utils {
     public static FirebaseUser user;
@@ -109,7 +95,7 @@ public class Utils {
     }
 
     //validate login form
-    public static boolean validateForm(EditText emailAddress, EditText password) {
+    public static boolean validateForm(@NotNull EditText emailAddress, EditText password) {
         boolean valid = true;
 
         String email = emailAddress.getText().toString();
@@ -132,7 +118,7 @@ public class Utils {
     }
 
     //validate registration form
-    public static boolean validateRegistrationForm(EditText emailAddress, EditText password, EditText
+    public static boolean validateRegistrationForm(@NotNull EditText emailAddress, EditText password, EditText
                                                    passwordConfirmation) {
         boolean valid = true;
 
@@ -169,53 +155,26 @@ public class Utils {
         return valid;
     }
 
-    //convert spinners to integer values
-    public static double convertWateringSpinnerValueToInteger(String spinnerValue)
-    {
-        String[] stringValues= applicationContext.getResources().getStringArray(R.array.plant_watering_needs_array);
-        double value=0;
-
-        for (int i=1;i<16;i++) {
-            if(stringValues[i].equals(spinnerValue))
-            {
-                value=i;
-                break;
-            }
-            else
-            {
-                value=0.5;
-            }
-        }
-
-        return value;
-    }
-
-    //TODO do watering and fertilizing values with enums?
-    //convert spinners to integer values
-    public static double convertFertilizingSpinnerValueToInteger(String spinnerValue)
-    {
-        String[] stringValues= applicationContext.getResources().getStringArray(R.array.plant_fertilizing_needs_array);
-        double value=0;
-
-        for (int i=1;i<8;i++) {
-            if(stringValues[i].equals(spinnerValue))
-            {
-                value=i;
-                break;
-            }
-            else {
-                    value=0;
-            }
-
-            }
-        return value;
-    }
-
     //convert Light condition enum to string array for spinners
+    @NotNull
     public static String[] getLightConditionNames() {
-        return Arrays.toString(Light_Condition.values()).
-                replace('[',' ').replace(']',' ')
-                .replace('_', ' ').split(", ");
+        String myArray=Arrays.toString(Light_Condition.values());
+        myArray=myArray.substring(1, myArray.length()-1);
+        return myArray.replace('_', ' ').split(", ");
+    }
+
+    @NotNull
+    public static String[] getWateringNeedsNames() {
+        String myArray=Arrays.toString(Watering_Needs.values());
+        myArray=myArray.substring(1, myArray.length()-1);
+        return myArray.replace('_', ' ').split(", ");
+    }
+
+    @NotNull
+    public static String[] getFertilizingNeedsNames() {
+        String myArray=Arrays.toString(Fertilizing_Needs.values());
+        myArray=myArray.substring(1, myArray.length()-1);
+        return myArray.replace('_', ' ').split(", ");
     }
 
 
@@ -224,7 +183,7 @@ public static void PushPicToDB(String plantID, String imagePath)
 {
     String userID=Utils.user.getUid();
     PlantImage plantImage=new PlantImage(imagePath);
-    Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).child("images").push().setValue(plantImage);
+    Utils.databaseReference.child("users").child(userID).child("plantsPics").child(plantID).child("images").push().setValue(plantImage);
 }
 
 //retrieve image from saved position
@@ -274,4 +233,44 @@ public static void deletePic(String picturePath)
     }
 }
 
+public static Date convertStringToDate(String string)
+{
+    Date myDate=new Date();
+    SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yy");
+    try
+    {
+        myDate=sdf.parse(string);
+    }
+    catch (ParseException ex)
+    {Log.v("Date exception", ex.getMessage());}
+    return myDate;
+}
+
+public static int convertFertilizingNeedsToInteger(int value)
+{
+    int newValue=0;
+    switch (value){
+        case 1:
+            newValue=7;
+            break;
+        case 2:
+            newValue=14;
+            break;
+        case 3:
+            newValue=21;
+            break;
+        case 4:
+            newValue=28;
+            break;
+        case 5:
+            newValue=42;
+            break;
+        case 6:
+            newValue=56;
+            break;
+            default:
+                break;
+    }
+return newValue;
+}
 }

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -25,7 +26,6 @@ import java.util.Date;
 
 public class AddPlant extends AppCompatActivity {
 
-    //TODO view single plant
     private EditText edit_text_plant_name;
     private EditText edit_text_plant_description;
     private EditText edit_text_plant_notes;
@@ -40,12 +40,14 @@ public class AddPlant extends AppCompatActivity {
     private String plant_name;
     private String plant_description;
     private String plant_notes;
-    private double plant_watering_needs;
-    private double plant_fertilizing_needs;
+    private Watering_Needs plant_watering_needs;
+    private Fertilizing_Needs plant_fertilizing_needs;
     private Light_Condition plant_light_conditions;
     private boolean plant_outdoor_plant;
     private ImageView img_view_plant_profile_preview;
     private String[] imgProfilePath;
+    private TextView plant_title;
+    private boolean modify=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +64,7 @@ public class AddPlant extends AppCompatActivity {
         radioButton_outdoor_plant_yes=(RadioButton)findViewById(R.id.radio_button_yes);
         radioButton_outdoor_plant_no=(RadioButton)findViewById(R.id.radio_button_no);
         img_view_plant_profile_preview=(ImageView)findViewById(R.id.img_view_plant_profile_preview);
-        plant_light_conditions=Light_Condition.Sunny;
+        plant_title=findViewById(R.id.plant_title);
         setSpinners();
 
         String userID=Utils.user.getUid();
@@ -100,6 +102,10 @@ public class AddPlant extends AppCompatActivity {
                 Utils.temporary_plant=savePlantDetails();
                 Intent intent=new Intent(AddPlant.this, AddPictureToPlant.class);
                 intent.putExtra("IsProfilePicture",true);
+                if(modify)
+                intent.putExtra("modify", true);
+                else
+                    intent.putExtra("modify", false);
                 startActivity(intent);
             }
         });
@@ -107,20 +113,41 @@ public class AddPlant extends AppCompatActivity {
         btn_plant_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(Utils.plantIterator==null)
-                    Utils.plantIterator=0;
-                addPlant(Utils.plantIterator.toString());
-                String[] stringArray=getIntent().getStringArrayExtra("image");
-                if(getIntent().getStringArrayExtra("image")!=null)
-                {
-                    Utils.PushPicToDB(Utils.plantIterator.toString(), stringArray[0]);
+
+
+                if(!modify) {
+                    if(Utils.plantIterator==null)
+                        Utils.plantIterator=0;
+                    addPlant(Utils.plantIterator.toString());
+
+                    String[] stringArray=getIntent().getStringArrayExtra("image");
+                    if(getIntent().getStringArrayExtra("image")!=null)
+                    {
+                        Utils.PushPicToDB(Utils.plantIterator.toString(), stringArray[0]);
+                    }
+                    Utils.plantIterator++;
+                    Toast.makeText(AddPlant.this, "Plant saved successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(AddPlant.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    Utils.temporary_plant = null;
+
                 }
-                Utils.plantIterator++;
-                Toast.makeText(AddPlant.this, "Plant saved successfully", Toast.LENGTH_SHORT).show();
-                Intent intent=new Intent(AddPlant.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-                Utils.temporary_plant=null;
+                else
+                {
+                    String[] stringArray=getIntent().getStringArrayExtra("image");
+                    if(getIntent().getStringArrayExtra("image")!=null)
+                    {
+                        Utils.PushPicToDB(Utils.temporary_plant.getPlantID(), stringArray[0]);
+                    }
+                    Toast.makeText(AddPlant.this, "Plant modified successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(AddPlant.this, SinglePlant.class);
+                    addPlant(Utils.temporary_plant.getPlantID());
+                    intent.putExtra("plantID", Utils.temporary_plant.getPlantID());
+                    startActivity(intent);
+                    finish();
+                    Utils.temporary_plant = null;
+                }
             }
         });
     }
@@ -128,42 +155,66 @@ public class AddPlant extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            imgProfilePath=getIntent().getStringArrayExtra("image");
-            img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
-            setSpinners();
+        modify=getIntent().getBooleanExtra("modify", false);
+        if(!modify) {
+            try {
+                imgProfilePath = getIntent().getStringArrayExtra("image");
+                img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
+                setSpinners();
 
-            if (Utils.temporary_plant != null) {
-                edit_text_plant_name.setText(Utils.temporary_plant.getName());
-                edit_text_plant_notes.setText(Utils.temporary_plant.getNotes());
-                edit_text_plant_description.setText(Utils.temporary_plant.getDescription());
-                if (Utils.temporary_plant.getWateringNeeds() != 0.5)
-                    spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().intValue());
-                else
-                    spinner_watering_needs.setSelection(0);
-                    spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().intValue());
-                spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
-                if(Utils.temporary_plant.isOutdoorPlant())
-                    radioButton_outdoor_plant_yes.setChecked(true);
-                else if(!Utils.temporary_plant.isOutdoorPlant())
-                    radioButton_outdoor_plant_no.setChecked(true);
-                else
-                    radioGroup_outdoor_plant.clearCheck();
+                if (Utils.temporary_plant != null) {
+                    edit_text_plant_name.setText(Utils.temporary_plant.getName());
+                    edit_text_plant_notes.setText(Utils.temporary_plant.getNotes());
+                    edit_text_plant_description.setText(Utils.temporary_plant.getDescription());
+                    spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().value);
+                    spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().value);
+                    spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
+                    if (Utils.temporary_plant.isOutdoorPlant())
+                        radioButton_outdoor_plant_yes.setChecked(true);
+                    else if (!Utils.temporary_plant.isOutdoorPlant())
+                        radioButton_outdoor_plant_no.setChecked(true);
+                    else
+                        radioGroup_outdoor_plant.clearCheck();
+                }
+            } catch (Exception ex) {
+                Log.v("Error adding plant", ex.getMessage());
             }
-        }catch (Exception ex)
+        }
+        else
         {
-            Log.v("Error adding plant",ex.getMessage());
+            try {
+                        if (Utils.temporary_plant != null) {
+                        edit_text_plant_name.setText(Utils.temporary_plant.getName());
+                        edit_text_plant_notes.setText(Utils.temporary_plant.getNotes());
+                        edit_text_plant_description.setText(Utils.temporary_plant.getDescription());
+                        spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().value);
+                        spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().value);
+                        spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
+                        if (Utils.temporary_plant.isOutdoorPlant())
+                            radioButton_outdoor_plant_yes.setChecked(true);
+                        else if (!Utils.temporary_plant.isOutdoorPlant())
+                            radioButton_outdoor_plant_no.setChecked(true);
+                        else
+                            radioGroup_outdoor_plant.clearCheck();
+                            imgProfilePath = getIntent().getStringArrayExtra("image");
+                            if(imgProfilePath!=null)
+                            img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
+                            else if(Utils.temporary_plant.getProfilePicPath()!=null)
+                                img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(Utils.temporary_plant.getProfilePicPath()));
+                            plant_title.setText("Modify plant");
+
+                }
+            }catch (Exception ex) {
+                Log.v("Error adding plant", ex.getMessage());}
         }
     }
     private void setSpinners()
     {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.plant_watering_needs_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapter=new ArrayAdapter<CharSequence>(this,
+                R.layout.support_simple_spinner_dropdown_item, Utils.getWateringNeedsNames());
         spinner_watering_needs.setAdapter(adapter);
-        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
-                R.array.plant_fertilizing_needs_array, android.R.layout.simple_spinner_item);
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapter2=new ArrayAdapter<CharSequence>(this,
+                R.layout.support_simple_spinner_dropdown_item, Utils.getFertilizingNeedsNames());
         spinner_fertilizing_needs.setAdapter(adapter2);
         ArrayAdapter<CharSequence> adapter1=new ArrayAdapter<CharSequence>(this,
                 R.layout.support_simple_spinner_dropdown_item, Utils.getLightConditionNames());
@@ -177,21 +228,33 @@ public class AddPlant extends AppCompatActivity {
         plant_name=edit_text_plant_name.getText().toString();
         plant_description=edit_text_plant_description.getText().toString();
         plant_notes=edit_text_plant_notes.getText().toString();
-        plant_watering_needs=Utils.convertWateringSpinnerValueToInteger(spinner_watering_needs.getSelectedItem().toString());
-        plant_fertilizing_needs=Utils.convertFertilizingSpinnerValueToInteger(spinner_fertilizing_needs.getSelectedItem().toString());
-        if(spinner_light_conditions.isSelected())
-            plant_light_conditions=Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString());
+        plant_fertilizing_needs= Fertilizing_Needs.valueOf(spinner_fertilizing_needs.getSelectedItem().toString().replace(" ","_"));
+        plant_watering_needs=Watering_Needs.valueOf(spinner_watering_needs.getSelectedItem().toString().replace(" ","_"));
+        plant_light_conditions=Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString().replace(" ","_"));
         if(radioButton_outdoor_plant_yes.isChecked())
             plant_outdoor_plant=true;
         else if(radioButton_outdoor_plant_no.isChecked())
             plant_outdoor_plant=false;
         Plant myPlant;
+        if(!modify)
+        {
         if (imgProfilePath==null)
         myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
                 plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, "");
         else
             myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
-                    plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);
+                    plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);}
+        else
+        {
+            if(imgProfilePath==null)
+            myPlant=new Plant(Utils.temporary_plant.getPlantID(),plant_name,plant_description,Utils.temporary_plant.getDateAdded(),
+                    plant_notes,plant_watering_needs, plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions,
+                    Utils.temporary_plant.getProfilePicPath());
+            else
+                myPlant=new Plant(Utils.temporary_plant.getPlantID(),plant_name,plant_description,Utils.temporary_plant.getDateAdded(),plant_notes,plant_watering_needs,
+                        plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);
+        }
+        Log.v("saved temporary plant", myPlant.getFertilizingNeeds().toString());
         return myPlant;
     }
 
@@ -207,6 +270,7 @@ public class AddPlant extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if(imgProfilePath!=null)
         Utils.deletePic(imgProfilePath[0]);
         Intent intent=new Intent(AddPlant.this, MainActivity.class);
         startActivity(intent);

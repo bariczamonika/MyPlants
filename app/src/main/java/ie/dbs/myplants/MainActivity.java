@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
+//TODO filters and search bar
 public class MainActivity extends AppCompatActivity {
     private Button addPlantButton;
     private ArrayList<Object> plants = new ArrayList<>();

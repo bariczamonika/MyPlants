@@ -43,6 +43,7 @@ public class AddPictureToPlant extends AppCompatActivity {
     private ImageView preview;
     private boolean isProfilePic;
     private String plantID;
+    private boolean modify=false;
     int index=0;
 
     @Override
@@ -56,6 +57,7 @@ public class AddPictureToPlant extends AppCompatActivity {
         save=(Button)findViewById(R.id.saveImages);
         cancel=(Button)findViewById(R.id.cancel);
         plantID=getIntent().getStringExtra("plantID");
+        modify=getIntent().getBooleanExtra("modify",false);
 
         Utils.AskForPermission(Manifest.permission.CAMERA, AddPictureToPlant.this);
         Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, AddPictureToPlant.this);
@@ -130,10 +132,21 @@ public class AddPictureToPlant extends AppCompatActivity {
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         imagePath[i]=Utils.createDirectoryAndSaveFile(bitmap, AddPictureToPlant.this);
                         if(isProfilePic) {
-                            Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
-                            intent.putExtra("image", imagePath);
-                            startActivity(intent);
-                            finish();
+                            if(!modify) {
+                                Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
+                                intent.putExtra("image", imagePath);
+                                intent.putExtra("modify", false);
+                                startActivity(intent);
+                                finish();
+                            }
+                            else
+                            {
+                                Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
+                                intent.putExtra("image", imagePath);
+                                intent.putExtra("modify", true);
+                                startActivity(intent);
+                                finish();
+                            }
                         }
                         else
                         {

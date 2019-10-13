@@ -32,34 +32,6 @@
     <string name="plant_outdoor_plant">Is this an outdoor plant?</string>
     <string name="plant_add_plant_title">Add a plant</string>
     <string name="plant_notes">Notes</string>
-    <string-array name="plant_watering_needs_array">
-        <item>Twice daily</item>
-        <item>Daily</item>
-        <item>Every 2 days</item>
-        <item>Every 3 days</item>
-        <item>Every 4 days</item>
-        <item>Every 5 days</item>
-        <item>Every 6 days</item>
-        <item>Weekly</item>
-        <item>Every 8 days</item>
-        <item>Every 9 days</item>
-        <item>Every 10 days</item>
-        <item>Every 11 days</item>
-        <item>Every 12 days</item>
-        <item>Every 13 days</item>
-        <item>Every 2 weeks</item>
-        <item>Custom options</item>
-    </string-array>
-    <string-array name="plant_fertilizing_needs_array">
-        <item>Never</item>
-        <item>Weekly</item>
-        <item>Every two weeks</item>
-        <item>Every three weeks</item>
-        <item>Every month</item>
-        <item>Every 6 weeks</item>
-        <item>Every 2 months</item>
-        <item>Custom options</item>
-    </string-array>
     <string name="plant_add_profile_picture">Add profile picture</string>
 
     //Mainactivity
@@ -67,4 +39,23 @@
 
     //Single plant
     <string name="single_add_picture">Add more pictures</string>
+    <string name="single_information">Information </string>
+    <string name="single_information_plant_name">Plant\'s name</string>
+    <string name="single_information_date_added">Date added</string>
+    <string name="single_information_watering_needs">Watering needs</string>
+    <string name="single_information_fertilizing_needs">Fertilizing needs</string>
+    <string name="single_information_outdoor_plant">Outdoor plant</string>
+    <string name="single_information_light_condition">Preferred light conditions</string>
+    <string name="single_information_description">Description</string>
+    <string name="single_information_notes">Notes</string>
+    <string name="single_action">Actions</string>
+    <string name="single_action_last_watered">Last watered</string>
+    <string name="single_action_last_fertilized">Last fertilized</string>
+    <string name="single_action_last_replanted">Last replanted</string>
+    <string name="single_modify_information">Modify information</string>
+    <string name="single_upcoming_tasks">Upcoming tasks</string>
+    <string name="single_tasks_watering">Next watering</string>
+    <string name="single_tasks_fertilizing">Next fertilizing</string>
+    <string name="single_tasks_replanting">Next replanting</string>
+    <string name="notification_button">Manage notifications</string>
 </resources>
