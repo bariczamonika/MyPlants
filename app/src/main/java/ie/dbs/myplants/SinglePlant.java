@@ -2,13 +2,29 @@ package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -37,7 +53,7 @@ import java.util.Map;
 //TODO notification for watering fertilizing
 //TODO timeline view (gallery)
 //TODO onDragListener
-//TODO manage single plant
+
 
 public class SinglePlant extends AppCompatActivity{
     private Plant myPlant;
@@ -74,6 +90,7 @@ public class SinglePlant extends AppCompatActivity{
     private ExpandableRelativeLayout expandableRelativeLayout;
     private ExpandableRelativeLayout expandableRelativeLayout2;
     private ExpandableRelativeLayout expandableRelativeLayout3;
+    private String CHANNEL_ID="my_channel_01";
     private Button notificationButton;
     Date myDate=new Date();
     int index=0;
@@ -119,6 +136,7 @@ public class SinglePlant extends AppCompatActivity{
 
         final String plantID=getIntent().getStringExtra("plantID");
         String userID = Utils.user.getUid();
+
 
 
         final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants").child(plantID);
@@ -200,6 +218,7 @@ public class SinglePlant extends AppCompatActivity{
         });
 
         autoChangeDatesOnceItIsReached();
+
 
         plant_images.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -333,8 +352,9 @@ public class SinglePlant extends AppCompatActivity{
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 createAlertDialogWithRadioButtons();
-                addPlant(myPlant);
+
             }
         });
     }
@@ -444,25 +464,30 @@ private int scrollRight(int size)
         Date now=new Date();
         now=addDaysToDate(now,-1);
         if(myPlant!=null) {
-            while (myPlant.getNextWatering().before(now)) {
-                if ((myPlant.getNextWatering() == now) || (myPlant.getNextWatering().before(now))) {
-                    myPlant.setLastWatered(myPlant.getNextWatering());
-                    int days = myPlant.getWateringNeeds().value;
-                    myPlant.setNextWatering(addDaysToDate(myPlant.getLastWatered(), days));
+            if (myPlant.getNextWatering() != null) {
+                while (myPlant.getNextWatering().before(now)) {
+                    if ((myPlant.getNextWatering() == now) || (myPlant.getNextWatering().before(now))) {
+                        myPlant.setLastWatered(myPlant.getNextWatering());
+                        int days = myPlant.getWateringNeeds().value;
+                        myPlant.setNextWatering(addDaysToDate(myPlant.getLastWatered(), days));
+                    }
                 }
             }
 
-            while (myPlant.getNextFertilizing().before(now)) {
-                if ((myPlant.getNextFertilizing() == now) || (myPlant.getNextFertilizing().before(now))) {
-                    myPlant.setLastFertilized(myPlant.getNextFertilizing());
-                    int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
-                    myPlant.setNextFertilizing(addDaysToDate(myPlant.getLastFertilized(), days));
+            if (myPlant.getNextFertilizing() != null) {
+                while (myPlant.getNextFertilizing().before(now)) {
+                    if ((myPlant.getNextFertilizing() == now) || (myPlant.getNextFertilizing().before(now))) {
+                        myPlant.setLastFertilized(myPlant.getNextFertilizing());
+                        int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
+                        myPlant.setNextFertilizing(addDaysToDate(myPlant.getLastFertilized(), days));
+                    }
                 }
+                addPlant(myPlant);
             }
-            addPlant(myPlant);
         }
     }
 
+    //TODO lastwatered and nextwatering gets lost when going to modify plant
     private Date addDaysToDate(Date myDate,int days)
     {
         Date newDate;
@@ -499,8 +524,32 @@ private int scrollRight(int size)
                 for(int i=0;i<checkedOptions.length;i++){
                     boolean checked=checkedOptions[i];
                     if(checked) {
-                        if (i == 0)
+                        if (i == 0) {
+                            //TODO put this in a method and have to be set up globally
                             myPlant.setNotificationWatering(true);
+                            if(myPlant.getWateringNeeds()!=Watering_Needs.None) {
+                                if (myPlant.getNextWatering() == null) {
+                                    myPlant.setLastWatered(new Date());
+                                    myPlant.setNextWatering(addDaysToDate(myPlant.getLastWatered(), myPlant.getWateringNeeds().value));
+                                }
+                                long notificationTimeInMillis = myPlant.getNextWatering().getTime();
+                                long timeInMillisNow = new Date().getTime();
+                                long delay = notificationTimeInMillis - timeInMillisNow;
+                                scheduleNotification(getNotification(myPlant.getName() + " needs watering"), delay);
+                                Toast.makeText(SinglePlant.this, "Notification set successfully", Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                                //TODO alertbox
+                            {Toast.makeText(SinglePlant.this, "Please set up your plant's watering needs",Toast.LENGTH_SHORT).show();}
+                            /*NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, CHANNEL_ID)
+                                    .setSmallIcon(R.drawable.my_plant_icon)
+                                    .setContentTitle("MyPlants")
+                                    .setContentText(myPlant.getName() + " needs watering")
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(Utils.applicationContext);
+                            notificationManager.notify(1, builder.build());*/
+
+                        }
                         else
                             myPlant.setNotificationFertilizing(true);
                     }
@@ -517,9 +566,65 @@ private int scrollRight(int size)
         });
         AlertDialog dialog=builder.create();
         dialog.show();
-
-
-
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.logout: {
+                final AlertDialog dialog = new AlertDialog.Builder(SinglePlant.this).create();
+                dialog.setTitle("Logout");
+                dialog.setMessage("Are you sure?");
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Utils.mAuth.signOut();
+                        Intent intent = new Intent(SinglePlant.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+                break;
+            }
+
+            default:
+                break;
+        }
+        return true;
+    }
+
+    private void scheduleNotification(Notification notification, long delay) {
+
+        Intent notificationIntent = new Intent(this, AlarmReceiver.class);
+        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, 1);
+        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+    }
+
+    private Notification getNotification(String content) {
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(this, CHANNEL_ID);
+        Notification notification = builder
+        .setContentTitle("Scheduled Notification")
+        .setContentText(content)
+        .setSmallIcon(R.drawable.my_plant_icon).build();
+        return notification;
+    }
 }
