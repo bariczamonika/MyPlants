@@ -59,6 +59,7 @@ public class AddPictureToPlant extends AppCompatActivity {
         plantID=getIntent().getStringExtra("plantID");
         modify=getIntent().getBooleanExtra("modify",false);
 
+
         Utils.AskForPermission(Manifest.permission.CAMERA, AddPictureToPlant.this);
         Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, AddPictureToPlant.this);
         Utils.AskForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, AddPictureToPlant.this);

@@ -50,6 +50,8 @@ public class Utils {
     public static DatabaseReference databaseReference;
     public static Plant temporary_plant;
     public static Integer plantIterator;
+    public static String CHANNEL_ID="my_channel_01";
+    public static int notification_iterator;
 
     //asks for permission on SDK>16
     public static void AskForPermission(String myPermission, Activity whichActivity)
@@ -282,4 +284,43 @@ public static int convertFertilizingNeedsToInteger(int value)
 return newValue;
 }
 
+
+
+    public static Date addDaysToDate(Date myDate,int days)
+    {
+        Date newDate;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(myDate);
+        calendar.add(Calendar.DAY_OF_MONTH, days);
+        newDate=calendar.getTime();
+        return newDate;
+    }
+
+    public static Plant autoChangeDatesOnceItIsReached(Plant myPlant){
+        Date now=new Date();
+        now=Utils.addDaysToDate(now,-1);
+        if(myPlant!=null) {
+            if (myPlant.getNextWatering() != null) {
+                while (myPlant.getNextWatering().before(now)) {
+                    if ((myPlant.getNextWatering() == now) || (myPlant.getNextWatering().before(now))) {
+                        myPlant.setLastWatered(myPlant.getNextWatering());
+                        int days = myPlant.getWateringNeeds().value;
+                        myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), days));
+                    }
+                }
+            }
+
+            if (myPlant.getNextFertilizing() != null) {
+                while (myPlant.getNextFertilizing().before(now)) {
+                    if ((myPlant.getNextFertilizing() == now) || (myPlant.getNextFertilizing().before(now))) {
+                        myPlant.setLastFertilized(myPlant.getNextFertilizing());
+                        int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
+                        myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), days));
+                    }
+                }
+
+            }
+        }
+        return myPlant;
+    }
 }

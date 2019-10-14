@@ -35,6 +35,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     private Button addPlantButton;
     private ArrayList<Object> plants = new ArrayList<>();
+    private List<Plant>myPlants=new ArrayList<>();
     FirebaseRecyclerOptions<Plant> options;
     FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter> adapter;
     RecyclerView recyclerView;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     Plant myPlant = plantSnapshot.getValue(Plant.class);
                     plants.add(myPlant);
+                    //myPlants.add(myPlant);
                 }
 
                 Log.v("myplantsindb", plants.toString());
@@ -83,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.v("Error retrieving plant", "loadPost:onCancelled", databaseError.toException());
             }
         });
+
+        //TODO transfer this into splash together with database reference it should update the plant next watering
+        for (int i=0;i<plants.size();i++){
+            myPlants.set(i, Utils.autoChangeDatesOnceItIsReached(myPlants.get(i)));
+            addPlant(myPlants.get(i));
+        }
 
     }
 
@@ -170,5 +178,10 @@ public class MainActivity extends AppCompatActivity {
         displayPlants();
         if(adapter!=null)
         adapter.startListening();
+    }
+
+    private void addPlant(Plant plant) {
+        String userID=Utils.user.getUid();
+        Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
     }
 }

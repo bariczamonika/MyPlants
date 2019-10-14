@@ -22,6 +22,8 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.Date;
 
 public class AddPlant extends AppCompatActivity {
@@ -118,7 +120,8 @@ public class AddPlant extends AppCompatActivity {
                 if(!modify) {
                     if(Utils.plantIterator==null)
                         Utils.plantIterator=0;
-                    addPlant(Utils.plantIterator.toString());
+                    Plant myPlant=savePlantDetails();
+                    addPlant(myPlant);
 
                     String[] stringArray=getIntent().getStringArrayExtra("image");
                     if(getIntent().getStringArrayExtra("image")!=null)
@@ -142,7 +145,8 @@ public class AddPlant extends AppCompatActivity {
                     }
                     Toast.makeText(AddPlant.this, "Plant modified successfully", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(AddPlant.this, SinglePlant.class);
-                    addPlant(Utils.temporary_plant.getPlantID());
+                    Plant myPlant=savePlantDetails();
+                    addPlant(myPlant);
                     intent.putExtra("plantID", Utils.temporary_plant.getPlantID());
                     startActivity(intent);
                     finish();
@@ -201,7 +205,8 @@ public class AddPlant extends AppCompatActivity {
                             img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
                             else if(Utils.temporary_plant.getProfilePicPath()!=null)
                                 img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(Utils.temporary_plant.getProfilePicPath()));
-                            plant_title.setText("Modify plant");
+                            plant_title.setText(R.string.plant_modify_plant);
+                            btn_add_pic_to_plant.setText(R.string.plant_modify_profile_pic);
 
                 }
             }catch (Exception ex) {
@@ -246,25 +251,43 @@ public class AddPlant extends AppCompatActivity {
                     plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);}
         else
         {
-            if(imgProfilePath==null)
-            myPlant=new Plant(Utils.temporary_plant.getPlantID(),plant_name,plant_description,Utils.temporary_plant.getDateAdded(),
-                    plant_notes,plant_watering_needs, plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions,
-                    Utils.temporary_plant.getProfilePicPath());
-            else
-                myPlant=new Plant(Utils.temporary_plant.getPlantID(),plant_name,plant_description,Utils.temporary_plant.getDateAdded(),plant_notes,plant_watering_needs,
-                        plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);
+            String plantID=getIntent().getStringExtra("plantID");
+            String userID=Utils.user.getUid();
+            DatabaseReference databaseReference=Utils.databaseReference.child("users").child(userID).child("plants").child(plantID);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
+                       Utils.temporary_plant=dataSnapshot.getValue(Plant.class);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+            myPlant=Utils.temporary_plant;
+            myPlant.setDescription(plant_description);
+            myPlant.setFertilizingNeeds(plant_fertilizing_needs);
+            myPlant.setLightCondition(plant_light_conditions);
+            myPlant.setName(plant_name);
+            myPlant.setNotes(plant_notes);
+            myPlant.setOutdoorPlant(plant_outdoor_plant);
+            myPlant.setWateringNeeds(plant_watering_needs);
+            if(imgProfilePath!=null)
+                myPlant.setProfilePicPath(imgProfilePath[0]);
         }
         Log.v("saved temporary plant", myPlant.getFertilizingNeeds().toString());
         return myPlant;
     }
 
 
-    private void addPlant(String plantID) {
-        Plant myPlant=savePlantDetails();
+    private void addPlant(Plant myPlant) {
         if(imgProfilePath==null)
             imgProfilePath=new String[]{""};
         String userID=Utils.user.getUid();
-        Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).setValue(myPlant);
+        Utils.databaseReference.child("users").child(userID).child("plants").child(myPlant.getPlantID()).setValue(myPlant);
     }
 
     @Override

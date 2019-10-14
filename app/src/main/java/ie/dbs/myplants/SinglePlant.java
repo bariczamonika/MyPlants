@@ -49,8 +49,8 @@ import java.util.Map;
 
 
 
-//TODO last watered, last fertilized, pick the date for them, next to come up
-//TODO notification for watering fertilizing
+
+
 //TODO timeline view (gallery)
 //TODO onDragListener
 
@@ -90,7 +90,7 @@ public class SinglePlant extends AppCompatActivity{
     private ExpandableRelativeLayout expandableRelativeLayout;
     private ExpandableRelativeLayout expandableRelativeLayout2;
     private ExpandableRelativeLayout expandableRelativeLayout3;
-    private String CHANNEL_ID="my_channel_01";
+
     private Button notificationButton;
     Date myDate=new Date();
     int index=0;
@@ -217,7 +217,7 @@ public class SinglePlant extends AppCompatActivity{
             }
         });
 
-        autoChangeDatesOnceItIsReached();
+        myPlant=Utils.autoChangeDatesOnceItIsReached(myPlant);
 
 
         plant_images.setOnClickListener(new View.OnClickListener() {
@@ -321,6 +321,7 @@ public class SinglePlant extends AppCompatActivity{
             public void onClick(View view) {
                 chooseDate(single_action_last_watered,0);
 
+
             }
         });
 
@@ -404,55 +405,89 @@ private int scrollRight(int size)
         final int month = calendar.get(Calendar.MONTH);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePicker =
-                new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(final DatePicker view, final int year, final int month,
-                                          final int dayOfMonth) {
+        if(((whatToUseItFor==0)&&(myPlant.getWateringNeeds()!=Watering_Needs.None)) ||
+                ((whatToUseItFor==1)&&(myPlant.getFertilizingNeeds()!=Fertilizing_Needs.None))) {
+            final DatePickerDialog datePicker =
+                    new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(final DatePicker view, final int year, final int month,
+                                              final int dayOfMonth) {
 
-                        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd/MM/yy");
-                        calendar.set(year, month, dayOfMonth);
-                        myDate=calendar.getTime();
-                        String dateString=simpleDateFormat.format(myDate);
-                        textView.setText(dateString);
-                        if(whatToUseItFor==0) {
-                            myPlant.setLastWatered(myDate);
-                            Date newDate=new Date();
-                            int days=myPlant.getWateringNeeds().value;
-                            if((myPlant.getLastWatered()!=null) &&(myPlant.getWateringNeeds()!=null)) {
-                                newDate=addDaysToDate(myDate,days);
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy");
+                            calendar.set(year, month, dayOfMonth);
+                            myDate = calendar.getTime();
+                            String dateString = simpleDateFormat.format(myDate);
+                            textView.setText(dateString);
+                            if (whatToUseItFor == 0) {
+                                myPlant.setLastWatered(myDate);
+                                Date newDate = new Date();
+                                int days = myPlant.getWateringNeeds().value;
+                                if ((myPlant.getLastWatered() != null) && (myPlant.getWateringNeeds() != null)) {
+                                    newDate = Utils.addDaysToDate(myDate, days);
+                                    myPlant.setNextWatering(newDate);
+                                }
+                                if(myPlant.isNotificationWatering())
+                                setWateringNotification(myPlant);
+
+                            } else if (whatToUseItFor == 1) {
+                                myPlant.setLastFertilized(myDate);
+                                Date newDate = new Date();
+                                int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
+                                if ((myPlant.getLastFertilized() != null) && (myPlant.getFertilizingNeeds() != null)) {
+                                    newDate = Utils.addDaysToDate(myDate, days);
+                                    myPlant.setNextFertilizing(newDate);
+                                }
+                                if(myPlant.isNotificationFertilizing())
+                                setFertilizingNotification(myPlant);
+
+                            } else {
+                                myPlant.setLastReplanted(myDate);
                             }
-                            myPlant.setNextWatering(newDate);
-                        }
+                            myPlant=Utils.autoChangeDatesOnceItIsReached(myPlant);
+                            addPlant(myPlant);
 
-                        else if(whatToUseItFor==1) {
-                            myPlant.setLastFertilized(myDate);
-                            Date newDate=new Date();
-                            int days=Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
-                            if((myPlant.getLastFertilized()!=null) &&(myPlant.getFertilizingNeeds()!=null)) {
-                                newDate=addDaysToDate(myDate,days);
+
+                        }
+                    }, year, month, day); // set date picker to current date
+            datePicker.getDatePicker().setMaxDate(new Date().getTime());
+            datePicker.show();
+
+            datePicker.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(final DialogInterface dialog) {
+                    dialog.dismiss();
+                }
+            });
+        }
+        else
+        {
+            if(whatToUseItFor==0)
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(SinglePlant.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Please set watering needs first");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
                             }
-                            myPlant.setNextFertilizing(newDate);
-                        }
-
-                        else {
-                            myPlant.setLastReplanted(myDate);
-                        }
-                        autoChangeDatesOnceItIsReached();
-                        addPlant(myPlant);
-
-
-                    }
-                }, year, month, day); // set date picker to current date
-        datePicker.getDatePicker().setMaxDate(new Date().getTime());
-        datePicker.show();
-
-        datePicker.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(final DialogInterface dialog) {
-                dialog.dismiss();
+                        });
+                alertDialog.show();
             }
-        });
+            else if(whatToUseItFor==1)
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(SinglePlant.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Please set fertilizing needs first");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        }
     }
 
     private void addPlant(Plant plant) {
@@ -460,43 +495,9 @@ private int scrollRight(int size)
         Utils.databaseReference.child("users").child(userID).child("plants").child(myPlant.getPlantID()).setValue(plant);
     }
 
-    private void autoChangeDatesOnceItIsReached(){
-        Date now=new Date();
-        now=addDaysToDate(now,-1);
-        if(myPlant!=null) {
-            if (myPlant.getNextWatering() != null) {
-                while (myPlant.getNextWatering().before(now)) {
-                    if ((myPlant.getNextWatering() == now) || (myPlant.getNextWatering().before(now))) {
-                        myPlant.setLastWatered(myPlant.getNextWatering());
-                        int days = myPlant.getWateringNeeds().value;
-                        myPlant.setNextWatering(addDaysToDate(myPlant.getLastWatered(), days));
-                    }
-                }
-            }
 
-            if (myPlant.getNextFertilizing() != null) {
-                while (myPlant.getNextFertilizing().before(now)) {
-                    if ((myPlant.getNextFertilizing() == now) || (myPlant.getNextFertilizing().before(now))) {
-                        myPlant.setLastFertilized(myPlant.getNextFertilizing());
-                        int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
-                        myPlant.setNextFertilizing(addDaysToDate(myPlant.getLastFertilized(), days));
-                    }
-                }
-                addPlant(myPlant);
-            }
-        }
-    }
 
-    //TODO lastwatered and nextwatering gets lost when going to modify plant
-    private Date addDaysToDate(Date myDate,int days)
-    {
-        Date newDate;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(myDate);
-        calendar.add(Calendar.DAY_OF_MONTH, days);
-        newDate=calendar.getTime();
-        return newDate;
-    }
+
 
     protected void createAlertDialogWithRadioButtons() {
         final String[]optionsArray=new String[]{
@@ -510,7 +511,6 @@ private int scrollRight(int size)
 
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setTitle("Notifications");
-       // builder.setMessage("What would you like notifications for?");
         builder.setMultiChoiceItems(optionsArray, checkedOptions, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which, boolean isChecked) {
@@ -525,40 +525,27 @@ private int scrollRight(int size)
                     boolean checked=checkedOptions[i];
                     if(checked) {
                         if (i == 0) {
-                            //TODO put this in a method and have to be set up globally
                             myPlant.setNotificationWatering(true);
-                            if(myPlant.getWateringNeeds()!=Watering_Needs.None) {
-                                if (myPlant.getNextWatering() == null) {
-                                    myPlant.setLastWatered(new Date());
-                                    myPlant.setNextWatering(addDaysToDate(myPlant.getLastWatered(), myPlant.getWateringNeeds().value));
-                                }
-                                long notificationTimeInMillis = myPlant.getNextWatering().getTime();
-                                long timeInMillisNow = new Date().getTime();
-                                long delay = notificationTimeInMillis - timeInMillisNow;
-                                scheduleNotification(getNotification(myPlant.getName() + " needs watering"), delay);
-                                Toast.makeText(SinglePlant.this, "Notification set successfully", Toast.LENGTH_SHORT).show();
-                            }
-                            else
-                                //TODO alertbox
-                            {Toast.makeText(SinglePlant.this, "Please set up your plant's watering needs",Toast.LENGTH_SHORT).show();}
-                            /*NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, CHANNEL_ID)
-                                    .setSmallIcon(R.drawable.my_plant_icon)
-                                    .setContentTitle("MyPlants")
-                                    .setContentText(myPlant.getName() + " needs watering")
-                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(Utils.applicationContext);
-                            notificationManager.notify(1, builder.build());*/
+                            setWateringNotification(myPlant);
+                            addPlant(myPlant);
 
                         }
-                        else
+                        else {
                             myPlant.setNotificationFertilizing(true);
+                            setFertilizingNotification(myPlant);
+                            addPlant(myPlant);
+                        }
                     }
                     else
                     {
-                        if(i==0)
+                        if(i==0) {
                             myPlant.setNotificationWatering(false);
-                        else
+                            myPlant.setWateringNotificationSet(false);
+                        }
+                        else {
                             myPlant.setNotificationFertilizing(false);
+                            myPlant.setFertilizingNotificationSet(false);
+                        }
                     }
                 }
                 addPlant(myPlant);
@@ -607,24 +594,87 @@ private int scrollRight(int size)
         return true;
     }
 
-    private void scheduleNotification(Notification notification, long delay) {
+    public void scheduleNotification(Notification notification, long delay, int notificationID) {
 
-        Intent notificationIntent = new Intent(this, AlarmReceiver.class);
-        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, 1);
+        //TODO how to sort out Utils.NotificationIterator Save it in DB? probably the best solution?
+        Intent notificationIntent = new Intent(SinglePlant.this, AlarmReceiver.class);
+        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(SinglePlant.this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager)SinglePlant.this.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
     }
 
-    private Notification getNotification(String content) {
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(this, CHANNEL_ID);
+    public Notification getNotification(String content) {
+        NotificationCompat.Builder builder=new NotificationCompat.Builder(SinglePlant.this, Utils.CHANNEL_ID);
         Notification notification = builder
-        .setContentTitle("Scheduled Notification")
-        .setContentText(content)
-        .setSmallIcon(R.drawable.my_plant_icon).build();
+                .setContentTitle("Scheduled Notification")
+                .setContentText(content)
+                .setSmallIcon(R.drawable.my_plant_icon).build();
         return notification;
+    }
+
+    public void setWateringNotification(Plant myPlant) {
+
+            if (myPlant.getWateringNeeds() != Watering_Needs.None) {
+                if (myPlant.getNextWatering() == null) {
+                    myPlant.setLastWatered(new Date());
+                    myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), myPlant.getWateringNeeds().value));
+                }
+                long notificationTimeInMillis = myPlant.getNextWatering().getTime();
+                long timeInMillisNow = new Date().getTime();
+                //long delay = notificationTimeInMillis - timeInMillisNow;
+                long delay=5000;
+                //TODO schedule notifications for a certain amount of time? like 30 days or something?
+                //TODO how to clear notifications
+                scheduleNotification(getNotification(myPlant.getName() + " needs watering"), delay, Utils.notification_iterator);
+                Toast.makeText(SinglePlant.this, "Notification set successfully", Toast.LENGTH_SHORT).show();
+                myPlant.setWateringNotificationSet(true);
+            } else
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(SinglePlant.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Please set up your plant's watering needs");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+
+            }
+    }
+
+    public void setFertilizingNotification(Plant myPlant) {
+
+            if (myPlant.getFertilizingNeeds() != Fertilizing_Needs.None) {
+                if (myPlant.getNextFertilizing() == null) {
+                    myPlant.setLastFertilized(new Date());
+                    myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), myPlant.getFertilizingNeeds().value));
+                }
+                long notificationTimeInMillis = myPlant.getNextFertilizing().getTime();
+                long timeInMillisNow = new Date().getTime();
+                //long delay = notificationTimeInMillis - timeInMillisNow;
+                long delay=10000;
+                scheduleNotification(getNotification(myPlant.getName() + " needs fertilizing"), delay, Utils.notification_iterator);
+                Toast.makeText(SinglePlant.this, "Notification set successfully", Toast.LENGTH_SHORT).show();
+                myPlant.setFertilizingNotificationSet(true);
+            } else
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(SinglePlant.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Please set up your plant's fertilizing needs");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+
+            }
     }
 }

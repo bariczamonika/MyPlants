@@ -46,6 +46,8 @@ public class Plant {
     private Date nextFertilizing;
     private boolean notificationWatering;
     private boolean notificationFertilizing;
+    private boolean isWateringNotificationSet;
+    private boolean isFertilizingNotificationSet;
 
     public Plant() {
 
@@ -64,6 +66,22 @@ public class Plant {
         this.lightCondition = lightCondition;
         this.profilePicPath=profilePicPath;
 
+    }
+
+    public boolean isWateringNotificationSet() {
+        return isWateringNotificationSet;
+    }
+
+    public void setWateringNotificationSet(boolean wateringNotificationSet) {
+        isWateringNotificationSet = wateringNotificationSet;
+    }
+
+    public boolean isFertilizingNotificationSet() {
+        return isFertilizingNotificationSet;
+    }
+
+    public void setFertilizingNotificationSet(boolean fertilizingNotificationSet) {
+        isFertilizingNotificationSet = fertilizingNotificationSet;
     }
 
     public String getProfilePicPath() {

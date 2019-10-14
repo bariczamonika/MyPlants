@@ -35,6 +35,8 @@
     <string name="plant_add_plant_title">Add a plant</string>
     <string name="plant_notes">Notes</string>
     <string name="plant_add_profile_picture">Add profile picture</string>
+    <string name="plant_modify_plant">Modify plant</string>
+    <string name="plant_modify_profile_pic">Modify profile picture</string>
 
     //Mainactivity
     <string name="all_my_plants">My Plants</string>
