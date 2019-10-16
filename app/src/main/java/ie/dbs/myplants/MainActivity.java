@@ -3,7 +3,6 @@ package ie.dbs.myplants;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
@@ -29,13 +28,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 //TODO filters and search bar
 public class MainActivity extends AppCompatActivity {
     private Button addPlantButton;
     private ArrayList<Object> plants = new ArrayList<>();
     private List<Plant>myPlants=new ArrayList<>();
+    private List<Plant>myNewPlants=new ArrayList<>();
+    private List<PlantNotifications> allNotifications=new ArrayList<>();
     FirebaseRecyclerOptions<Plant> options;
     FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter> adapter;
     RecyclerView recyclerView;
@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     Plant myPlant = plantSnapshot.getValue(Plant.class);
                     plants.add(myPlant);
-                    //myPlants.add(myPlant);
+                    myPlants.add(Utils.autoChangeDatesOnceItIsReached(myPlant));
+                    addPlant(myPlant);
                 }
 
                 Log.v("myplantsindb", plants.toString());
@@ -86,11 +87,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //TODO transfer this into splash together with database reference it should update the plant next watering
-        for (int i=0;i<plants.size();i++){
-            myPlants.set(i, Utils.autoChangeDatesOnceItIsReached(myPlants.get(i)));
-            addPlant(myPlants.get(i));
-        }
+
+
 
     }
 
