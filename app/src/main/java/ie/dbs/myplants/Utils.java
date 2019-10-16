@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class Utils extends Activity{
+public class Utils extends Activity {
     public static FirebaseUser user;
     public static FirebaseAuth mAuth;
     public static int MyVersion;
@@ -59,19 +59,17 @@ public class Utils extends Activity{
     public static DatabaseReference databaseReference;
     public static Plant temporary_plant;
     public static Integer plantIterator;
-    public static String CHANNEL_ID="my_channel_01";
-    public static boolean isCalledFromAlertDialog=false;
-    public static boolean removedBecauseExpired=false;
+    public static String CHANNEL_ID = "my_channel_01";
+    public static int isCalledFromAlertDialog = 0;
+    public static boolean removedBecauseExpired = false;
 
     //asks for permission on SDK>16
-    public static void AskForPermission(String myPermission, Activity whichActivity)
-    {
+    public static void AskForPermission(String myPermission, Activity whichActivity) {
 
-        if(Utils.MyVersion> Build.VERSION_CODES.LOLLIPOP_MR1){
-            if(ContextCompat.checkSelfPermission(applicationContext, myPermission)
-                    != PackageManager.PERMISSION_GRANTED)
-            {
-                ActivityCompat.requestPermissions(whichActivity, new String []{myPermission},1);
+        if (Utils.MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (ContextCompat.checkSelfPermission(applicationContext, myPermission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(whichActivity, new String[]{myPermission}, 1);
             }
         }
     }
@@ -79,17 +77,17 @@ public class Utils extends Activity{
     //create custom directory and save file
     public static String createDirectoryAndSaveFile(Bitmap imageToSave, Context context) {
 
-        File homeDirectory=new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
+        File homeDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
         if (!homeDirectory.exists()) {
             File plantDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
             plantDirectory.mkdirs();
         }
-        File myFile=new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
+        File myFile = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
 
-        String timestamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File file = new File(myFile, "picture"+
-                timestamp+".jpeg");
-        String imagePath=file.getAbsolutePath();
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File file = new File(myFile, "picture" +
+                timestamp + ".jpeg");
+        String imagePath = file.getAbsolutePath();
         if (file.exists()) {
             file.delete();
         }
@@ -100,7 +98,7 @@ public class Utils extends Activity{
             out.close();
             //TODO check mediascanner it's not showing in gallery
             MediaScannerConnection.scanFile(context,
-                    new String[] { file.toString() }, null,
+                    new String[]{file.toString()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
                         public void onScanCompleted(String path, Uri uri) {
                             Log.v("ExternalStorage", "Scanned " + path + ":");
@@ -139,7 +137,7 @@ public class Utils extends Activity{
 
     //validate registration form
     public static boolean validateRegistrationForm(@NotNull EditText emailAddress, EditText password, EditText
-                                                   passwordConfirmation) {
+            passwordConfirmation) {
         boolean valid = true;
 
         String email = emailAddress.getText().toString();
@@ -158,17 +156,14 @@ public class Utils extends Activity{
             password.setError(null);
         }
 
-        String myPasswordConfirmation=passwordConfirmation.getText().toString();
+        String myPasswordConfirmation = passwordConfirmation.getText().toString();
         if (TextUtils.isEmpty(myPasswordConfirmation)) {
             passwordConfirmation.setError("Required.");
             valid = false;
-        }
-        else if (!myPasswordConfirmation.equals(myPassword))
-        {
+        } else if (!myPasswordConfirmation.equals(myPassword)) {
             passwordConfirmation.setError("Passwords don't match");
-            valid=false;
-        }
-            else {
+            valid = false;
+        } else {
             passwordConfirmation.setError(null);
         }
 
@@ -178,140 +173,130 @@ public class Utils extends Activity{
     //convert Light condition enum to string array for spinners
     @NotNull
     public static String[] getLightConditionNames() {
-        String myArray=Arrays.toString(Light_Condition.values());
-        myArray=myArray.substring(1, myArray.length()-1);
+        String myArray = Arrays.toString(Light_Condition.values());
+        myArray = myArray.substring(1, myArray.length() - 1);
         return myArray.replace('_', ' ').split(", ");
     }
 
     @NotNull
     public static String[] getWateringNeedsNames() {
-        String myArray=Arrays.toString(Watering_Needs.values());
-        myArray=myArray.substring(1, myArray.length()-1);
+        String myArray = Arrays.toString(Watering_Needs.values());
+        myArray = myArray.substring(1, myArray.length() - 1);
         return myArray.replace('_', ' ').split(", ");
     }
 
     @NotNull
     public static String[] getFertilizingNeedsNames() {
-        String myArray=Arrays.toString(Fertilizing_Needs.values());
-        myArray=myArray.substring(1, myArray.length()-1);
+        String myArray = Arrays.toString(Fertilizing_Needs.values());
+        myArray = myArray.substring(1, myArray.length() - 1);
         return myArray.replace('_', ' ').split(", ");
     }
 
 
     //push pictures to database
-public static void PushPicToDB(String plantID, String imagePath)
-{
-    String userID=Utils.user.getUid();
-    PlantImage plantImage=new PlantImage(imagePath);
-    Utils.databaseReference.child("users").child(userID).child("plantsPics").child(plantID).child("images").push().setValue(plantImage);
-}
+    public static void PushPicToDB(String plantID, String imagePath) {
+        String userID = Utils.user.getUid();
+        PlantImage plantImage = new PlantImage(imagePath);
+        Utils.databaseReference.child("users").child(userID).child("plantsPics").child(plantID).child("images").push().setValue(plantImage);
+    }
 
-//retrieve image from saved position
-public static Bitmap getImageFromFile(String path)
-{
-    Drawable drawable=applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
-    Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
-    bitmap=Bitmap.createScaledBitmap(bitmap, 400,280,false);
+    //retrieve image from saved position
+    public static Bitmap getImageFromFile(String path) {
+        Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        bitmap = Bitmap.createScaledBitmap(bitmap, 400, 280, false);
 
-    if(path!=null) {
-        if (!path.equals("")) {
-            final File imgFile = new File(path);
-            if (imgFile.exists()) {
-                         bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                        if (bitmap.getHeight() > bitmap.getWidth())
-                            bitmap=Bitmap.createScaledBitmap(bitmap, 300,400,false);
-                        else
-                            bitmap=Bitmap.createScaledBitmap(bitmap, 400,280,false);
+        if (path != null) {
+            if (!path.equals("")) {
+                final File imgFile = new File(path);
+                if (imgFile.exists()) {
+                    bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                    if (bitmap.getHeight() > bitmap.getWidth())
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 300, 400, false);
+                    else
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 400, 280, false);
+                }
             }
         }
+        return bitmap;
+
     }
-    return bitmap;
 
-}
-
-public static String getPictureDateFromPicturePath(String picturePath)
-{
-        int length=picturePath.length();
-        int index=picturePath.indexOf("20");
-        String trimmedPicturePath=picturePath.substring(index, length-12);
-        String year=trimmedPicturePath.substring(0,4);
-        String month=trimmedPicturePath.substring(4,6);
-        String day=trimmedPicturePath.substring(6,8);
-        String picDate=day+"/"+month+"/"+year;
+    public static String getPictureDateFromPicturePath(String picturePath) {
+        int length = picturePath.length();
+        int index = picturePath.indexOf("20");
+        String trimmedPicturePath = picturePath.substring(index, length - 12);
+        String year = trimmedPicturePath.substring(0, 4);
+        String month = trimmedPicturePath.substring(4, 6);
+        String day = trimmedPicturePath.substring(6, 8);
+        String picDate = day + "/" + month + "/" + year;
         return picDate;
-}
-
-public static void deletePic(String picturePath)
-{
-    File file=new File(picturePath);
-    if (file.exists())
-    {
-        if(file.delete())
-            Log.v("File deleted", picturePath);
-        else
-            Log.v("File not deleted", picturePath);
     }
-}
 
-public static Date convertStringToDate(String string)
-{
-    Date myDate=new Date();
-    SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yy");
-    try
-    {
-        myDate=sdf.parse(string);
+    public static void deletePic(String picturePath) {
+        File file = new File(picturePath);
+        if (file.exists()) {
+            if (file.delete())
+                Log.v("File deleted", picturePath);
+            else
+                Log.v("File not deleted", picturePath);
+        }
     }
-    catch (ParseException ex)
-    {Log.v("Date exception", ex.getMessage());}
-    return myDate;
-}
 
-public static int convertFertilizingNeedsToInteger(int value)
-{
-    int newValue=0;
-    switch (value){
-        case 1:
-            newValue=7;
-            break;
-        case 2:
-            newValue=14;
-            break;
-        case 3:
-            newValue=21;
-            break;
-        case 4:
-            newValue=28;
-            break;
-        case 5:
-            newValue=42;
-            break;
-        case 6:
-            newValue=56;
-            break;
+    public static Date convertStringToDate(String string) {
+        Date myDate = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+        try {
+            myDate = sdf.parse(string);
+        } catch (ParseException ex) {
+            Log.v("Date exception", ex.getMessage());
+        }
+        return myDate;
+    }
+
+    public static int convertFertilizingNeedsToInteger(int value) {
+        int newValue = 0;
+        switch (value) {
+            case 1:
+                newValue = 7;
+                break;
+            case 2:
+                newValue = 14;
+                break;
+            case 3:
+                newValue = 21;
+                break;
+            case 4:
+                newValue = 28;
+                break;
+            case 5:
+                newValue = 42;
+                break;
+            case 6:
+                newValue = 56;
+                break;
             default:
                 break;
+        }
+        return newValue;
     }
-return newValue;
-}
 
 
-
-    public static Date addDaysToDate(Date myDate,int days)
-    {
+    public static Date addDaysToDate(Date myDate, int days) {
         Date newDate;
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(getLastMinuteOfDay(myDate));
+        calendar.setTime(getTimeOfDay(myDate));
         calendar.add(Calendar.DAY_OF_MONTH, days);
-        newDate=calendar.getTime();
+        newDate = calendar.getTime();
         return newDate;
     }
 
     //TODO user can choose the time for notification
-    public static Plant autoChangeDatesOnceItIsReached(Plant myPlant){
+    public static Plant autoChangeDatesOnceItIsReached(Plant myPlant) {
 
-        Date now=new Date();
-        now=getLastMinuteOfDay(now);
-        if(myPlant!=null) {
+        Date now = new Date();
+        now = getLastMinuteOfDay(now);
+        if (myPlant != null) {
             if (myPlant.getNextWatering() != null) {
                 while (myPlant.getNextWatering().before(now)) {
                     if ((myPlant.getNextWatering() == now) || (myPlant.getNextWatering().before(now))) {
@@ -336,36 +321,43 @@ return newValue;
         return myPlant;
     }
 
-    public static Date getLastMinuteOfDay(Date now)
-    {
-        Calendar calendar=Calendar.getInstance();
+    public static Date getLastMinuteOfDay(Date now) {
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
-        int year=calendar.get(Calendar.YEAR);
-        int month=calendar.get(Calendar.MONTH);
-        int day=calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year,month,day,23,59,59);
-        now=calendar.getTime();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year, month, day, 23, 59, 59);
+        now = calendar.getTime();
+        return now;
+    }
 
+    public static Date getTimeOfDay(Date now) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year, month, day, 11, 00, 00);
+        now = calendar.getTime();
         return now;
     }
 
     //TODO use this to look for unused IDs for plants
     //TODO use timestamp for unique id? or push it to db and use generated id?
-public static void addNotification(String plantID, PlantNotifications plantNotification, int notificationID)
-{
-    String userID = Utils.user.getUid();
-    Utils.databaseReference.child("users").child(userID).child("notifications").
-            child(String.valueOf(notificationID)).setValue(plantNotification);
-}
+    public static void addNotification(String plantID, PlantNotifications plantNotification, int notificationID) {
+        String userID = Utils.user.getUid();
+        Utils.databaseReference.child("users").child(userID).child("notifications").
+                child(String.valueOf(notificationID)).setValue(plantNotification);
+    }
 
-    public static void cancelNotification(int notificationID, Activity whichActivity)
-    {
+    public static void cancelNotification(int notificationID, Activity whichActivity) {
         Intent notificationIntent = new Intent(whichActivity, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(whichActivity, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager)whichActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) whichActivity.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
-        Toast.makeText(whichActivity, "Notification "+ notificationID + "cancelled", Toast.LENGTH_SHORT).show();
+        Toast.makeText(whichActivity, "Notification " + notificationID + "cancelled", Toast.LENGTH_SHORT).show();
     }
 
     public static void scheduleNotification(Notification notification, long delay, int notificationID, Activity whichActivity, long interval) {
@@ -377,19 +369,19 @@ public static void addNotification(String plantID, PlantNotifications plantNotif
         PendingIntent pendingIntent = PendingIntent.getBroadcast(whichActivity, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
-        AlarmManager alarmManager = (AlarmManager)whichActivity.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,futureInMillis,interval,pendingIntent);
-       // alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,futureInMillis, interval, pendingIntent);
-        Toast.makeText(whichActivity, "Notification set" +notificationID, Toast.LENGTH_SHORT).show();
-        SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putInt("notification_iterator", notificationID+1);
+        AlarmManager alarmManager = (AlarmManager) whichActivity.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, futureInMillis, interval, pendingIntent);
+        // alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,futureInMillis, interval, pendingIntent);
+        Toast.makeText(whichActivity, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
+        SharedPreferences sharedPreferences = whichActivity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("notification_iterator", notificationID + 1);
         editor.apply();
     }
 
 
     public static Notification getNotification(String content, Activity whichActivity) {
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(whichActivity, Utils.CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(whichActivity, Utils.CHANNEL_ID);
         Notification notification = builder
                 .setContentTitle("Scheduled Notification")
                 .setContentText(content)
@@ -405,16 +397,17 @@ public static void addNotification(String plantID, PlantNotifications plantNotif
                 myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value)));
             }
 
-                long interval= TimeUnit.DAYS.toMillis(Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value));
-                long delay=myPlant.getNextWatering().getTime();
-                SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
-                int notificationID=sharedPreferences.getInt("notification_iterator",0);
-                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing",whichActivity), delay, notificationID, whichActivity,interval);
-                PlantNotifications plantNotifications = new PlantNotifications(notificationID,
+            long interval = TimeUnit.DAYS.toMillis(Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value));
+            long delay = myPlant.getNextFertilizing().getTime();
+              /*  SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
+                int notificationID=sharedPreferences.getInt("notification_iterator",0);*/
+            int notificationID=generateNotificationID(myPlant.getPlantID(),false);
+
+            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing", whichActivity), delay, notificationID, whichActivity, interval);
+              /*  PlantNotifications plantNotifications = new PlantNotifications(notificationID,
                     Utils.addDaysToDate(myPlant.getNextFertilizing(),myPlant.getWateringNeeds().value), myPlant.getPlantID(), false);
-                Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);
-        } else
-        {
+                Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);*/
+        } else {
             AlertDialog alertDialog = new AlertDialog.Builder(whichActivity).create();
             alertDialog.setTitle("Alert");
             alertDialog.setMessage("Please set up your plant's fertilizing needs");
@@ -428,6 +421,7 @@ public static void addNotification(String plantID, PlantNotifications plantNotif
 
         }
     }
+
     public static void setWateringNotification(Plant myPlant, Activity whichActivity) {
 
         if (myPlant.getWateringNeeds() != Watering_Needs.None) {
@@ -438,36 +432,40 @@ public static void addNotification(String plantID, PlantNotifications plantNotif
 
             //TODO schedule notifications for a certain amount of time? 30 days
             //TODO how to clear notifications
-                long interval= TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value);
-                long delay=myPlant.getNextWatering().getTime();
-                SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
-                int notificationID=sharedPreferences.getInt("notification_iterator",0);
-                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" +notificationID,whichActivity), delay, notificationID,whichActivity, interval);
-                PlantNotifications plantNotifications = new PlantNotifications(notificationID,
+            long interval = TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value);
+            long delay = myPlant.getNextWatering().getTime();
+            int notificationID=generateNotificationID(myPlant.getPlantID(), true);
+                /*SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
+                int notificationID=sharedPreferences.getInt("notification_iterator",0);*/
+                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID, whichActivity), delay, notificationID, whichActivity, interval);
+               /* PlantNotifications plantNotifications = new PlantNotifications(notificationID,
                       Utils.addDaysToDate(myPlant.getNextWatering(),myPlant.getWateringNeeds().value), myPlant.getPlantID(), true);
-                Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);
+                Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);*/
 
-        } else
-        {
-            AlertDialog alertDialog = new AlertDialog.Builder(whichActivity).create();
-            alertDialog.setTitle("Alert");
-            alertDialog.setMessage("Please set up your plant's watering needs");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+            } else {
+                AlertDialog alertDialog = new AlertDialog.Builder(whichActivity).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Please set up your plant's watering needs");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+
         }
 
-    }
 
+      /*  //TODO plantiterator and notificationiterator has to be done differently, need an alogirithm to find not used ids in db
+        public static void cancelNotifications ( final boolean watering,
+        final Activity whichActivity, final Plant myPlant)
+        {
+            if (watering) {
 
-    //TODO plantiterator and notificationiterator has to be done differently, need an alogirithm to find not used ids in db
-    public static void cancelNotifications(final boolean watering, final Activity whichActivity, final Plant myPlant)
-    {
-        String userID = Utils.user.getUid();
+            }
+       /* String userID = Utils.user.getUid();
 
         final List<PlantNotifications>allNotifications=new ArrayList<>();
         DatabaseReference databaseReference=Utils.databaseReference.child("users").child(userID).child("notifications");
@@ -478,20 +476,21 @@ public static void addNotification(String plantID, PlantNotifications plantNotif
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()){
 
                     PlantNotifications plantNotifications=plantSnapshot.getValue(PlantNotifications.class);
-                    allNotifications.add(plantNotifications);
                     if(((watering)&&(plantNotifications.getPlantID().equals(myPlant.getPlantID())&&
-                            (plantNotifications.isWatering()))&&(isCalledFromAlertDialog)))
+                            (plantNotifications.isWatering()))&&(isCalledFromAlertDialog==1)))
                     {
                         plantSnapshot.getRef().removeValue();
                         Utils.cancelNotification(plantNotifications.getNotificationID(), whichActivity);
-                        Utils.isCalledFromAlertDialog=false;
+                        Utils.isCalledFromAlertDialog=0;
+
                     }
                     else if (((!watering)&&(plantNotifications.getPlantID().equals(myPlant.getPlantID()))
-                            &&(!plantNotifications.isWatering())&&(isCalledFromAlertDialog)))
+                            &&(!plantNotifications.isWatering())&&(isCalledFromAlertDialog==2)))
                     {
                         plantSnapshot.getRef().removeValue();
                         Utils.cancelNotification(plantNotifications.getNotificationID(), whichActivity);
-                        Utils.isCalledFromAlertDialog=false;
+                        Utils.isCalledFromAlertDialog=0;
+
                     }
 
                 }
@@ -504,7 +503,35 @@ public static void addNotification(String plantID, PlantNotifications plantNotif
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
-    }
-}
+      public static int generateNotificationID(String plantID, boolean isWatering)
+      {
+          int notificationID = 0;
+          if(isWatering) {
+              if (plantID != null) {
+                  String notificationIDString;
+                  if (!plantID.equals("0")) {
+                      notificationIDString = plantID + "0";
+                      notificationID = Integer.valueOf(notificationIDString);
+                  }
+                  else
+                      notificationID=0;
+              }
+          }
+          else
+          {
+              if (plantID != null) {
+                  String notificationIDString;
+                  if (!plantID.equals("0")) {
+                      notificationIDString = plantID + "1";
+                      notificationID = Integer.valueOf(notificationIDString);
+                  }
+                  else
+                      notificationID=1;
+              }
+          }
+          return notificationID;
+      }
+        }
+

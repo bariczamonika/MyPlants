@@ -219,7 +219,7 @@ public class SinglePlant extends AppCompatActivity{
         plant_images.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (plantImages!=null)
+                if (plantImages.size()!=0)
                 {
                     int size=plantImages.size();
                     index=scrollRight(size);
@@ -234,7 +234,7 @@ public class SinglePlant extends AppCompatActivity{
         scroll_left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (plantImages!=null)
+                if (plantImages.size()!=0)
                 {
                     int size=plantImages.size();
                     index=scrollLeft(size);
@@ -248,7 +248,7 @@ public class SinglePlant extends AppCompatActivity{
         scroll_right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (plantImages!=null)
+                if (plantImages.size()!=0)
                 {
                     int size=plantImages.size();
                     index=scrollRight(size);
@@ -494,6 +494,7 @@ private int scrollRight(int size)
 
 
 
+    //TODO have to check for if both checked
 
     protected void createAlertDialogWithRadioButtons() {
         final String[]optionsArray=new String[]{
@@ -523,26 +524,28 @@ private int scrollRight(int size)
                         if ((i == 0)&&(!myPlant.isNotificationWatering())) {
                             myPlant.setNotificationWatering(true);
                             Utils.setWateringNotification(myPlant, SinglePlant.this);
-                            addPlant(myPlant);
                         }
                         else if ((i==1)&&(!myPlant.isNotificationFertilizing())){
                             myPlant.setNotificationFertilizing(true);
                             Utils.setFertilizingNotification(myPlant, SinglePlant.this);
-                            addPlant(myPlant);
                         }
                     }
                     else
                     {
                         if((i==0)&&(myPlant.isNotificationWatering())) {
                             myPlant.setNotificationWatering(false);
-                            Utils.isCalledFromAlertDialog=true;
-                            Utils.cancelNotifications(true, SinglePlant.this, myPlant);
+                            Utils.isCalledFromAlertDialog=1;
+                            int notificationID=Utils.generateNotificationID(myPlant.getPlantID(), true);
+                            Utils.cancelNotification(notificationID,SinglePlant.this);
+                            //Utils.cancelNotifications(true, SinglePlant.this, myPlant);
                             //TODO cancel upcoming notifications
                         }
                         else if((i==1)&&(myPlant.isNotificationFertilizing())){
                             myPlant.setNotificationFertilizing(false);
-                            Utils.isCalledFromAlertDialog=true;
-                            Utils.cancelNotifications(false, SinglePlant.this, myPlant);
+                            Utils.isCalledFromAlertDialog=2;
+                            int notificationID=Utils.generateNotificationID(myPlant.getPlantID(), false);
+                            Utils.cancelNotification(notificationID, SinglePlant.this);
+                            //Utils.cancelNotifications(false, SinglePlant.this, myPlant);
 
                         }
                     }
