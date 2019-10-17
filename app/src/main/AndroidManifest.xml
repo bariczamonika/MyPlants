@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -14,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SinglePlant"></activity>
+
+        <activity android:name=".SinglePlant" />
         <activity android:name=".AddPlant" />
         <activity android:name=".AddPictureToPlant" />
         <activity android:name=".RegisterActivity" />
@@ -30,16 +32,29 @@
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
 
-                <category android:name="android.intent.category.MAIN" />
+                <category android:name="android.intent.category.MAIN" />,
+
             </intent-filter>
+
+
         </activity>
+
         <receiver android:name=".AlarmReceiver">
             <intent-filter>
                 <action android:name="android.media.action.DISPLAY_NOTIFICATION" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-    </application>
 
+        <receiver android:name=".DeviceBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+    </application>
 
 </manifest>

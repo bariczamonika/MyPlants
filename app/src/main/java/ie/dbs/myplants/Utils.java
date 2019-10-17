@@ -360,28 +360,24 @@ public class Utils extends Activity {
         Toast.makeText(whichActivity, "Notification " + notificationID + "cancelled", Toast.LENGTH_SHORT).show();
     }
 
-    public static void scheduleNotification(Notification notification, long delay, int notificationID, Activity whichActivity, long interval) {
+    public static void scheduleNotification(Notification notification, long delay, int notificationID, long interval) {
 
         //TODO how to sort out Utils.NotificationIterator Save it in DB? probably the best solution?
-        Intent notificationIntent = new Intent(whichActivity, AlarmReceiver.class);
+        Intent notificationIntent = new Intent(Utils.applicationContext, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(whichActivity, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(Utils.applicationContext, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
-        AlarmManager alarmManager = (AlarmManager) whichActivity.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, futureInMillis, interval, pendingIntent);
         // alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,futureInMillis, interval, pendingIntent);
-        Toast.makeText(whichActivity, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
-        SharedPreferences sharedPreferences = whichActivity.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("notification_iterator", notificationID + 1);
-        editor.apply();
+        Toast.makeText(Utils.applicationContext, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
     }
 
 
-    public static Notification getNotification(String content, Activity whichActivity) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(whichActivity, Utils.CHANNEL_ID);
+    public static Notification getNotification(String content) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID);
         Notification notification = builder
                 .setContentTitle("Scheduled Notification")
                 .setContentText(content)
@@ -389,7 +385,7 @@ public class Utils extends Activity {
         return notification;
     }
 
-    public static void setFertilizingNotification(Plant myPlant, Activity whichActivity) {
+    public static void setFertilizingNotification(Plant myPlant) {
 
         if (myPlant.getFertilizingNeeds() != Fertilizing_Needs.None) {
             if (myPlant.getNextFertilizing() == null) {
@@ -403,12 +399,12 @@ public class Utils extends Activity {
                 int notificationID=sharedPreferences.getInt("notification_iterator",0);*/
             int notificationID=generateNotificationID(myPlant.getPlantID(),false);
 
-            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing", whichActivity), delay, notificationID, whichActivity, interval);
+            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), delay, notificationID,  interval);
               /*  PlantNotifications plantNotifications = new PlantNotifications(notificationID,
                     Utils.addDaysToDate(myPlant.getNextFertilizing(),myPlant.getWateringNeeds().value), myPlant.getPlantID(), false);
                 Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);*/
         } else {
-            AlertDialog alertDialog = new AlertDialog.Builder(whichActivity).create();
+            AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
             alertDialog.setTitle("Alert");
             alertDialog.setMessage("Please set up your plant's fertilizing needs");
             alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -422,7 +418,7 @@ public class Utils extends Activity {
         }
     }
 
-    public static void setWateringNotification(Plant myPlant, Activity whichActivity) {
+    public static void setWateringNotification(Plant myPlant) {
 
         if (myPlant.getWateringNeeds() != Watering_Needs.None) {
             if (myPlant.getNextWatering() == null) {
@@ -433,17 +429,21 @@ public class Utils extends Activity {
             //TODO schedule notifications for a certain amount of time? 30 days
             //TODO how to clear notifications
             long interval = TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value);
+            //long interval=10000*6;
             long delay = myPlant.getNextWatering().getTime();
+            //long delay=30000;
             int notificationID=generateNotificationID(myPlant.getPlantID(), true);
+            Log.v("delayAlarm", String.valueOf(myPlant.getNextWatering()));
+            Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
                 /*SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
                 int notificationID=sharedPreferences.getInt("notification_iterator",0);*/
-                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID, whichActivity), delay, notificationID, whichActivity, interval);
+                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), delay, notificationID,  interval);
                /* PlantNotifications plantNotifications = new PlantNotifications(notificationID,
                       Utils.addDaysToDate(myPlant.getNextWatering(),myPlant.getWateringNeeds().value), myPlant.getPlantID(), true);
                 Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);*/
 
             } else {
-                AlertDialog alertDialog = new AlertDialog.Builder(whichActivity).create();
+                AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
                 alertDialog.setTitle("Alert");
                 alertDialog.setMessage("Please set up your plant's watering needs");
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",

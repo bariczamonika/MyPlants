@@ -423,7 +423,7 @@ private int scrollRight(int size)
                                     myPlant.setNextWatering(newDate);
                                 }
                                 if(myPlant.isNotificationWatering())
-                                Utils.setWateringNotification(myPlant, SinglePlant.this);
+                                Utils.setWateringNotification(myPlant);
 
                             } else if (whatToUseItFor == 1) {
                                 myPlant.setLastFertilized(myDate);
@@ -434,7 +434,7 @@ private int scrollRight(int size)
                                     myPlant.setNextFertilizing(newDate);
                                 }
                                 if(myPlant.isNotificationFertilizing())
-                                Utils.setFertilizingNotification(myPlant, SinglePlant.this);
+                                Utils.setFertilizingNotification(myPlant);
 
                             } else {
                                 myPlant.setLastReplanted(myDate);
@@ -523,11 +523,11 @@ private int scrollRight(int size)
                     if(checked) {
                         if ((i == 0)&&(!myPlant.isNotificationWatering())) {
                             myPlant.setNotificationWatering(true);
-                            Utils.setWateringNotification(myPlant, SinglePlant.this);
+                            Utils.setWateringNotification(myPlant);
                         }
                         else if ((i==1)&&(!myPlant.isNotificationFertilizing())){
                             myPlant.setNotificationFertilizing(true);
-                            Utils.setFertilizingNotification(myPlant, SinglePlant.this);
+                            Utils.setFertilizingNotification(myPlant);
                         }
                     }
                     else

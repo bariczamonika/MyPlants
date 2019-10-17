@@ -2,43 +2,58 @@ package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //TODO filters and search bar
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private Button addPlantButton;
     private ArrayList<Object> plants = new ArrayList<>();
-    private List<Plant>myPlants=new ArrayList<>();
     private List<Plant>myNewPlants=new ArrayList<>();
     private List<PlantNotifications> allNotifications=new ArrayList<>();
-    FirebaseRecyclerOptions<Plant> options;
-    FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter> adapter;
+    private final List<Plant> fullPlantList=new ArrayList<>();
+    private ArrayList<Plant> myPlants;
+    private EditText searchBar;
+    private DatabaseReference databaseReference;
+    private SearchView searchView;
     RecyclerView recyclerView;
+    String search;
 
 
     @Override
@@ -54,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setDrawingCacheEnabled(true);
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
-
+        searchView=findViewById(R.id.searchBar);
         addPlantButton = findViewById(R.id.addPlant);
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,30 +81,64 @@ public class MainActivity extends AppCompatActivity {
 
 
         String userID = Utils.user.getUid();
-        final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
-        plantListRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                displayPlants();
-                for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
-                    Plant myPlant = plantSnapshot.getValue(Plant.class);
-                    plants.add(myPlant);
-                    myPlants.add(Utils.autoChangeDatesOnceItIsReached(myPlant));
-                    addPlant(myPlant);
+        databaseReference = Utils.databaseReference.child("users").child(userID).child("plants");
+
+
+
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(databaseReference!=null){
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        myPlants=new ArrayList<>();
+                        for(DataSnapshot plantSnapshot:dataSnapshot.getChildren()){
+                            myPlants.add(plantSnapshot.getValue(Plant.class));
+                        }
+                        PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(myPlants);
+                        recyclerView.setAdapter(plantRecyclerAdapter);
+                    }
+                    if(searchView!=null){
+                        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                            @Override
+                            public boolean onQueryTextSubmit(String query) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onQueryTextChange(String newText) {
+                                search(newText);
+                                return true;
+                            }
+                        });
+                    }
+
                 }
 
-                Log.v("myplantsindb", plants.toString());
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        }
+    }
+
+    private void search(String str){
+        ArrayList<Plant> list=new ArrayList<>();
+        for(Plant plant:myPlants){
+            if(plant.getName().toLowerCase().trim().contains(str.toLowerCase())){
+                list.add(plant);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.v("Error retrieving plant", "loadPost:onCancelled", databaseError.toException());
-            }
-        });
-
-
-
-
+        }
+        PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(list);
+        recyclerView.setAdapter(plantRecyclerAdapter);
     }
 
     @Override
@@ -132,12 +181,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void displayPlants()
+   /* private void displayPlants()
     {
+
         String userID = Utils.user.getUid();
         final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
+        Query query =plantListRef.orderByChild("plants").equalTo(search);
         options = new FirebaseRecyclerOptions.Builder<Plant>()
-                .setQuery(plantListRef, Plant.class).build();
+                .setQuery(query, Plant.class).build();
         adapter = new FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull PlantRecyclerAdapter holder, int position, @NonNull Plant model) {
@@ -177,9 +228,11 @@ public class MainActivity extends AppCompatActivity {
         if(adapter!=null)
         adapter.startListening();
     }
-
+*/
     private void addPlant(Plant plant) {
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
     }
+
+
 }
