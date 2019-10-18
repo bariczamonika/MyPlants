@@ -27,12 +27,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.RequestQueue;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,6 +45,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -55,7 +63,7 @@ public class Utils extends Activity {
     public static Integer plantIterator;
     public static String CHANNEL_ID = "my_channel_01";
     public static int isCalledFromAlertDialog = 0;
-    public static boolean removedBecauseExpired = false;
+    public static RequestQueue queue;
 
     //asks for permission on SDK>16
     public static void AskForPermission(String myPermission, Activity whichActivity) {
@@ -510,6 +518,41 @@ public class Utils extends Activity {
               }
           }
           return sortedPlants;
+    }
+
+    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Iterator<String> keysItr = object.keys();
+        while (keysItr.hasNext()) {
+            String key = keysItr.next();
+            Object value = object.get(key);
+            if (value instanceof JSONArray) {
+                value = toList((JSONArray) value);
+            } else if (value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    public static List<Object> toList(JSONArray array) {
+        List<Object> list = new ArrayList<Object>();
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                Object value = array.get(i);
+                if (value instanceof JSONArray) {
+                    value = toList((JSONArray) value);
+                } else if (value instanceof JSONObject) {
+                    value = Utils.toMap((JSONObject) value);
+                }
+                list.add(value);
+            }
+        } catch (Exception ex) {
+            Log.e("Exception", ex.getMessage());
+            Toast.makeText(applicationContext, "That didn't work", Toast.LENGTH_SHORT).show();
+        }
+        return list;
     }
 }
 

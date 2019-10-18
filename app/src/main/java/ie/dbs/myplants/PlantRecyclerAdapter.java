@@ -12,9 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 
 public class PlantRecyclerAdapter extends RecyclerView.Adapter<PlantRecyclerAdapter.myViewHolder> {

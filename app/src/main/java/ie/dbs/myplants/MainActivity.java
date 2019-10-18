@@ -220,5 +220,10 @@ public class MainActivity extends AppCompatActivity{
         Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent=new Intent(MainActivity.this, DashBoard.class);
+        startActivity(intent);
+    }
 }

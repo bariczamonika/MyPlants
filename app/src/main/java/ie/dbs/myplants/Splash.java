@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -46,10 +47,13 @@ public class Splash extends Activity {
             startActivity(intent);
             finish();
         } else {
-            Intent intent = new Intent(Splash.this, MainActivity.class);
+            Intent intent = new Intent(Splash.this, DashBoard.class);
             startActivity(intent);
             finish();
         }
+
+        if (Utils.queue == null) {
+            Utils.queue = Volley.newRequestQueue(getApplicationContext());}
 
     }
     private void createNotificationChannel() {

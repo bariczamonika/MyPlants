@@ -12,6 +12,8 @@
     <string name="channel_description">My plants channel</string>
     <string name="search_hint">search by name</string>
     <string name="sort_by">Sort by</string>
+    <string name="api_url">http://api.openweathermap.org/data/2.5/forecast?</string>
+    <string name="api_key">bf9fa411797e941a3536db50a36c86d5</string>
 
     //Login Activity
     <string name="login_email">Email Address</string>
@@ -64,4 +66,13 @@
     <string name="single_tasks_fertilizing">Next fertilizing</string>
     <string name="single_tasks_replanting">Next replanting</string>
     <string name="notification_button">Manage notifications</string>
+
+    //TaskRecyclerAdapter
+    <string name="task_fertilizing">Fertilizing</string>
+    <string name="task_watering">Watering</string>
+    <string name="task_todays_tasks">Today\'s tasks</string>
+    <string name="task_tomorrows_tasks">Tomorrow\'s tasks</string>
+
+    //Dashboard
+    <string name="all_plants_button">All plants</string>
 </resources>
