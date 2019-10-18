@@ -7,53 +7,34 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
-import android.app.DownloadManager;
-import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
-//TODO filters and search bar
 public class MainActivity extends AppCompatActivity{
     private Button addPlantButton;
-    private ArrayList<Object> plants = new ArrayList<>();
-    private List<Plant>myNewPlants=new ArrayList<>();
-    private List<PlantNotifications> allNotifications=new ArrayList<>();
-    private final List<Plant> fullPlantList=new ArrayList<>();
     private ArrayList<Plant> myPlants;
-    private EditText searchBar;
     private DatabaseReference databaseReference;
     private SearchView searchView;
+    private AlertDialog alertDialog1;
+    private ArrayList<Plant> filteredPlants;
+
     RecyclerView recyclerView;
-    String search;
+    CharSequence[] values = {"Name", "Date Added", "Outdoor Plants", "Indoor Plants"};
 
 
     @Override
@@ -82,16 +63,15 @@ public class MainActivity extends AppCompatActivity{
 
         String userID = Utils.user.getUid();
         databaseReference = Utils.databaseReference.child("users").child(userID).child("plants");
-
-
-
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        displayPlants();
+    }
+
+    public void displayPlants(){
         if(databaseReference!=null){
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -113,11 +93,12 @@ public class MainActivity extends AppCompatActivity{
 
                             @Override
                             public boolean onQueryTextChange(String newText) {
-                                search(newText);
+                                filteredPlants=search(newText);
                                 return true;
                             }
                         });
                     }
+                    else filteredPlants=myPlants;
 
                 }
 
@@ -130,7 +111,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private void search(String str){
+    private ArrayList<Plant> search(String str){
         ArrayList<Plant> list=new ArrayList<>();
         for(Plant plant:myPlants){
             if(plant.getName().toLowerCase().trim().contains(str.toLowerCase())){
@@ -139,6 +120,7 @@ public class MainActivity extends AppCompatActivity{
         }
         PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(list);
         recyclerView.setAdapter(plantRecyclerAdapter);
+        return list;
     }
 
     @Override
@@ -150,6 +132,7 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.logout: {
                 final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -173,6 +156,9 @@ public class MainActivity extends AppCompatActivity{
                 dialog.show();
                 break;
             }
+            case R.id.sortBy:{
+                CreateAlertDialogWithRadioButtons();
+            }
 
             default:
                 break;
@@ -181,54 +167,54 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-   /* private void displayPlants()
-    {
+    protected void CreateAlertDialogWithRadioButtons() {
+        if(searchView==null)
+            filteredPlants=myPlants;
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle("Sort By");
 
-        String userID = Utils.user.getUid();
-        final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
-        Query query =plantListRef.orderByChild("plants").equalTo(search);
-        options = new FirebaseRecyclerOptions.Builder<Plant>()
-                .setQuery(query, Plant.class).build();
-        adapter = new FirebaseRecyclerAdapter<Plant, PlantRecyclerAdapter>(options) {
-                    @Override
-                    protected void onBindViewHolder(@NonNull PlantRecyclerAdapter holder, int position, @NonNull Plant model) {
-                        holder.txt_name.setText(model.getName());
-                        String myPath = model.getProfilePicPath();
-                        Bitmap bitmap=Utils.getImageFromFile(myPath);
-                        if(bitmap.getWidth()>bitmap.getHeight())
-                            bitmap=Bitmap.createBitmap(bitmap, 0,0,bitmap.getHeight(), bitmap.getHeight());
-                        else
-                            bitmap=Bitmap.createBitmap(bitmap, 0,0,bitmap.getWidth(), bitmap.getWidth());
-                        holder.img_avatar.setImageBitmap(bitmap);
-                        holder.plantID=model.getPlantID();
-                    }
+        builder.setSingleChoiceItems(values, -1, new DialogInterface.OnClickListener() {
 
-                    @NonNull
-                    @Override
-                    public PlantRecyclerAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                        View itemView = LayoutInflater.from(getBaseContext()).inflate(R.layout.all_plants, parent, false);
-                        return new PlantRecyclerAdapter(itemView);
-                    }
-                };
-        adapter.startListening();
-        recyclerView.setAdapter(adapter);
+            public void onClick(DialogInterface dialog, int item) {
+
+                switch(item)
+                {
+                    case 0:
+                        ArrayList<Plant>sortedList=Utils.sortStringBubble(filteredPlants, true);
+                        PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(sortedList);
+                        recyclerView.setAdapter(plantRecyclerAdapter);
+                        Toast.makeText(MainActivity.this, "Name selected", Toast.LENGTH_LONG).show();
+                        break;
+                    case 1:
+
+                        sortedList=Utils.sortStringBubble(filteredPlants, false);
+                        plantRecyclerAdapter=new PlantRecyclerAdapter(sortedList);
+                        recyclerView.setAdapter(plantRecyclerAdapter);
+                        Toast.makeText(MainActivity.this, "Date selected", Toast.LENGTH_LONG).show();
+                        break;
+                     case 2:
+                        sortedList=Utils.sortByOutDoorPlant(filteredPlants,true);
+                        plantRecyclerAdapter=new PlantRecyclerAdapter(sortedList);
+                        recyclerView.setAdapter(plantRecyclerAdapter);
+                        Toast.makeText(MainActivity.this, "Outdoor plants selected", Toast.LENGTH_LONG).show();
+                        break;
+                    case 3:
+                        sortedList=Utils.sortByOutDoorPlant(filteredPlants,false);
+                        plantRecyclerAdapter=new PlantRecyclerAdapter(sortedList);
+                        recyclerView.setAdapter(plantRecyclerAdapter);
+                        Toast.makeText(MainActivity.this, "Indoor plants selected", Toast.LENGTH_LONG).show();
+                        break;
+                        default:
+                            break;
+                }
+                alertDialog1.dismiss();
+            }
+        });
+        alertDialog1 = builder.create();
+        alertDialog1.show();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (adapter!=null)
-            adapter.stopListening();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        displayPlants();
-        if(adapter!=null)
-        adapter.startListening();
-    }
-*/
     private void addPlant(Plant plant) {
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);

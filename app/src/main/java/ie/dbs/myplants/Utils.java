@@ -8,7 +8,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,30 +22,25 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -243,16 +237,6 @@ public class Utils extends Activity {
         }
     }
 
-    public static Date convertStringToDate(String string) {
-        Date myDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
-        try {
-            myDate = sdf.parse(string);
-        } catch (ParseException ex) {
-            Log.v("Date exception", ex.getMessage());
-        }
-        return myDate;
-    }
 
     public static int convertFertilizingNeedsToInteger(int value) {
         int newValue = 0;
@@ -285,7 +269,7 @@ public class Utils extends Activity {
     public static Date addDaysToDate(Date myDate, int days) {
         Date newDate;
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(getTimeOfDay(myDate));
+        calendar.setTime(getLastMinuteOfDay(myDate));
         calendar.add(Calendar.DAY_OF_MONTH, days);
         newDate = calendar.getTime();
         return newDate;
@@ -343,13 +327,6 @@ public class Utils extends Activity {
         return now;
     }
 
-    //TODO use this to look for unused IDs for plants
-    //TODO use timestamp for unique id? or push it to db and use generated id?
-    public static void addNotification(String plantID, PlantNotifications plantNotification, int notificationID) {
-        String userID = Utils.user.getUid();
-        Utils.databaseReference.child("users").child(userID).child("notifications").
-                child(String.valueOf(notificationID)).setValue(plantNotification);
-    }
 
     public static void cancelNotification(int notificationID, Activity whichActivity) {
         Intent notificationIntent = new Intent(whichActivity, AlarmReceiver.class);
@@ -371,7 +348,6 @@ public class Utils extends Activity {
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
         AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, futureInMillis, interval, pendingIntent);
-        // alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,futureInMillis, interval, pendingIntent);
         Toast.makeText(Utils.applicationContext, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
     }
 
@@ -394,15 +370,14 @@ public class Utils extends Activity {
             }
 
             long interval = TimeUnit.DAYS.toMillis(Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value));
-            long delay = myPlant.getNextFertilizing().getTime();
-              /*  SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
-                int notificationID=sharedPreferences.getInt("notification_iterator",0);*/
+            Date now=new Date();
+            Date notificationDate=getTimeOfDay(myPlant.getNextFertilizing());
+            if(now.getTime()>notificationDate.getTime())
+                notificationDate= getTimeOfDay((addDaysToDate(notificationDate,convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value))));
+            long delay =notificationDate.getTime()-now.getTime();
             int notificationID=generateNotificationID(myPlant.getPlantID(),false);
 
             Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), delay, notificationID,  interval);
-              /*  PlantNotifications plantNotifications = new PlantNotifications(notificationID,
-                    Utils.addDaysToDate(myPlant.getNextFertilizing(),myPlant.getWateringNeeds().value), myPlant.getPlantID(), false);
-                Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);*/
         } else {
             AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
             alertDialog.setTitle("Alert");
@@ -429,19 +404,15 @@ public class Utils extends Activity {
             //TODO schedule notifications for a certain amount of time? 30 days
             //TODO how to clear notifications
             long interval = TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value);
-            //long interval=10000*6;
-            long delay = myPlant.getNextWatering().getTime();
-            //long delay=30000;
+            Date now=new Date();
+            Date notificationDate=getTimeOfDay(myPlant.getNextWatering());
+            if(now.getTime()>notificationDate.getTime())
+               notificationDate= getTimeOfDay((addDaysToDate(notificationDate,myPlant.getWateringNeeds().value)));
+            long delay =notificationDate.getTime()-now.getTime();
             int notificationID=generateNotificationID(myPlant.getPlantID(), true);
-            Log.v("delayAlarm", String.valueOf(myPlant.getNextWatering()));
+            Log.v("delayAlarm", String.valueOf(delay));
             Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
-                /*SharedPreferences sharedPreferences=whichActivity.getPreferences(Context.MODE_PRIVATE);
-                int notificationID=sharedPreferences.getInt("notification_iterator",0);*/
                 Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), delay, notificationID,  interval);
-               /* PlantNotifications plantNotifications = new PlantNotifications(notificationID,
-                      Utils.addDaysToDate(myPlant.getNextWatering(),myPlant.getWateringNeeds().value), myPlant.getPlantID(), true);
-                Utils.addNotification(myPlant.getPlantID(), plantNotifications, notificationID);*/
-
             } else {
                 AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
                 alertDialog.setTitle("Alert");
@@ -458,52 +429,7 @@ public class Utils extends Activity {
         }
 
 
-      /*  //TODO plantiterator and notificationiterator has to be done differently, need an alogirithm to find not used ids in db
-        public static void cancelNotifications ( final boolean watering,
-        final Activity whichActivity, final Plant myPlant)
-        {
-            if (watering) {
 
-            }
-       /* String userID = Utils.user.getUid();
-
-        final List<PlantNotifications>allNotifications=new ArrayList<>();
-        DatabaseReference databaseReference=Utils.databaseReference.child("users").child(userID).child("notifications");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()){
-
-                    PlantNotifications plantNotifications=plantSnapshot.getValue(PlantNotifications.class);
-                    if(((watering)&&(plantNotifications.getPlantID().equals(myPlant.getPlantID())&&
-                            (plantNotifications.isWatering()))&&(isCalledFromAlertDialog==1)))
-                    {
-                        plantSnapshot.getRef().removeValue();
-                        Utils.cancelNotification(plantNotifications.getNotificationID(), whichActivity);
-                        Utils.isCalledFromAlertDialog=0;
-
-                    }
-                    else if (((!watering)&&(plantNotifications.getPlantID().equals(myPlant.getPlantID()))
-                            &&(!plantNotifications.isWatering())&&(isCalledFromAlertDialog==2)))
-                    {
-                        plantSnapshot.getRef().removeValue();
-                        Utils.cancelNotification(plantNotifications.getNotificationID(), whichActivity);
-                        Utils.isCalledFromAlertDialog=0;
-
-                    }
-
-                }
-
-
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });*/
 
       public static int generateNotificationID(String plantID, boolean isWatering)
       {
@@ -533,5 +459,57 @@ public class Utils extends Activity {
           }
           return notificationID;
       }
+
+
+    public static ArrayList<Plant> sortStringBubble( ArrayList<Plant> plants, boolean name )
+    {
+        int j;
+        boolean flag = true;  // will determine when the sort is finished
+        Plant temp;
+
+        while ( flag )
+        {
+            flag = false;
+            for ( j = 0;  j < plants.size() - 1;  j++ )
+            {
+                if(name) {
+                    if (plants.get(j).getName().compareToIgnoreCase(plants.get(j + 1).getName()) > 0) {
+                        temp = plants.get(j);
+                        plants.set(j, plants.get(j + 1));
+                        plants.set(j + 1, temp);
+                        flag = true;
+                    }
+                }
+                else
+                {
+                    if(plants.get(j).getDateAdded().compareTo(plants.get(j+1).getDateAdded())>0){
+                        temp = plants.get(j);
+                        plants.set(j, plants.get(j + 1));
+                        plants.set(j + 1, temp);
+                        flag = true;
+                    }
+                }
+            }
         }
+        return plants;
+    }
+
+    public static ArrayList<Plant> sortByOutDoorPlant(ArrayList<Plant>plants, boolean outdoor){
+          ArrayList<Plant>sortedPlants=new ArrayList<>();
+          for(Plant plant:plants) {
+              if (outdoor) {
+                  if (plant.isOutdoorPlant()){
+                      sortedPlants.add(plant);
+                  }
+              }
+              else
+              {
+                  if(!plant.isOutdoorPlant()){
+                      sortedPlants.add(plant);
+                  }
+              }
+          }
+          return sortedPlants;
+    }
+}
 

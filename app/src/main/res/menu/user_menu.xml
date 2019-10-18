@@ -13,5 +13,8 @@
         android:id="@+id/logout"
         app:showAsAction="ifRoom"
         android:title="@string/user_menu_logout"/>
+    <item
+        android:id="@+id/sortBy"
+        android:title="@string/sort_by"/>
 
 </menu>

@@ -71,7 +71,6 @@ public class SinglePlant extends AppCompatActivity{
     private ExpandableRelativeLayout expandableRelativeLayout;
     private ExpandableRelativeLayout expandableRelativeLayout2;
     private ExpandableRelativeLayout expandableRelativeLayout3;
-    final List<PlantNotifications> myNotifications=new ArrayList<>();
 
     private Button notificationButton;
     Date myDate=new Date();
