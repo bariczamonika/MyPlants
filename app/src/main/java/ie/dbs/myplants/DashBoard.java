@@ -39,6 +39,7 @@ import org.json.JSONObject;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -134,14 +135,17 @@ public class DashBoard extends AppCompatActivity {
                     if (dataSnapshot.exists()) {
                         task_plants = new ArrayList<>();
                         for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
-                            task_plants.add(plantSnapshot.getValue(Plant.class));
+                            Plant myPlant=plantSnapshot.getValue(Plant.class);
+                            myPlant=Utils.autoChangeDatesOnceItIsReached(myPlant);
+                            task_plants.add(Utils.autoChangeDatesOnceItIsReached(myPlant));
+                            addPlant(myPlant);
                         }
                         ArrayList<Plant>my_task_plants=todaysPlants(task_plants);
                         TaskRecyclerAdapter taskRecyclerAdapter = new TaskRecyclerAdapter(my_task_plants);
                         task_recycler_view.setAdapter(taskRecyclerAdapter);
                         ArrayList<Plant>tomorrow_task_plants=tomorrowsPlants(task_plants);
-                        TaskRecyclerAdapter taskRecyclerAdapter1=new TaskRecyclerAdapter(tomorrow_task_plants);
-                        task_tomorrow_recycler_view.setAdapter(taskRecyclerAdapter1);
+                        TomorrowTaskRecyclerAdapter tomorrowTaskRecyclerAdapter=new TomorrowTaskRecyclerAdapter(tomorrow_task_plants);
+                        task_tomorrow_recycler_view.setAdapter(tomorrowTaskRecyclerAdapter);
                     }
                 }
 
@@ -156,17 +160,15 @@ public class DashBoard extends AppCompatActivity {
     private ArrayList<Plant> todaysPlants(ArrayList<Plant> plants)
     {
         ArrayList<Plant>plantList=new ArrayList<>();
-        Date yesterday=Utils.addDaysToDate(Utils.getLastMinuteOfDay(new Date()),-1);
-        Date tomorrow=Utils.getLastMinuteOfDay(new Date());
-        Log.v("yesterday", String.valueOf(yesterday));
+        Date tomorrow=Utils.addOneSecondToDate(Utils.getLastMinuteOfDay(new Date()));
         Log.v("tomorrow", String.valueOf(tomorrow));
         for(int i=0;i<plants.size();i++){
             Date fertilizing_date=plants.get(i).getNextFertilizing();
             Date watering_date=plants.get(i).getNextWatering();
-            if(fertilizing_date!=null&&fertilizing_date.before(tomorrow)&&fertilizing_date.after(yesterday)){
+            if(fertilizing_date!=null&&fertilizing_date.before(tomorrow)){
                 plantList.add(plants.get(i));
             }
-            else if(watering_date!=null&&watering_date.before(tomorrow) && watering_date.after(yesterday)){
+            else if(watering_date!=null&& watering_date.before(tomorrow)){
                 plantList.add(plants.get(i));
             }
         }
@@ -176,8 +178,8 @@ public class DashBoard extends AppCompatActivity {
     private ArrayList<Plant> tomorrowsPlants(ArrayList<Plant> plants)
     {
         ArrayList<Plant>plantList=new ArrayList<>();
-        Date day_after_tomorrow=Utils.addDaysToDate(Utils.getLastMinuteOfDay(new Date()),2);
-        Date today=Utils.getLastMinuteOfDay(new Date());
+        Date day_after_tomorrow=Utils.addOneSecondToDate(Utils.addDaysToDate(Utils.getLastMinuteOfDay(new Date()),1));
+        Date today=Utils.addOneSecondToDate(Utils.getLastMinuteOfDay(new Date()));
         Log.v("day after tomorrow", String.valueOf(day_after_tomorrow));
         Log.v("today", String.valueOf(today));
         for(int i=0;i<plants.size();i++){
@@ -186,7 +188,7 @@ public class DashBoard extends AppCompatActivity {
             if(fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today)){
                 plantList.add(plants.get(i));
             }
-            else if(watering_date!=null&&watering_date.before(day_after_tomorrow) && watering_date.after(today)){
+            else if(watering_date!=null&&watering_date.before(day_after_tomorrow) && (watering_date.after(today))){
                 plantList.add(plants.get(i));
             }
         }
@@ -272,5 +274,8 @@ public class DashBoard extends AppCompatActivity {
             }
         }, 200);
     }
-
+    private void addPlant(Plant plant) {
+        String userID=Utils.user.getUid();
+        Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
+    }
 }

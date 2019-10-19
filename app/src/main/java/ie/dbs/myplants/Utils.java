@@ -287,25 +287,23 @@ public class Utils extends Activity {
     public static Plant autoChangeDatesOnceItIsReached(Plant myPlant) {
 
         Date now = new Date();
-        now = getLastMinuteOfDay(now);
+        now = addDaysToDate(getLastMinuteOfDay(now), -1);
         if (myPlant != null) {
             if (myPlant.getNextWatering() != null) {
-                while (myPlant.getNextWatering().before(now)) {
-                    if ((myPlant.getNextWatering() == now) || (myPlant.getNextWatering().before(now))) {
+                while (myPlant.getNextWatering().before(now)|| myPlant.getNextWatering().equals(now)) {
                         myPlant.setLastWatered(myPlant.getNextWatering());
                         int days = myPlant.getWateringNeeds().value;
                         myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), days));
-                    }
                 }
             }
 
             if (myPlant.getNextFertilizing() != null) {
-                while (myPlant.getNextFertilizing().before(now)) {
-                    if ((myPlant.getNextFertilizing() == now) || (myPlant.getNextFertilizing().before(now))) {
+                while (myPlant.getNextFertilizing().before(now) || (myPlant.getNextFertilizing() == now)) {
+
                         myPlant.setLastFertilized(myPlant.getNextFertilizing());
                         int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
                         myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), days));
-                    }
+
                 }
 
             }
@@ -332,6 +330,14 @@ public class Utils extends Activity {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         calendar.set(year, month, day, 11, 00, 00);
         now = calendar.getTime();
+        return now;
+    }
+
+    public static Date addOneSecondToDate(Date now){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.SECOND,1);
+        now=calendar.getTime();
         return now;
     }
 

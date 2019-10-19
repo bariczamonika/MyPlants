@@ -15,10 +15,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
+public class TomorrowTaskRecyclerAdapter extends RecyclerView.Adapter<TomorrowTaskRecyclerAdapter.ViewHolder> {
     ArrayList<Plant> task_plants;
 
-    public TaskRecyclerAdapter(ArrayList<Plant>task_plants){this.task_plants=task_plants;}
+    public TomorrowTaskRecyclerAdapter(ArrayList<Plant>task_plants){this.task_plants=task_plants;}
 
     class ViewHolder extends RecyclerView.ViewHolder{
         TextView task_plant_name;
@@ -36,21 +36,25 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.task_list, parent, false);
         return new ViewHolder(view);
     }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //TODO put the filter in activity
         holder.task_plant_name.setText(task_plants.get(position).getName());
-        Date tomorrow=Utils.addOneSecondToDate(Utils.getLastMinuteOfDay(new Date()));
-        Log.v("tomorrow", String.valueOf(tomorrow));
+        Date day_after_tomorrow=Utils.addOneSecondToDate(Utils.addDaysToDate(Utils.getLastMinuteOfDay(new Date()),1));
+        Date today=Utils.addOneSecondToDate(Utils.getLastMinuteOfDay(new Date()));
+        Log.v("day after tomorrow", String.valueOf(day_after_tomorrow));
+        Log.v("today", String.valueOf(today));
+
             Date fertilizing_date=task_plants.get(position).getNextFertilizing();
             Date watering_date=task_plants.get(position).getNextWatering();
-            if(fertilizing_date!=null&&fertilizing_date.before(tomorrow)){
+            if(fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today)){
                 holder.task_action.setText(R.string.task_fertilizing);
             }
-            else if(watering_date!=null&&watering_date.before(tomorrow)){
+            else if(watering_date!=null&&watering_date.before(day_after_tomorrow) && watering_date.after(today)){
                 holder.task_action.setText(R.string.task_watering);
             }
     }
+
 
     @Override
     public int getItemCount() {

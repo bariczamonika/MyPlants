@@ -79,7 +79,9 @@ public class MainActivity extends AppCompatActivity{
                     if(dataSnapshot.exists()){
                         myPlants=new ArrayList<>();
                         for(DataSnapshot plantSnapshot:dataSnapshot.getChildren()){
-                            myPlants.add(plantSnapshot.getValue(Plant.class));
+                            Plant myPlant=plantSnapshot.getValue(Plant.class);
+                            myPlants.add(myPlant);
+
                         }
                         PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(myPlants);
                         recyclerView.setAdapter(plantRecyclerAdapter);
