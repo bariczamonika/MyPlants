@@ -3,12 +3,15 @@ package ie.dbs.myplants;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.Notification;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -18,6 +21,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -38,6 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.security.Permission;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,8 +59,9 @@ public class DashBoard extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private int longitude;
     private int latitude;
+    private TextView current_temp, current_max_temp, current_min_temp,current_wind_speed,tomorrow_temp,
+    tomorrow_min_temp,tomorrow_max_temp,tomorrow_wind_speed;
     private List<Object> data;
-    private JSONArray jsonArray;
     String url;
 
     @Override
@@ -65,6 +71,14 @@ public class DashBoard extends AppCompatActivity {
         all_plants_button = findViewById(R.id.all_plants_button);
         task_recycler_view = findViewById(R.id.task_recycler_view);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        current_temp=findViewById(R.id.current_temp);
+        current_max_temp=findViewById(R.id.current_max);
+        current_min_temp=findViewById(R.id.current_min);
+        current_wind_speed=findViewById(R.id.current_wind_speed);
+        tomorrow_max_temp=findViewById(R.id.tomorrow_max);
+        tomorrow_min_temp=findViewById(R.id.tomorrow_min);
+        tomorrow_temp=findViewById(R.id.tomorrow_temperature);
+        tomorrow_wind_speed=findViewById(R.id.tomorrow_wind_speed);
 
         Utils.AskForPermission(Manifest.permission.ACCESS_COARSE_LOCATION, DashBoard.this);
         Utils.AskForPermission(Manifest.permission.ACCESS_NETWORK_STATE, DashBoard.this);
@@ -205,6 +219,11 @@ public class DashBoard extends AppCompatActivity {
                 try {
                     //jsonArray=new JSONArray(response);
                     final JSONObject jsonObject=new JSONObject(response);
+                    //JSONObject listObject=jsonObject.getJSONObject("list");
+                    final JSONArray listArray=jsonObject.getJSONArray("list");
+
+                    //final JSONArray windArray=listObject.getJSONArray("wind");
+                   // Log.v("weather temp array",String.valueOf(tempArray));
 
 
 
@@ -221,23 +240,98 @@ public class DashBoard extends AppCompatActivity {
 
 
 
-                    new AsyncTask<Void, Void, Void>() {
+                  new AsyncTask<Void, Void, Void>() {
 
+                      List<WeatherInfo> todayWeatherList=new ArrayList<>();
+                      List<WeatherInfo> tomorrowWeatherList=new ArrayList<>();
+                      WeatherInfo todaysWeather=new WeatherInfo();
+                      WeatherInfo tomorrowsWeather=new WeatherInfo();
+                      int notificationIterator=0;
                         @Override
                         protected Void doInBackground(Void... voids) {
-                            WeatherInfo weatherInfo;
-                           List<WeatherInfo> wetList=new ArrayList<>();
-                            try {
-                                for (int i=0;i<jsonObject.length();i++) {
-                                    double currentTemp=Double.parseDouble(jsonObject.getString("list.main.temp"));
-                                    double currentMinTemp=Double.parseDouble(jsonObject.getString("list.main.temp_min"));
-                                    double currentMaxTemp=Double.parseDouble(jsonObject.getString("list.main.temp_max"));
-                                    double currentWindSpeed=Double.parseDouble(jsonObject.getString("list.wind.speed"));
-                                    weatherInfo = new WeatherInfo(currentTemp,currentMinTemp,currentMaxTemp,currentWindSpeed);
-                                    wetList.add(weatherInfo);
-                                    Log.v("weatherinfo", weatherInfo.toString());
-                                }
 
+                            try {
+                                for(int i=0;i<listArray.length();i++) {
+                                    JSONObject jsonTempObject=listArray.getJSONObject(i);
+                                    JSONObject tempObject=jsonTempObject.getJSONObject("main");
+                                    JSONObject windObject=jsonTempObject.getJSONObject("wind");
+                                    String timeObject=jsonTempObject.getString("dt_txt");
+                                    if(Utils.isDateToday(Utils.createDateFromString(timeObject)))
+                                    {
+                                        WeatherInfo weather=new WeatherInfo();
+                                        weather.setCurrentTemp(Double.parseDouble(tempObject.getString("temp")));
+                                        weather.setCurrentMinTemp(Double.parseDouble(tempObject.getString("temp_min")));
+                                        weather.setCurrentMaxTemp(Double.parseDouble(tempObject.getString("temp_max")));
+                                        weather.setCurrentWindSpeed(Double.parseDouble(windObject.getString("speed"))*3.6);
+                                        todayWeatherList.add(weather);
+                                        if(weather.getCurrentMinTemp()<0)
+                                        {
+                                            NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
+                                                    .setSmallIcon(R.drawable.my_plant_icon)
+                                                    .setContentTitle(getResources().getString(R.string.weather_alert))
+                                                    .setContentText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject))
+                                                    .setStyle(new NotificationCompat.BigTextStyle()
+                                                            .bigText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject)))
+                                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                                            NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
+                                            notificationManagerCompat.notify(notificationIterator,builder.build());
+                                            notificationIterator++;
+                                        }
+
+                                        if(weather.getCurrentWindSpeed()>50)
+                                        {
+                                            NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
+                                                    .setSmallIcon(R.drawable.my_plant_icon)
+                                                    .setContentTitle(getResources().getString(R.string.weather_alert))
+                                                    .setContentText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject))
+                                                    .setStyle(new NotificationCompat.BigTextStyle()
+                                                            .bigText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject)))
+                                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                                            NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
+                                            notificationManagerCompat.notify(notificationIterator,builder.build());
+                                            notificationIterator++;
+                                        }
+
+                                        Log.v("weatherTimeToday", String.valueOf(timeObject));
+                                    }
+                                    else if (Utils.isDateTomorrow(Utils.createDateFromString(timeObject)))
+                                    {
+                                        WeatherInfo weather=new WeatherInfo();
+                                        weather.setCurrentTemp(Double.parseDouble(tempObject.getString("temp")));
+                                        weather.setCurrentMinTemp(Double.parseDouble(tempObject.getString("temp_min")));
+                                        weather.setCurrentMaxTemp(Double.parseDouble(tempObject.getString("temp_max")));
+                                        weather.setCurrentWindSpeed(Double.parseDouble(windObject.getString("speed"))*3.6);
+                                        tomorrowWeatherList.add(weather);
+                                        if(weather.getCurrentMinTemp()<0)
+                                        {
+                                            NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
+                                                    .setSmallIcon(R.drawable.my_plant_icon)
+                                                    .setContentTitle(getResources().getString(R.string.weather_alert))
+                                                    .setContentText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject))
+                                                    .setStyle(new NotificationCompat.BigTextStyle()
+                                                            .bigText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject)))
+                                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                                            NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
+                                            notificationManagerCompat.notify(notificationIterator,builder.build());
+                                            notificationIterator++;
+                                        }
+                                        if(weather.getCurrentWindSpeed()>50)
+                                        {
+                                            NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
+                                                    .setSmallIcon(R.drawable.my_plant_icon)
+                                                    .setContentTitle(getResources().getString(R.string.weather_alert))
+                                                    .setContentText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject))
+                                                    .setStyle(new NotificationCompat.BigTextStyle()
+                                                            .bigText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject)))
+                                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                                            NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
+                                            notificationManagerCompat.notify(notificationIterator,builder.build());
+                                            notificationIterator++;
+                                        }
+                                        Log.v("weatherTimeTomorrow", String.valueOf(timeObject));
+                                    }
+
+                                }
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -245,7 +339,62 @@ public class DashBoard extends AppCompatActivity {
                             }
                             return null;
                         }
-                    }.execute();
+
+                      @Override
+                      protected void onPostExecute(Void aVoid) {
+                          super.onPostExecute(aVoid);
+                          double avgTemp=0;
+                          double avgMinTemp=0;
+                          double avgMaxTemp=0;
+                          double avgWindSpeed=0;
+                          DecimalFormat decimalFormat=new DecimalFormat("#.##");
+                          if(todayWeatherList!=null) {
+                              for (int i = 0; i < todayWeatherList.size(); i++) {
+                                  avgTemp = avgTemp + todayWeatherList.get(i).getCurrentTemp();
+                                  Log.v("weatherAVGTemp",String.valueOf(avgTemp));
+                                  avgMaxTemp = avgMaxTemp + todayWeatherList.get(i).getCurrentMaxTemp();
+                                  avgMinTemp = avgMinTemp + todayWeatherList.get(i).getCurrentMinTemp();
+                                  avgWindSpeed = avgWindSpeed + todayWeatherList.get(i).getCurrentWindSpeed();
+                              }
+                              avgTemp = avgTemp / todayWeatherList.size();
+                              avgMaxTemp=avgMaxTemp/todayWeatherList.size();
+                              avgMinTemp=avgMinTemp/todayWeatherList.size();
+                              avgWindSpeed=avgWindSpeed/todayWeatherList.size();
+                              Log.v("weatherAVGTemp",String.valueOf(avgTemp));
+                              todaysWeather.setCurrentTemp(avgTemp);
+                              todaysWeather.setCurrentMaxTemp(avgMaxTemp);
+                              todaysWeather.setCurrentMinTemp(avgMinTemp);
+                              todaysWeather.setCurrentWindSpeed(avgWindSpeed);
+                              current_temp.setText(decimalFormat.format(todaysWeather.getCurrentTemp()) + "°C");
+                              current_max_temp.setText(decimalFormat.format(todaysWeather.getCurrentMaxTemp()) + "°C");
+                              current_min_temp.setText(decimalFormat.format(todaysWeather.getCurrentMinTemp())+"°C");
+                              current_wind_speed.setText(decimalFormat.format(todaysWeather.getCurrentWindSpeed()) + "km/h");
+                          }
+
+                          if(tomorrowWeatherList!=null)
+                          {
+                              for (int i = 0; i < tomorrowWeatherList.size(); i++) {
+                                  avgTemp = avgTemp + tomorrowWeatherList.get(i).getCurrentTemp();
+                                  avgMaxTemp = avgMaxTemp + tomorrowWeatherList.get(i).getCurrentMaxTemp();
+                                  avgMinTemp = avgMinTemp + tomorrowWeatherList.get(i).getCurrentMinTemp();
+                                  avgWindSpeed = avgWindSpeed + tomorrowWeatherList.get(i).getCurrentWindSpeed();
+                              }
+                              avgTemp = avgTemp / tomorrowWeatherList.size();
+                              avgMaxTemp=avgMaxTemp/tomorrowWeatherList.size();
+                              avgMinTemp=avgMinTemp/tomorrowWeatherList.size();
+                              avgWindSpeed=avgWindSpeed/tomorrowWeatherList.size();
+                              tomorrowsWeather.setCurrentTemp(avgTemp);
+                              tomorrowsWeather.setCurrentMaxTemp(avgMaxTemp);
+                              tomorrowsWeather.setCurrentMinTemp(avgMinTemp);
+                              tomorrowsWeather.setCurrentWindSpeed(avgWindSpeed);
+                              tomorrow_max_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentMaxTemp()) + "°C");
+                              tomorrow_min_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentMinTemp()) + "°C");
+                              tomorrow_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentTemp())+"°C");
+                              tomorrow_wind_speed.setText(decimalFormat.format(tomorrowsWeather.getCurrentWindSpeed()) + "km/h");
+                          }
+
+                      }
+                  }.execute();
 
 
 
