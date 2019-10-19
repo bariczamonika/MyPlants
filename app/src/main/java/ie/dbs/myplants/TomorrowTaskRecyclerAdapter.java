@@ -50,7 +50,7 @@ public class TomorrowTaskRecyclerAdapter extends RecyclerView.Adapter<TomorrowTa
             if(fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today)){
                 holder.task_action.setText(R.string.task_fertilizing);
             }
-            else if(watering_date!=null&&watering_date.before(day_after_tomorrow) && watering_date.after(today)){
+            if(watering_date!=null&&watering_date.before(day_after_tomorrow) && watering_date.after(today)){
                 holder.task_action.setText(R.string.task_watering);
             }
     }

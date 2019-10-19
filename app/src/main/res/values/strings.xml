@@ -75,4 +75,22 @@
 
     //Dashboard
     <string name="all_plants_button">All plants</string>
+
+    //Weather forecast
+    <string name="today_forecast">Today\'s forecast</string>
+    <string name="current_temperature">Current temperature</string>
+    <string name="current_min">Minimum temperature</string>
+    <string name="current_max">Maximum temperature</string>
+    <string name="current_wind_speed">Wind speed</string>
+
+    <string name="tomorrow_forecast">Tomorrow\'s forecast</string>
+    <string name="tomorrow_temperature">Average temperature</string>
+    <string name="tomorrow_min">Minimum temperature</string>
+    <string name="tomorrow_max">Maximum temperature</string>
+    <string name="tomorrow_wind_speed">Wind speed</string>
+
+    //Notifications
+    <string name="frost_expected">Please check the weather forecast some frost is expected at </string>
+    <string name="wind_expected">Please check the weather forecast heavy wind is expected at </string>
+    <string name="weather_alert">Weather alert</string>
 </resources>

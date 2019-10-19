@@ -51,6 +51,26 @@ public class Plant {
 
     }
 
+    public Plant(Plant anotherPlant){
+        this.nextFertilizing=anotherPlant.nextFertilizing;
+        this.profilePicPath=anotherPlant.profilePicPath;
+        this.plantID=anotherPlant.plantID;
+        this.name=anotherPlant.name;
+        this.description=anotherPlant.description;
+        this.notes=anotherPlant.notes;
+        this.dateAdded=anotherPlant.dateAdded;
+        this.wateringNeeds=anotherPlant.wateringNeeds;
+        this.fertilizingNeeds=anotherPlant.fertilizingNeeds;
+        this.lastFertilized=anotherPlant.lastFertilized;
+        this.lastReplanted=anotherPlant.lastReplanted;
+        this.lastWatered=anotherPlant.lastWatered;
+        this.outdoorPlant=anotherPlant.outdoorPlant;
+        this.lightCondition=anotherPlant.lightCondition;
+        this.nextWatering=anotherPlant.nextWatering;
+        this.notificationWatering=anotherPlant.notificationWatering;
+        this.notificationFertilizing=anotherPlant.notificationFertilizing;
+    }
+
     public Plant(String plantID, String name, String description, Date dateAdded, String notes, Watering_Needs wateringNeeds,
                  Fertilizing_Needs fertilizingNeeds, boolean outdoorPlant, Light_Condition lightCondition, String profilePicPath) {
         this.plantID=plantID;

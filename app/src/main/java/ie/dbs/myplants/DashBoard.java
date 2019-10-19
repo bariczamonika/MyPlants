@@ -177,14 +177,24 @@ public class DashBoard extends AppCompatActivity {
         Date tomorrow=Utils.addOneSecondToDate(Utils.getLastMinuteOfDay(new Date()));
         Log.v("tomorrow", String.valueOf(tomorrow));
         for(int i=0;i<plants.size();i++){
+            Plant myPlant=plants.get(i);
             Date fertilizing_date=plants.get(i).getNextFertilizing();
             Date watering_date=plants.get(i).getNextWatering();
-            if(fertilizing_date!=null&&fertilizing_date.before(tomorrow)){
-                plantList.add(plants.get(i));
+            boolean isFertilizingDateToday=fertilizing_date!=null&&fertilizing_date.before(tomorrow);
+            boolean isWateringDateToday=watering_date!=null&& watering_date.before(tomorrow);
+
+            if(isFertilizingDateToday&&isWateringDateToday)
+            {
+
+                Plant newPlant=new Plant(myPlant);
+                newPlant.setNextFertilizing(null);
+                plantList.add(newPlant);
+                Plant newNewPlant=new Plant(myPlant);
+                newNewPlant.setNextWatering(null);
+                plantList.add(newNewPlant);
             }
-            else if(watering_date!=null&& watering_date.before(tomorrow)){
-                plantList.add(plants.get(i));
-            }
+            else if(isFertilizingDateToday ^ isWateringDateToday)
+                plantList.add(myPlant);
         }
         return plantList;
     }
@@ -197,14 +207,23 @@ public class DashBoard extends AppCompatActivity {
         Log.v("day after tomorrow", String.valueOf(day_after_tomorrow));
         Log.v("today", String.valueOf(today));
         for(int i=0;i<plants.size();i++){
-            Date fertilizing_date=plants.get(i).getNextFertilizing();
-            Date watering_date=plants.get(i).getNextWatering();
-            if(fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today)){
-                plantList.add(plants.get(i));
+            Plant myPlant=plants.get(i);
+            Date fertilizing_date=myPlant.getNextFertilizing();
+            Date watering_date=myPlant.getNextWatering();
+            boolean isFertilizingDateTomorrow=fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today);
+            boolean isWateringDateTomorrow=watering_date!=null&&watering_date.before(day_after_tomorrow) && (watering_date.after(today));
+            if(isFertilizingDateTomorrow&&isWateringDateTomorrow)
+            {
+
+                Plant newPlant=new Plant(myPlant);
+                newPlant.setNextFertilizing(null);
+                plantList.add(newPlant);
+                Plant newNewPlant=new Plant(myPlant);
+                newNewPlant.setNextWatering(null);
+                plantList.add(newNewPlant);
             }
-            else if(watering_date!=null&&watering_date.before(day_after_tomorrow) && (watering_date.after(today))){
-                plantList.add(plants.get(i));
-            }
+            else if(isFertilizingDateTomorrow ^ isWateringDateTomorrow)
+                plantList.add(myPlant);
         }
         return plantList;
     }

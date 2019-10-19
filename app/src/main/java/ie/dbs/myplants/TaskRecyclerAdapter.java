@@ -47,7 +47,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
             if(fertilizing_date!=null&&fertilizing_date.before(tomorrow)){
                 holder.task_action.setText(R.string.task_fertilizing);
             }
-            else if(watering_date!=null&&watering_date.before(tomorrow)){
+            if(watering_date!=null&&watering_date.before(tomorrow)){
                 holder.task_action.setText(R.string.task_watering);
             }
     }

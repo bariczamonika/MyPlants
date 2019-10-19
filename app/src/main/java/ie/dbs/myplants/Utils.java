@@ -341,6 +341,42 @@ public class Utils extends Activity {
         return now;
     }
 
+    public static Date createDateFromString(String string)
+    {
+        Date date=new Date();
+        String[] stringArray=string.split(" ");
+        String[]dateArray=stringArray[0].split("-");
+        String []timeArray=stringArray[1].split(":");
+        Calendar calendar=Calendar.getInstance();
+        calendar.set(Integer.parseInt(dateArray[0]),Integer.parseInt(dateArray[1])-1, Integer.parseInt(dateArray[2]),
+                Integer.parseInt(timeArray[0]),Integer.parseInt(timeArray[1]), Integer.parseInt(timeArray[2]));
+        date=calendar.getTime();
+        return date;
+    }
+
+    public static boolean isDateToday(Date date)
+    {
+        boolean check=false;
+        Date now=new Date();
+        Date today=addOneSecondToDate(addDaysToDate(getLastMinuteOfDay(now), -1));
+        Date tomorrow=getLastMinuteOfDay(now);
+        if(date.before(tomorrow)&&date.after(today))
+            check=true;
+        return check;
+    }
+
+    public static boolean isDateTomorrow(Date date)
+    {
+        boolean check=false;
+        Date now=new Date();
+        Date day_after_tomorrow=addDaysToDate(getLastMinuteOfDay(now), 1);
+        Date tomorrow=addOneSecondToDate(getLastMinuteOfDay(now));
+        if(date.before(day_after_tomorrow)&&date.after(tomorrow))
+            check=true;
+        return check;
+    }
+
+
 
     public static void cancelNotification(int notificationID, Activity whichActivity) {
         Intent notificationIntent = new Intent(whichActivity, AlarmReceiver.class);
@@ -359,9 +395,9 @@ public class Utils extends Activity {
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(Utils.applicationContext, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+
         AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, futureInMillis, interval, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, delay, interval, pendingIntent);
         Toast.makeText(Utils.applicationContext, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
     }
 
@@ -388,7 +424,7 @@ public class Utils extends Activity {
             Date notificationDate=getTimeOfDay(myPlant.getNextFertilizing());
             if(now.getTime()>notificationDate.getTime())
                 notificationDate= getTimeOfDay((addDaysToDate(notificationDate,convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value))));
-            long delay =notificationDate.getTime()-now.getTime();
+            long delay =notificationDate.getTime();
             int notificationID=generateNotificationID(myPlant.getPlantID(),false);
 
             Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), delay, notificationID,  interval);
@@ -422,7 +458,7 @@ public class Utils extends Activity {
             Date notificationDate=getTimeOfDay(myPlant.getNextWatering());
             if(now.getTime()>notificationDate.getTime())
                notificationDate= getTimeOfDay((addDaysToDate(notificationDate,myPlant.getWateringNeeds().value)));
-            long delay =notificationDate.getTime()-now.getTime();
+            long delay =notificationDate.getTime();
             int notificationID=generateNotificationID(myPlant.getPlantID(), true);
             Log.v("delayAlarm", String.valueOf(delay));
             Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
