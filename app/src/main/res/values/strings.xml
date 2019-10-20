@@ -46,6 +46,7 @@
     <string name="all_my_plants">My Plants</string>
 
     //Single plant
+    <string name="single_gallery">Gallery</string>
     <string name="single_add_picture">Add more pictures</string>
     <string name="single_information">Information </string>
     <string name="single_information_plant_name">Plant\'s name</string>

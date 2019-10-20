@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.aakira.expandablelayout.ExpandableLinearLayout;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ import java.util.Map;
 
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
     ArrayList<Plant> task_plants;
+
 
     public TaskRecyclerAdapter(ArrayList<Plant>task_plants){this.task_plants=task_plants;}
 
@@ -38,7 +41,6 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     }
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //TODO put the filter in activity
         holder.task_plant_name.setText(task_plants.get(position).getName());
         Date tomorrow=Utils.addOneSecondToDate(Utils.getLastMinuteOfDay(new Date()));
         Log.v("tomorrow", String.valueOf(tomorrow));

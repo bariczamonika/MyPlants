@@ -28,6 +28,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.github.aakira.expandablelayout.ExpandableLinearLayout;
+import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -59,9 +61,17 @@ public class DashBoard extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private int longitude;
     private int latitude;
+    private SearchView searchView;
+    private ArrayList<Plant> filteredPlants;
+    private ArrayList<Plant> filteredTomorrowPlants;
+    private ArrayList<Plant> my_task_plants;
+    private ArrayList<Plant> tomorrow_task_plants;
     private TextView current_temp, current_max_temp, current_min_temp,current_wind_speed,tomorrow_temp,
     tomorrow_min_temp,tomorrow_max_temp,tomorrow_wind_speed;
     private List<Object> data;
+    private ExpandableRelativeLayout expandable_today_weather;
+    private ExpandableRelativeLayout expandable_tomorrow_weather;
+    private TextView tomorrows_forecast, todays_forecast, tomorrows_forecast_plus_minus, todays_forecast_plus_minus;
     String url;
 
     @Override
@@ -79,6 +89,43 @@ public class DashBoard extends AppCompatActivity {
         tomorrow_min_temp=findViewById(R.id.tomorrow_min);
         tomorrow_temp=findViewById(R.id.tomorrow_temperature);
         tomorrow_wind_speed=findViewById(R.id.tomorrow_wind_speed);
+        searchView=findViewById(R.id.dashboardSearchBar);
+        expandable_today_weather=findViewById(R.id.expandable_layout_today);
+        expandable_tomorrow_weather=findViewById(R.id.expandable_layout_tomorrow);
+        todays_forecast=findViewById(R.id.todays_forecast);
+        tomorrows_forecast=findViewById(R.id.tomorrows_forecast);
+        todays_forecast_plus_minus=findViewById(R.id.todays_forecast_plus_minus);
+        tomorrows_forecast_plus_minus=findViewById(R.id.tomorrows_forecast_plus_minus);
+        expandable_tomorrow_weather.collapse();
+        expandable_today_weather.collapse();
+
+        todays_forecast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(expandable_today_weather.isExpanded()){
+                    expandable_today_weather.collapse();
+                    todays_forecast_plus_minus.setText("+");
+                }
+                else{
+                    expandable_today_weather.expand();
+                    todays_forecast_plus_minus.setText("-");
+                }
+            }
+        });
+
+        tomorrows_forecast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(expandable_tomorrow_weather.isExpanded()){
+                    expandable_tomorrow_weather.collapse();
+                    tomorrows_forecast_plus_minus.setText("+");
+                }
+                else{
+                    expandable_tomorrow_weather.expand();
+                    tomorrows_forecast_plus_minus.setText("-");
+                }
+            }
+        });
 
         Utils.AskForPermission(Manifest.permission.ACCESS_COARSE_LOCATION, DashBoard.this);
         Utils.AskForPermission(Manifest.permission.ACCESS_NETWORK_STATE, DashBoard.this);
@@ -101,12 +148,6 @@ public class DashBoard extends AppCompatActivity {
                 }
             });
         }
-
-
-
-
-
-
 
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -154,12 +195,27 @@ public class DashBoard extends AppCompatActivity {
                             task_plants.add(Utils.autoChangeDatesOnceItIsReached(myPlant));
                             addPlant(myPlant);
                         }
-                        ArrayList<Plant>my_task_plants=todaysPlants(task_plants);
+                        my_task_plants=todaysPlants(task_plants);
                         TaskRecyclerAdapter taskRecyclerAdapter = new TaskRecyclerAdapter(my_task_plants);
                         task_recycler_view.setAdapter(taskRecyclerAdapter);
-                        ArrayList<Plant>tomorrow_task_plants=tomorrowsPlants(task_plants);
+                        tomorrow_task_plants=tomorrowsPlants(task_plants);
                         TomorrowTaskRecyclerAdapter tomorrowTaskRecyclerAdapter=new TomorrowTaskRecyclerAdapter(tomorrow_task_plants);
                         task_tomorrow_recycler_view.setAdapter(tomorrowTaskRecyclerAdapter);
+                    }
+                    if(searchView!=null){
+                        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                            @Override
+                            public boolean onQueryTextSubmit(String query) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onQueryTextChange(String newText) {
+                                filteredPlants=searchToday(newText);
+                                filteredTomorrowPlants=searchTomorrow(newText);
+                                return true;
+                            }
+                        });
                     }
                 }
 
@@ -171,6 +227,33 @@ public class DashBoard extends AppCompatActivity {
             });
         }
     }
+
+    private ArrayList<Plant> searchToday(String str){
+        ArrayList<Plant> list=new ArrayList<>();
+        for(Plant plant:my_task_plants){
+            if(plant.getName().toLowerCase().trim().contains(str.toLowerCase())){
+                list.add(plant);
+            }
+        }
+        TaskRecyclerAdapter taskRecyclerAdapter=new TaskRecyclerAdapter(list);
+        task_recycler_view.setAdapter(taskRecyclerAdapter);
+        return list;
+    }
+
+    private ArrayList<Plant> searchTomorrow(String str){
+        ArrayList<Plant> list=new ArrayList<>();
+        for(Plant plant:tomorrow_task_plants){
+            if(plant.getName().toLowerCase().trim().contains(str.toLowerCase())){
+                list.add(plant);
+            }
+        }
+        TomorrowTaskRecyclerAdapter tomorrowTaskRecyclerAdapter=new TomorrowTaskRecyclerAdapter(list);
+        task_tomorrow_recycler_view.setAdapter(tomorrowTaskRecyclerAdapter);
+        return list;
+    }
+
+
+
     private ArrayList<Plant> todaysPlants(ArrayList<Plant> plants)
     {
         ArrayList<Plant>plantList=new ArrayList<>();

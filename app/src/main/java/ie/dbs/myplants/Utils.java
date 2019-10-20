@@ -328,7 +328,7 @@ public class Utils extends Activity {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 11, 00, 00);
+        calendar.set(year, month, day, 13, 30, 0);
         now = calendar.getTime();
         return now;
     }
@@ -387,17 +387,23 @@ public class Utils extends Activity {
         Toast.makeText(whichActivity, "Notification " + notificationID + "cancelled", Toast.LENGTH_SHORT).show();
     }
 
-    public static void scheduleNotification(Notification notification, long delay, int notificationID, long interval) {
+    public static void scheduleNotification(Notification notification, Date whenToStart, int notificationID, long interval) {
 
         //TODO how to sort out Utils.NotificationIterator Save it in DB? probably the best solution?
         Intent notificationIntent = new Intent(Utils.applicationContext, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(Utils.applicationContext, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(whenToStart);
+        calendar.set(Calendar.HOUR_OF_DAY,13);
+        calendar.set(Calendar.MINUTE, 30);
+        Date date=calendar.getTime();
+        Log.v("notification time", String.valueOf(date));
 
         AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, delay, interval, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(), interval, pendingIntent);
+        //alarmManager.setRepeating(AlarmManager.RTC, delay, interval, pendingIntent);
         Toast.makeText(Utils.applicationContext, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
     }
 
@@ -427,7 +433,7 @@ public class Utils extends Activity {
             long delay =notificationDate.getTime();
             int notificationID=generateNotificationID(myPlant.getPlantID(),false);
 
-            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), delay, notificationID,  interval);
+            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), notificationDate, notificationID,  interval);
         } else {
             AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
             alertDialog.setTitle("Alert");
@@ -460,9 +466,10 @@ public class Utils extends Activity {
                notificationDate= getTimeOfDay((addDaysToDate(notificationDate,myPlant.getWateringNeeds().value)));
             long delay =notificationDate.getTime();
             int notificationID=generateNotificationID(myPlant.getPlantID(), true);
+            Log.v("notification date",String.valueOf(notificationDate));
             Log.v("delayAlarm", String.valueOf(delay));
             Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
-                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), delay, notificationID,  interval);
+                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), notificationDate, notificationID,  interval);
             } else {
                 AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
                 alertDialog.setTitle("Alert");

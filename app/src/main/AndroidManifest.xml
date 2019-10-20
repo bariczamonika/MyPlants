@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -18,11 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Gallery"></activity>
         <activity android:name=".DashBoard">
             <intent-filter>
-            <action android:name="android.intent.action.DEFAULT" />
+                <action android:name="android.intent.action.DEFAULT" />
 
-            <category android:name="android.intent.category.MAIN" />
+                <category android:name="android.intent.category.MAIN" />
             </intent-filter>
         </activity>
         <activity android:name=".SinglePlant" />

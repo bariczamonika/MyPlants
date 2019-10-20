@@ -66,6 +66,7 @@ public class SinglePlant extends AppCompatActivity{
     private TextView single_task_replanted;
     private TextView single_pic_count;
     private Button modify_information;
+    private Button gallery;
     private List<String> plantImages=new ArrayList<>();
     private HashMap<String, String> plantImagesMap=new HashMap<>();
     private ExpandableRelativeLayout expandableRelativeLayout;
@@ -109,6 +110,7 @@ public class SinglePlant extends AppCompatActivity{
         expandableRelativeLayout3=findViewById(R.id.expandableLayout3);
         modify_information=findViewById(R.id.modify_information);
         notificationButton=findViewById(R.id.notifications);
+        gallery=findViewById(R.id.single_gallery_button);
         expandableRelativeLayout.collapse();
         expandableRelativeLayout2.collapse();
         expandableRelativeLayout3.collapse();
@@ -133,6 +135,15 @@ public class SinglePlant extends AppCompatActivity{
 
             }
         });*/
+
+    gallery.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent=new Intent(SinglePlant.this, Gallery.class);
+            intent.putExtra("plantID", plantID);
+            startActivity(intent);
+        }
+    });
 
         final DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants").child(plantID);
         plantListRef.addValueEventListener(new ValueEventListener() {

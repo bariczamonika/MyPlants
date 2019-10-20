@@ -8,11 +8,23 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <androidx.appcompat.widget.SearchView
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/dashboardSearchBar"
+            android:padding="10dp"
+            android:layout_margin="5dp"
+            app:queryHint="@string/search_hint"
+            app:queryBackground="@color/colorWhite"
+            />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,15 +35,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/today_forecast"
-                android:gravity="center"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/today_forecast"
+                android:gravity="center"
+                android:id="@+id/todays_forecast"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/todays_forecast_plus_minus"
+                    android:text="+"/>
+            </LinearLayout>
+            <com.github.aakira.expandablelayout.ExpandableRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/expandable_layout_today"
+                app:ael_expanded="false"
+                app:ael_duration="500"
+                app:ael_interpolator="bounce"
+                app:ael_orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/linear_current_temp">
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -48,7 +80,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/linear_min_temp"
+                android:layout_below="@+id/linear_current_temp">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -65,7 +99,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/linear_max_temp"
+                android:layout_below="@+id/linear_min_temp">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -82,7 +118,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/linear_wind_speed"
+                android:layout_below="@+id/linear_max_temp">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -96,15 +134,38 @@
                     android:id="@+id/current_wind_speed"
                     />
             </LinearLayout>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/tomorrow_forecast"
-                android:gravity="center"/>
+            </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tomorrow_forecast"
+                android:gravity="center"
+                android:id="@+id/tomorrows_forecast"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:id="@+id/tomorrows_forecast_plus_minus"/>
+            </LinearLayout>
+            <com.github.aakira.expandablelayout.ExpandableRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ael_expanded="false"
+                app:ael_duration="500"
+                app:ael_interpolator="bounce"
+                app:ael_orientation="vertical"
+                android:id="@+id/expandable_layout_tomorrow">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/linear_tomorrow_temp">
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -121,7 +182,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/linear_tomorrow_min_temp"
+                android:layout_below="@+id/linear_tomorrow_temp"
+                >
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -138,7 +202,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/linear_tomorrow_max_temp"
+                android:layout_below="@+id/linear_tomorrow_min_temp">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -155,7 +221,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/linear_tomorrow_wind_speed"
+                android:layout_below="@+id/linear_tomorrow_max_temp">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -169,23 +237,30 @@
                     android:id="@+id/tomorrow_wind_speed"
                     />
             </LinearLayout>
+            </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
         </LinearLayout>
+
+
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/task_todays_tasks"
-            android:gravity="center"
+            android:id="@+id/todays_tasks"
             />
+
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/task_recycler_view">
         </androidx.recyclerview.widget.RecyclerView>
+
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/task_tomorrows_tasks"
-            android:gravity="center"/>
+            android:id="@+id/tomorrows_tasks"/>
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

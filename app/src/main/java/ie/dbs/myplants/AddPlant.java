@@ -69,8 +69,8 @@ public class AddPlant extends AppCompatActivity {
         plant_title=findViewById(R.id.plant_title);
         setSpinners();
 
-        String userID=Utils.user.getUid();
-        DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID);
+       /* String userID=Utils.user.getUid();
+        DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
         plantListRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -96,7 +96,7 @@ public class AddPlant extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
         btn_add_pic_to_plant.setOnClickListener(new View.OnClickListener() {
             @Override
