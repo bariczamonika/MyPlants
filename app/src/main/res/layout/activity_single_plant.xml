@@ -96,6 +96,12 @@
             android:id="@+id/notifications"
             android:text="@string/notification_button"
             android:background="@drawable/rounded_edittext"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_plant"
+            android:background="@drawable/rounded_edittext"
+            android:id="@+id/single_delete_plant"/>
 
         <LinearLayout
             android:layout_width="match_parent"

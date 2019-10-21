@@ -72,6 +72,7 @@ public class SinglePlant extends AppCompatActivity{
     private ExpandableRelativeLayout expandableRelativeLayout;
     private ExpandableRelativeLayout expandableRelativeLayout2;
     private ExpandableRelativeLayout expandableRelativeLayout3;
+    private Button delete_plant;
 
     private Button notificationButton;
     Date myDate=new Date();
@@ -111,6 +112,7 @@ public class SinglePlant extends AppCompatActivity{
         modify_information=findViewById(R.id.modify_information);
         notificationButton=findViewById(R.id.notifications);
         gallery=findViewById(R.id.single_gallery_button);
+        delete_plant=findViewById(R.id.single_delete_plant);
         expandableRelativeLayout.collapse();
         expandableRelativeLayout2.collapse();
         expandableRelativeLayout3.collapse();
@@ -118,23 +120,33 @@ public class SinglePlant extends AppCompatActivity{
 
 
         final String plantID=getIntent().getStringExtra("plantID");
-        String userID = Utils.user.getUid();
+        final String userID = Utils.user.getUid();
 
-    /*    DatabaseReference databaseReference=Utils.databaseReference.child("users").child(userID).child("notifications");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        delete_plant.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()){
-                    PlantNotifications PlantNotifications=plantSnapshot.getValue(ie.dbs.myplants.PlantNotifications.class);
-                    myNotifications.add(PlantNotifications);
-                }
+            public void onClick(View v) {
+                final AlertDialog alertDialog=new AlertDialog.Builder(SinglePlant.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Are you sure you would like to delete this plant?");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Utils.databaseReference.child("users").child(userID).child("plants").child(plantID).removeValue();
+                        Utils.databaseReference.child("users").child(userID).child("plantsPics").child(plantID).removeValue();
+                        Intent intent=new Intent(SinglePlant.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        alertDialog.dismiss();
+                    }
+                });
+                alertDialog.show();
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });*/
+        });
 
     gallery.setOnClickListener(new View.OnClickListener() {
         @Override

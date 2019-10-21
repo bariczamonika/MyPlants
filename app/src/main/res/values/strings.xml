@@ -67,6 +67,7 @@
     <string name="single_tasks_fertilizing">Next fertilizing</string>
     <string name="single_tasks_replanting">Next replanting</string>
     <string name="notification_button">Manage notifications</string>
+    <string name="delete_plant">Delete plant</string>
 
     //TaskRecyclerAdapter
     <string name="task_fertilizing">Fertilizing</string>
