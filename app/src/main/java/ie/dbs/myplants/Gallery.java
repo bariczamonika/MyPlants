@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -48,7 +49,7 @@ private ArrayList<PlantImage> plantImages=new ArrayList<>();
                     plantImages.add(plantImage);
                 }
                 if(plantImages!=null) {
-                    GalleryAdapter galleryAdapter = new GalleryAdapter(plantImages);
+                    GalleryAdapter galleryAdapter = new GalleryAdapter(plantImages, plantID);
                     gallery_recycler_view.setAdapter(galleryAdapter);
                 }
                 }
@@ -59,5 +60,15 @@ private ArrayList<PlantImage> plantImages=new ArrayList<>();
             }
 
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent=new Intent(Gallery.this, SinglePlant.class);
+        intent.putExtra("plantID", plantID);
+        startActivity(intent);
+        finish();
+
     }
 }

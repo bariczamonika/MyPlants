@@ -104,6 +104,7 @@ public class AddPlant extends AppCompatActivity {
                 Utils.temporary_plant=savePlantDetails();
                 Intent intent=new Intent(AddPlant.this, AddPictureToPlant.class);
                 intent.putExtra("IsProfilePicture",true);
+                intent.putExtra("plantID", Utils.temporary_plant.getPlantID());
                 if(modify)
                 intent.putExtra("modify", true);
                 else
@@ -252,6 +253,7 @@ public class AddPlant extends AppCompatActivity {
         else
         {
             String plantID=getIntent().getStringExtra("plantID");
+            Log.v("plantID", plantID);
             String userID=Utils.user.getUid();
             DatabaseReference databaseReference=Utils.databaseReference.child("users").child(userID).child("plants").child(plantID);
             databaseReference.addValueEventListener(new ValueEventListener() {

@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity{
                         Utils.plantIterator=myPlants.size();
                         PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(myPlants);
                         recyclerView.setAdapter(plantRecyclerAdapter);
+                        filteredPlants=myPlants;
                     }
                     if(searchView!=null){
                         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity{
                             }
                         });
                     }
-                    else filteredPlants=myPlants;
+
 
                 }
 
@@ -171,9 +172,9 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-
+//
     protected void CreateAlertDialogWithRadioButtons() {
-        if(searchView==null)
+        if(searchView.getQuery()==null)
             filteredPlants=myPlants;
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setTitle("Sort By");

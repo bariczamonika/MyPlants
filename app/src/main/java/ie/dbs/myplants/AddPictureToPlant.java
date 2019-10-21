@@ -137,6 +137,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                                 Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
                                 intent.putExtra("image", imagePath);
                                 intent.putExtra("modify", false);
+                                intent.putExtra("plantID", plantID);
                                 startActivity(intent);
                                 finish();
                             }
@@ -145,6 +146,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                                 Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
                                 intent.putExtra("image", imagePath);
                                 intent.putExtra("modify", true);
+                                intent.putExtra("plantID", plantID);
                                 startActivity(intent);
                                 finish();
                             }

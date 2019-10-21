@@ -31,6 +31,7 @@
         <activity android:name=".AddPictureToPlant" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
+        <activity android:name=".ImageDialog" android:theme="@style/myDialogTheme" />
         <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

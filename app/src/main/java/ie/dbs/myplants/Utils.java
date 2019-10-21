@@ -603,5 +603,10 @@ public class Utils extends Activity {
         }
         return list;
     }
+
+    public static void addPlant(Plant plant){
+        String userID=Utils.user.getUid();
+        Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
+    }
 }
 
