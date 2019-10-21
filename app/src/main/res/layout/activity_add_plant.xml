@@ -54,6 +54,12 @@
                 android:id="@+id/cancel"
                 />
         </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/pic_modify_date"
+            android:id="@+id/pic_modify_date"
+            />
     </LinearLayout>
 
 

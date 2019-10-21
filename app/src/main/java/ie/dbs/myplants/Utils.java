@@ -77,7 +77,7 @@ public class Utils extends Activity {
     }
 
     //create custom directory and save file
-    public static String createDirectoryAndSaveFile(Bitmap imageToSave, Context context) {
+    public static String createDirectoryAndSaveFile(Bitmap imageToSave, Context context, String timestamp) {
 
         File homeDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
         if (!homeDirectory.exists()) {
@@ -86,7 +86,8 @@ public class Utils extends Activity {
         }
         File myFile = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
 
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        if(timestamp==" ")
+        timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File file = new File(myFile, "picture" +
                 timestamp + ".jpeg");
         String imagePath = file.getAbsolutePath();
@@ -290,19 +291,19 @@ public class Utils extends Activity {
         now = addDaysToDate(getLastMinuteOfDay(now), -1);
         if (myPlant != null) {
             if (myPlant.getNextWatering() != null) {
-                while (myPlant.getNextWatering().before(now)|| myPlant.getNextWatering().equals(now)) {
-                        myPlant.setLastWatered(myPlant.getNextWatering());
-                        int days = myPlant.getWateringNeeds().value;
-                        myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), days));
+                while (myPlant.getNextWatering().before(now) || myPlant.getNextWatering().equals(now)) {
+                    myPlant.setLastWatered(myPlant.getNextWatering());
+                    int days = myPlant.getWateringNeeds().value;
+                    myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), days));
                 }
             }
 
             if (myPlant.getNextFertilizing() != null) {
                 while (myPlant.getNextFertilizing().before(now) || (myPlant.getNextFertilizing() == now)) {
 
-                        myPlant.setLastFertilized(myPlant.getNextFertilizing());
-                        int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
-                        myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), days));
+                    myPlant.setLastFertilized(myPlant.getNextFertilizing());
+                    int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
+                    myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), days));
 
                 }
 
@@ -328,54 +329,50 @@ public class Utils extends Activity {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 13, 30, 0);
+        calendar.set(year, month, day, 15, 0, 0);
         now = calendar.getTime();
         return now;
     }
 
-    public static Date addOneSecondToDate(Date now){
-        Calendar calendar=Calendar.getInstance();
+    public static Date addOneSecondToDate(Date now) {
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
-        calendar.add(Calendar.SECOND,1);
-        now=calendar.getTime();
+        calendar.add(Calendar.SECOND, 1);
+        now = calendar.getTime();
         return now;
     }
 
-    public static Date createDateFromString(String string)
-    {
-        Date date=new Date();
-        String[] stringArray=string.split(" ");
-        String[]dateArray=stringArray[0].split("-");
-        String []timeArray=stringArray[1].split(":");
-        Calendar calendar=Calendar.getInstance();
-        calendar.set(Integer.parseInt(dateArray[0]),Integer.parseInt(dateArray[1])-1, Integer.parseInt(dateArray[2]),
-                Integer.parseInt(timeArray[0]),Integer.parseInt(timeArray[1]), Integer.parseInt(timeArray[2]));
-        date=calendar.getTime();
+    public static Date createDateFromString(String string) {
+        Date date = new Date();
+        String[] stringArray = string.split(" ");
+        String[] dateArray = stringArray[0].split("-");
+        String[] timeArray = stringArray[1].split(":");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]) - 1, Integer.parseInt(dateArray[2]),
+                Integer.parseInt(timeArray[0]), Integer.parseInt(timeArray[1]), Integer.parseInt(timeArray[2]));
+        date = calendar.getTime();
         return date;
     }
 
-    public static boolean isDateToday(Date date)
-    {
-        boolean check=false;
-        Date now=new Date();
-        Date today=addOneSecondToDate(addDaysToDate(getLastMinuteOfDay(now), -1));
-        Date tomorrow=getLastMinuteOfDay(now);
-        if(date.before(tomorrow)&&date.after(today))
-            check=true;
+    public static boolean isDateToday(Date date) {
+        boolean check = false;
+        Date now = new Date();
+        Date today = addOneSecondToDate(addDaysToDate(getLastMinuteOfDay(now), -1));
+        Date tomorrow = getLastMinuteOfDay(now);
+        if (date.before(tomorrow) && date.after(today))
+            check = true;
         return check;
     }
 
-    public static boolean isDateTomorrow(Date date)
-    {
-        boolean check=false;
-        Date now=new Date();
-        Date day_after_tomorrow=addDaysToDate(getLastMinuteOfDay(now), 1);
-        Date tomorrow=addOneSecondToDate(getLastMinuteOfDay(now));
-        if(date.before(day_after_tomorrow)&&date.after(tomorrow))
-            check=true;
+    public static boolean isDateTomorrow(Date date) {
+        boolean check = false;
+        Date now = new Date();
+        Date day_after_tomorrow = addDaysToDate(getLastMinuteOfDay(now), 1);
+        Date tomorrow = addOneSecondToDate(getLastMinuteOfDay(now));
+        if (date.before(day_after_tomorrow) && date.after(tomorrow))
+            check = true;
         return check;
     }
-
 
 
     public static void cancelNotification(int notificationID, Activity whichActivity) {
@@ -389,22 +386,21 @@ public class Utils extends Activity {
 
     public static void scheduleNotification(Notification notification, Date whenToStart, int notificationID, long interval) {
 
-        //TODO how to sort out Utils.NotificationIterator Save it in DB? probably the best solution?
         Intent notificationIntent = new Intent(Utils.applicationContext, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(Utils.applicationContext, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Calendar calendar=Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(whenToStart);
-        calendar.set(Calendar.HOUR_OF_DAY,13);
-        calendar.set(Calendar.MINUTE, 30);
-        Date date=calendar.getTime();
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, 0);
+        Date date = calendar.getTime();
         Log.v("notification time", String.valueOf(date));
 
         AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC,calendar.getTimeInMillis(), interval, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval, pendingIntent);
         //alarmManager.setRepeating(AlarmManager.RTC, delay, interval, pendingIntent);
-        Toast.makeText(Utils.applicationContext, "Notification set" + notificationID, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Utils.applicationContext, "Notification set" + notificationID+" "+String.valueOf(date), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -426,25 +422,18 @@ public class Utils extends Activity {
             }
 
             long interval = TimeUnit.DAYS.toMillis(Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value));
-            Date now=new Date();
-            Date notificationDate=getTimeOfDay(myPlant.getNextFertilizing());
-            if(now.getTime()>notificationDate.getTime())
-                notificationDate= getTimeOfDay((addDaysToDate(notificationDate,convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value))));
-            long delay =notificationDate.getTime();
-            int notificationID=generateNotificationID(myPlant.getPlantID(),false);
+            Date now = new Date();
+            Date notificationDate = getTimeOfDay(myPlant.getNextFertilizing());
+            if (now.getTime() > notificationDate.getTime())
+                notificationDate = getTimeOfDay((addDaysToDate(notificationDate, convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value))));
+            long delay = notificationDate.getTime();
+            int notificationID = generateNotificationID(myPlant.getPlantID(), false);
 
-            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), notificationDate, notificationID,  interval);
+            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), notificationDate, notificationID, interval);
         } else {
-            AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
-            alertDialog.setTitle("Alert");
-            alertDialog.setMessage("Please set up your plant's fertilizing needs");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+            myPlant.setNotificationFertilizing(false);
+            Toast.makeText(Utils.applicationContext, "Please set up your fertilizing needs first",
+                    Toast.LENGTH_LONG).show();
 
         }
     }
@@ -457,89 +446,88 @@ public class Utils extends Activity {
                 myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), myPlant.getWateringNeeds().value));
             }
 
-            //TODO schedule notifications for a certain amount of time? 30 days
-            //TODO how to clear notifications
             long interval = TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value);
-            Date now=new Date();
-            Date notificationDate=getTimeOfDay(myPlant.getNextWatering());
-            if(now.getTime()>notificationDate.getTime())
-               notificationDate= getTimeOfDay((addDaysToDate(notificationDate,myPlant.getWateringNeeds().value)));
-            long delay =notificationDate.getTime();
-            int notificationID=generateNotificationID(myPlant.getPlantID(), true);
-            Log.v("notification date",String.valueOf(notificationDate));
+            Date now = new Date();
+            Date notificationDate = getTimeOfDay(myPlant.getNextWatering());
+            if (now.getTime() > notificationDate.getTime())
+                notificationDate = getTimeOfDay((addDaysToDate(notificationDate, myPlant.getWateringNeeds().value)));
+            long delay = notificationDate.getTime();
+            int notificationID = generateNotificationID(myPlant.getPlantID(), true);
+            Log.v("notification date", String.valueOf(notificationDate));
             Log.v("delayAlarm", String.valueOf(delay));
             Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
-                Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), notificationDate, notificationID,  interval);
-            } else {
-                AlertDialog alertDialog = new AlertDialog.Builder(Utils.applicationContext).create();
-                alertDialog.setTitle("Alert");
-                alertDialog.setMessage("Please set up your plant's watering needs");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
-            }
-
+            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), notificationDate, notificationID, interval);
+        } else {
+            //TODO throws exception
+            myPlant.setNotificationWatering(false);
+            Toast.makeText(Utils.applicationContext, "Please set up your watering needs first",
+                    Toast.LENGTH_LONG).show();
         }
 
+    }
 
 
-
-      public static int generateNotificationID(String plantID, boolean isWatering)
-      {
-          int notificationID = 0;
-          if(isWatering) {
-              if (plantID != null) {
-                  String notificationIDString;
-                  if (!plantID.equals("0")) {
-                      notificationIDString = plantID + "0";
-                      notificationID = Integer.valueOf(notificationIDString);
-                  }
-                  else
-                      notificationID=0;
-              }
-          }
-          else
-          {
-              if (plantID != null) {
-                  String notificationIDString;
-                  if (!plantID.equals("0")) {
-                      notificationIDString = plantID + "1";
-                      notificationID = Integer.valueOf(notificationIDString);
-                  }
-                  else
-                      notificationID=1;
-              }
-          }
-          return notificationID;
-      }
+    public static int generateNotificationID(String plantID, boolean isWatering) {
+        int notificationID = 0;
+        if (isWatering) {
+            if (plantID != null) {
+                String notificationIDString;
+                if (!plantID.equals("0")) {
+                    notificationIDString = plantID + "0";
+                    notificationID = Integer.valueOf(notificationIDString);
+                } else
+                    notificationID = 0;
+            }
+        } else {
+            if (plantID != null) {
+                String notificationIDString;
+                if (!plantID.equals("0")) {
+                    notificationIDString = plantID + "1";
+                    notificationID = Integer.valueOf(notificationIDString);
+                } else
+                    notificationID = 1;
+            }
+        }
+        return notificationID;
+    }
 
 
-    public static ArrayList<Plant> sortStringBubble( ArrayList<Plant> plants, boolean name )
+    public static ArrayList<PlantImage> sortStringBubbleArray(ArrayList<PlantImage> plants)
     {
+        int j;
+        boolean flag = true;  // will determine when the sort is finished
+        PlantImage temp;
+
+        while (flag) {
+            flag = false;
+            for (j = 0; j < plants.size() - 1; j++) {
+                if (getPictureDateFromPicturePath(plants.get(j).getPicturePath()).compareToIgnoreCase(getPictureDateFromPicturePath(plants.get(j + 1).getPicturePath())) > 0) {
+                    temp = plants.get(j);
+                    plants.set(j, plants.get(j + 1));
+                    plants.set(j + 1, temp);
+                    flag = true;
+                }
+            }
+        }
+            return plants;
+    }
+    public static ArrayList<Plant> sortStringBubble(ArrayList<Plant> plants, boolean name) {
         int j;
         boolean flag = true;  // will determine when the sort is finished
         Plant temp;
 
-        while ( flag )
-        {
+        while (flag) {
             flag = false;
-            for ( j = 0;  j < plants.size() - 1;  j++ )
-            {
-                if(name) {
+            for (j = 0; j < plants.size() - 1; j++) {
+                if (name) {
                     if (plants.get(j).getName().compareToIgnoreCase(plants.get(j + 1).getName()) > 0) {
                         temp = plants.get(j);
                         plants.set(j, plants.get(j + 1));
                         plants.set(j + 1, temp);
                         flag = true;
                     }
-                }
-                else
-                {
-                    if(plants.get(j).getDateAdded().compareTo(plants.get(j+1).getDateAdded())>0){
+                } else {
+                    if (plants.get(j).getDateAdded().compareTo(plants.get(j + 1).getDateAdded()) > 0) {
                         temp = plants.get(j);
                         plants.set(j, plants.get(j + 1));
                         plants.set(j + 1, temp);
@@ -551,22 +539,20 @@ public class Utils extends Activity {
         return plants;
     }
 
-    public static ArrayList<Plant> sortByOutDoorPlant(ArrayList<Plant>plants, boolean outdoor){
-          ArrayList<Plant>sortedPlants=new ArrayList<>();
-          for(Plant plant:plants) {
-              if (outdoor) {
-                  if (plant.isOutdoorPlant()){
-                      sortedPlants.add(plant);
-                  }
-              }
-              else
-              {
-                  if(!plant.isOutdoorPlant()){
-                      sortedPlants.add(plant);
-                  }
-              }
-          }
-          return sortedPlants;
+    public static ArrayList<Plant> sortByOutDoorPlant(ArrayList<Plant> plants, boolean outdoor) {
+        ArrayList<Plant> sortedPlants = new ArrayList<>();
+        for (Plant plant : plants) {
+            if (outdoor) {
+                if (plant.isOutdoorPlant()) {
+                    sortedPlants.add(plant);
+                }
+            } else {
+                if (!plant.isOutdoorPlant()) {
+                    sortedPlants.add(plant);
+                }
+            }
+        }
+        return sortedPlants;
     }
 
     public static Map<String, Object> toMap(JSONObject object) throws JSONException {
@@ -604,9 +590,27 @@ public class Utils extends Activity {
         return list;
     }
 
-    public static void addPlant(Plant plant){
-        String userID=Utils.user.getUid();
+    public static void addPlant(Plant plant) {
+        String userID = Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
+    }
+
+    public static int scrollRight(int size, int index) {
+
+        if (size > index + 1)
+            index = index + 1;
+        else if (size == index + 1)
+            index = 0;
+        return index;
+    }
+
+    public static int scrollLeft(int size, int index) {
+
+        if (index > 0)
+            index = index - 1;
+        else if (index == 0)
+            index = size - 1;
+        return index;
     }
 }
 

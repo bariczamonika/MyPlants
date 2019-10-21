@@ -27,6 +27,7 @@
     <string name="pic_choose_from_gallery">Choose from gallery</string>
     <string name="pic_take_picture">Take picture</string>
     <string name="pic_save_image">Save image(s)</string>
+    <string name="pic_modify_date">Picture\'s date (leave empty if today)</string>
 
 
     //Add plant activity
@@ -41,6 +42,7 @@
     <string name="plant_add_profile_picture">Add profile picture</string>
     <string name="plant_modify_plant">Modify plant</string>
     <string name="plant_modify_profile_pic">Modify profile picture</string>
+    <string name="plant_change_date_added">Change date added</string>
 
     //Mainactivity
     <string name="all_my_plants">My Plants</string>

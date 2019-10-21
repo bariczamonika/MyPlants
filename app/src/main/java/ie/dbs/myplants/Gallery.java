@@ -49,6 +49,7 @@ private ArrayList<PlantImage> plantImages=new ArrayList<>();
                     plantImages.add(plantImage);
                 }
                 if(plantImages!=null) {
+                    plantImages=Utils.sortStringBubbleArray(plantImages);
                     GalleryAdapter galleryAdapter = new GalleryAdapter(plantImages, plantID);
                     gallery_recycler_view.setAdapter(galleryAdapter);
                 }

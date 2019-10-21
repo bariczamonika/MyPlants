@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-//TODO timeline view (gallery)
+
 //TODO onDragListener
 
 
@@ -244,7 +244,7 @@ public class SinglePlant extends AppCompatActivity{
                 if (plantImages.size()!=0)
                 {
                     int size=plantImages.size();
-                    index=scrollRight(size);
+                    index=Utils.scrollRight(size, index);
                     plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
                     single_pic_count.setText(index+1 + "/" +size);
@@ -259,7 +259,7 @@ public class SinglePlant extends AppCompatActivity{
                 if (plantImages.size()!=0)
                 {
                     int size=plantImages.size();
-                    index=scrollLeft(size);
+                    index=Utils.scrollLeft(size, index);
                     plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
                     single_pic_count.setText(index+1 + "/" +size);
@@ -273,7 +273,7 @@ public class SinglePlant extends AppCompatActivity{
                 if (plantImages.size()!=0)
                 {
                     int size=plantImages.size();
-                    index=scrollRight(size);
+                    index=Utils.scrollRight(size, index);
                     plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
                     single_pic_count.setText(index+1 + "/" +size);
@@ -398,25 +398,8 @@ public class SinglePlant extends AppCompatActivity{
         }
     }
 
-private int scrollRight(int size)
-    {
-        if(size>index+1)
-            index=index+1;
-        else if(size==index+1)
-            index=0;
-        return index;
-    }
-     private int scrollLeft(int size)
-     {
 
-         if(index>0)
-             index=index-1;
-         else if(index==0)
-             index=size-1;
-         return index;
-     }
 
-     //TODO set reminders
     private void chooseDate(final TextView textView, final int whatToUseItFor) {
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
@@ -514,10 +497,6 @@ private int scrollRight(int size)
     }
 
 
-
-
-    //TODO have to check for if both checked
-
     protected void createAlertDialogWithRadioButtons() {
         final String[]optionsArray=new String[]{
                 "Watering",
@@ -559,8 +538,6 @@ private int scrollRight(int size)
                             Utils.isCalledFromAlertDialog=1;
                             int notificationID=Utils.generateNotificationID(myPlant.getPlantID(), true);
                             Utils.cancelNotification(notificationID,SinglePlant.this);
-                            //Utils.cancelNotifications(true, SinglePlant.this, myPlant);
-                            //TODO cancel upcoming notifications
                         }
                         else if((i==1)&&(myPlant.isNotificationFertilizing())){
                             myPlant.setNotificationFertilizing(false);

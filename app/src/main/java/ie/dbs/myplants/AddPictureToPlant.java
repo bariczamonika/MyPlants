@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,14 +22,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class AddPictureToPlant extends AppCompatActivity {
@@ -44,6 +52,8 @@ public class AddPictureToPlant extends AppCompatActivity {
     private boolean isProfilePic;
     private String plantID;
     private boolean modify=false;
+    private TextView modify_picture_date;
+    private String timeStamp;
     int index=0;
 
     @Override
@@ -56,13 +66,13 @@ public class AddPictureToPlant extends AppCompatActivity {
         mArrayUri=new ArrayList<>();
         save=(Button)findViewById(R.id.saveImages);
         cancel=(Button)findViewById(R.id.cancel);
+        modify_picture_date=findViewById(R.id.pic_modify_date);
         plantID=getIntent().getStringExtra("plantID");
         modify=getIntent().getBooleanExtra("modify",false);
+        timeStamp=" ";
 
 
-        Utils.AskForPermission(Manifest.permission.CAMERA, AddPictureToPlant.this);
-        Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, AddPictureToPlant.this);
-        Utils.AskForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, AddPictureToPlant.this);
+
         addFromGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,7 +141,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                     try {
                         InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(i));
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        imagePath[i]=Utils.createDirectoryAndSaveFile(bitmap, AddPictureToPlant.this);
+                        imagePath[i]=Utils.createDirectoryAndSaveFile(bitmap, AddPictureToPlant.this, timeStamp);
                         if(isProfilePic) {
                             if(!modify) {
                                 Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
@@ -192,8 +202,50 @@ public class AddPictureToPlant extends AppCompatActivity {
         });
 
 
+        modify_picture_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseDate();
+            }
+        });
 
     }
+
+    private void chooseDate() {
+        final Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int hour=calendar.get(Calendar.HOUR_OF_DAY);
+        final int minute=calendar.get(Calendar.MINUTE);
+        final int second=calendar.get(Calendar.SECOND);
+            final DatePickerDialog datePicker =
+                    new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(final DatePicker view, final int year, final int month,
+                                              final int dayOfMonth) {
+
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                            SimpleDateFormat simpleDateFormat1=new SimpleDateFormat("dd/MM/yy");
+                            calendar.set(year, month, dayOfMonth,hour, minute, second);
+                            Date myDate = calendar.getTime();
+                            String dateString = simpleDateFormat1.format(myDate);
+                            modify_picture_date.setText(dateString);
+                            timeStamp=simpleDateFormat.format(myDate);
+                        }
+                    }, year, month, day); // set date picker to current date
+            datePicker.getDatePicker().setMaxDate(new Date().getTime());
+            datePicker.show();
+
+            datePicker.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(final DialogInterface dialog) {
+                    timeStamp=" ";
+                    dialog.dismiss();
+                }
+            });
+        }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

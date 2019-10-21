@@ -4,12 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -24,6 +27,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class AddPlant extends AppCompatActivity {
@@ -50,6 +56,9 @@ public class AddPlant extends AppCompatActivity {
     private String[] imgProfilePath;
     private TextView plant_title;
     private boolean modify=false;
+    private TextView change_date_added;
+    private Date dateAdded;
+    private SimpleDateFormat simpleDateFormat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,36 +76,17 @@ public class AddPlant extends AppCompatActivity {
         radioButton_outdoor_plant_no=(RadioButton)findViewById(R.id.radio_button_no);
         img_view_plant_profile_preview=(ImageView)findViewById(R.id.img_view_plant_profile_preview);
         plant_title=findViewById(R.id.plant_title);
+        change_date_added=findViewById(R.id.change_date_added);
+        simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
+        change_date_added.setText(String.valueOf(simpleDateFormat.format(new Date())));
         setSpinners();
 
-       /* String userID=Utils.user.getUid();
-        DatabaseReference plantListRef = Utils.databaseReference.child("users").child(userID).child("plants");
-        plantListRef.addChildEventListener(new ChildEventListener() {
+        change_date_added.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Utils.plantIterator=(int)dataSnapshot.getChildrenCount();
+            public void onClick(View v) {
+                chooseDate();
             }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });*/
+        });
 
         btn_add_pic_to_plant.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,6 +164,7 @@ public class AddPlant extends AppCompatActivity {
                     spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().value);
                     spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().value);
                     spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
+                    change_date_added.setText(simpleDateFormat.format(Utils.temporary_plant.getDateAdded()));
                     if (Utils.temporary_plant.isOutdoorPlant())
                         radioButton_outdoor_plant_yes.setChecked(true);
                     else if (!Utils.temporary_plant.isOutdoorPlant())
@@ -195,6 +186,7 @@ public class AddPlant extends AppCompatActivity {
                         spinner_fertilizing_needs.setSelection(Utils.temporary_plant.getFertilizingNeeds().value);
                         spinner_watering_needs.setSelection(Utils.temporary_plant.getWateringNeeds().value);
                         spinner_light_conditions.setSelection(Utils.temporary_plant.getLightCondition().value);
+                            change_date_added.setText(simpleDateFormat.format(Utils.temporary_plant.getDateAdded()));
                         if (Utils.temporary_plant.isOutdoorPlant())
                             radioButton_outdoor_plant_yes.setChecked(true);
                         else if (!Utils.temporary_plant.isOutdoorPlant())
@@ -234,6 +226,10 @@ public class AddPlant extends AppCompatActivity {
         plant_name=edit_text_plant_name.getText().toString();
         plant_description=edit_text_plant_description.getText().toString();
         plant_notes=edit_text_plant_notes.getText().toString();
+        try {
+            dateAdded = simpleDateFormat.parse(change_date_added.getText().toString());
+        }catch (ParseException ex)
+        {ex.printStackTrace();}
         plant_fertilizing_needs= Fertilizing_Needs.valueOf(spinner_fertilizing_needs.getSelectedItem().toString().replace(" ","_"));
         plant_watering_needs=Watering_Needs.valueOf(spinner_watering_needs.getSelectedItem().toString().replace(" ","_"));
         plant_light_conditions=Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString().replace(" ","_"));
@@ -245,10 +241,10 @@ public class AddPlant extends AppCompatActivity {
         if(!modify)
         {
         if (imgProfilePath==null)
-        myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
+        myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,dateAdded,plant_notes,plant_watering_needs,
                 plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, "");
         else
-            myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,new Date(),plant_notes,plant_watering_needs,
+            myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,dateAdded,plant_notes,plant_watering_needs,
                     plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);}
         else
         {
@@ -300,5 +296,37 @@ public class AddPlant extends AppCompatActivity {
         Intent intent=new Intent(AddPlant.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void chooseDate() {
+        final Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final SimpleDateFormat simpleDateFormat1=new SimpleDateFormat("dd/MM/yy");
+        final DatePickerDialog datePicker =
+                new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(final DatePicker view, final int year, final int month,
+                                          final int dayOfMonth) {
+
+
+                        calendar.set(year, month, dayOfMonth);
+                        Date myDate = calendar.getTime();
+                        String dateString = simpleDateFormat1.format(myDate);
+                        change_date_added.setText(dateString);
+                    }
+                }, year, month, day); // set date picker to current date
+        datePicker.getDatePicker().setMaxDate(new Date().getTime());
+        datePicker.show();
+
+        datePicker.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(final DialogInterface dialog) {
+                Date now=new Date();
+                change_date_added.setText(simpleDateFormat1.format(now));
+                dialog.dismiss();
+            }
+        });
     }
 }

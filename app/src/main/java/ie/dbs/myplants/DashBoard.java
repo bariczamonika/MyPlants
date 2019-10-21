@@ -78,6 +78,9 @@ public class DashBoard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        Utils.AskForPermission(Manifest.permission.CAMERA, DashBoard.this);
+        Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DashBoard.this);
+        Utils.AskForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, DashBoard.this);
         all_plants_button = findViewById(R.id.all_plants_button);
         task_recycler_view = findViewById(R.id.task_recycler_view);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -319,29 +322,8 @@ public class DashBoard extends AppCompatActivity {
 
 
                 try {
-                    //jsonArray=new JSONArray(response);
                     final JSONObject jsonObject=new JSONObject(response);
-                    //JSONObject listObject=jsonObject.getJSONObject("list");
                     final JSONArray listArray=jsonObject.getJSONArray("list");
-
-                    //final JSONArray windArray=listObject.getJSONArray("wind");
-                   // Log.v("weather temp array",String.valueOf(tempArray));
-
-
-
-                    //TODO display data
-                  /*  RecyclerView recyclerView=(RecyclerView) findViewById(R.id.my_recycler_view);
-                    RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
-                    recyclerView.setLayoutManager(layoutManager);
-                    recyclerView.hasFixedSize();
-                    recyclerView.setItemViewCacheSize(20);
-                    recyclerView.setDrawingCacheEnabled(true);
-                    recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                    RecyclerView.Adapter mAdapter=new ModuleAdapter(adverts );
-                    recyclerView.setAdapter(mAdapter);*/
-
-
-
                   new AsyncTask<Void, Void, Void>() {
 
                       List<WeatherInfo> todayWeatherList=new ArrayList<>();
