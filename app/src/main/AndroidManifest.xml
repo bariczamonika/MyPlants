@@ -61,6 +61,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".ConnectionReceiver">
+            <intent-filter>
+                <action android:name="ie.dbs.AN_INTENT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

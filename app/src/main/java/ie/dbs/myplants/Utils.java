@@ -96,7 +96,7 @@ public class Utils extends Activity {
         }
         try {
             FileOutputStream out = new FileOutputStream(file);
-            imageToSave.compress(Bitmap.CompressFormat.JPEG, 70, out);
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
             //TODO check mediascanner it's not showing in gallery

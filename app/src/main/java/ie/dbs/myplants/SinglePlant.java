@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -73,6 +74,7 @@ public class SinglePlant extends AppCompatActivity{
     private ExpandableRelativeLayout expandableRelativeLayout2;
     private ExpandableRelativeLayout expandableRelativeLayout3;
     private Button delete_plant;
+    private ConnectionReceiver receiver;
 
     private Button notificationButton;
     Date myDate=new Date();
@@ -116,6 +118,10 @@ public class SinglePlant extends AppCompatActivity{
         expandableRelativeLayout.collapse();
         expandableRelativeLayout2.collapse();
         expandableRelativeLayout3.collapse();
+        receiver=new ConnectionReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
 
 
 
@@ -396,9 +402,16 @@ public class SinglePlant extends AppCompatActivity{
             for (int i=0;i<stringArray.length;i++)
             Utils.PushPicToDB(plantID, stringArray[i]);
         }
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
     }
 
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
 
     private void chooseDate(final TextView textView, final int whatToUseItFor) {
         final Calendar calendar = Calendar.getInstance();

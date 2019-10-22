@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView register;
     private TextView forgotPassword;
     private static final String TAG="LoginActivity";
+    private ConnectionReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,10 @@ public class LoginActivity extends AppCompatActivity {
         submitButton=findViewById(R.id.submit);
         register=findViewById(R.id.register);
         forgotPassword=findViewById(R.id.forgotPassword);
+        receiver=new ConnectionReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,9 +163,17 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
+    }
 
-
-
-
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
 }

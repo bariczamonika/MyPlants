@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -24,12 +25,17 @@ private String plantID;
 private TextView gallery_plant_name;
 private RecyclerView gallery_recycler_view;
 private ArrayList<PlantImage> plantImages=new ArrayList<>();
+private ConnectionReceiver receiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         plantID=getIntent().getStringExtra("plantID");
         gallery_plant_name=findViewById(R.id.gallery_plant_name);
+        receiver=new ConnectionReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
 
         gallery_recycler_view=findViewById(R.id.gallery_recycler_view);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,2);
@@ -71,5 +77,19 @@ private ArrayList<PlantImage> plantImages=new ArrayList<>();
         startActivity(intent);
         finish();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
     }
 }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity{
     private SearchView searchView;
     private AlertDialog alertDialog1;
     private ArrayList<Plant> filteredPlants;
+    private ConnectionReceiver receiver;
 
     RecyclerView recyclerView;
     CharSequence[] values = {"Name", "Date Added", "Outdoor Plants", "Indoor Plants"};
@@ -50,6 +52,10 @@ public class MainActivity extends AppCompatActivity{
         recyclerView.setDrawingCacheEnabled(true);
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
+        receiver=new ConnectionReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
         searchView=findViewById(R.id.searchBar);
         addPlantButton = findViewById(R.id.addPlant);
         addPlantButton.setOnClickListener(new View.OnClickListener() {
@@ -231,5 +237,19 @@ public class MainActivity extends AppCompatActivity{
         super.onBackPressed();
         Intent intent=new Intent(MainActivity.this, DashBoard.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
     }
 }

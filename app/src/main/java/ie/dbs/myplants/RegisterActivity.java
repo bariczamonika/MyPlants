@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText confirmPasswordField;
     private Button registerButton;
     private static final String TAG="RegisterActivity";
+    private ConnectionReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,10 @@ public class RegisterActivity extends AppCompatActivity {
         passwordField=findViewById(R.id.password);
         confirmPasswordField=findViewById(R.id.confirmPassword);
         registerButton=findViewById(R.id.register);
+        receiver=new ConnectionReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,5 +93,19 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
     }
 }

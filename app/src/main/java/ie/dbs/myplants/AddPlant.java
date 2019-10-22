@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -59,6 +60,7 @@ public class AddPlant extends AppCompatActivity {
     private TextView change_date_added;
     private Date dateAdded;
     private SimpleDateFormat simpleDateFormat;
+    private ConnectionReceiver receiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +81,10 @@ public class AddPlant extends AppCompatActivity {
         change_date_added=findViewById(R.id.change_date_added);
         simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
         change_date_added.setText(String.valueOf(simpleDateFormat.format(new Date())));
+        receiver=new ConnectionReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
         setSpinners();
 
         change_date_added.setOnClickListener(new View.OnClickListener() {
@@ -205,6 +211,9 @@ public class AddPlant extends AppCompatActivity {
             }catch (Exception ex) {
                 Log.v("Error adding plant", ex.getMessage());}
         }
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(receiver, filter);
     }
     private void setSpinners()
     {
@@ -296,6 +305,12 @@ public class AddPlant extends AppCompatActivity {
         Intent intent=new Intent(AddPlant.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
     }
 
     private void chooseDate() {
