@@ -1,8 +1,10 @@
 package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -61,13 +63,31 @@ public class RegisterActivity extends AppCompatActivity {
                             Log.d(TAG, "createUserWithEmail:success");
                             Utils.user = Utils.mAuth.getCurrentUser();
                             sendEmailVerification();
-                            Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
-                            startActivity(intent);
-                            finish();
+                            AlertDialog dialog=new AlertDialog.Builder(RegisterActivity.this).create();
+                            dialog.setTitle("Information");
+                            dialog.setMessage("A verification email was sent to your email address");
+                            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
+                            dialog.show();
+
                         } else {
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            AlertDialog alertDialog=new AlertDialog.Builder(RegisterActivity.this).create();
+                            alertDialog.setTitle("Error");
+                            alertDialog.setMessage("Failure to create user" + task.getException());
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
                         }
                     }
                 });
@@ -75,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void sendEmailVerification() {
 
-        //Utils.user = mAuth.getCurrentUser();
+
         Utils.user.sendEmailVerification()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override

@@ -24,7 +24,7 @@ public class ImageDialog extends Activity {
     private ImageView mDialog;
     private TextView date_added;
     private Button delete_pic;
-    private List<String> plantImages=new ArrayList<>();
+    private ArrayList<String> plantImages=new ArrayList<>();
     private String plantID;
     private int position;
     private Plant myPlant;
@@ -38,8 +38,6 @@ public class ImageDialog extends Activity {
         date_added=findViewById(R.id.image_date_added);
         delete_pic=findViewById(R.id.delete_pic);
         mDialog = (ImageView)findViewById(R.id.your_image);
-       // picturePath=getIntent().getStringExtra("picturePath");
-       // date_added_string=getIntent().getStringExtra("dateAdded");
         plantID=getIntent().getStringExtra("plantID");
         position=getIntent().getIntExtra("position",0);
 
@@ -68,6 +66,7 @@ public class ImageDialog extends Activity {
                         keys.add(plantSnapshot.getKey());
                     }
                 }
+                plantImages=Utils.sortStringBubbleArrayStringArray(plantImages);
                 mDialog.setImageBitmap(Utils.getImageFromFile(plantImages.get(position)));
                 date_added.setText(Utils.getPictureDateFromPicturePath(plantImages.get(position)));
                 delete_pic.setOnClickListener(new View.OnClickListener() {
@@ -139,11 +138,6 @@ public class ImageDialog extends Activity {
 
 
         mDialog.setClickable(true);
-
-
-
-        //finish the activity (dismiss the image dialog) if the user clicks
-        //anywhere on the image
         mDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -1,5 +1,6 @@
 package ie.dbs.myplants;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,14 +9,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.github.aakira.expandablelayout.ExpandableLinearLayout;
-
-import java.lang.reflect.Array;
+;
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.Date;
-import java.util.Map;
+
 
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
     ArrayList<Plant> task_plants;
@@ -26,10 +24,19 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     class ViewHolder extends RecyclerView.ViewHolder{
         TextView task_plant_name;
         TextView task_action;
+        String plantID;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             task_plant_name=itemView.findViewById(R.id.cardview_task_plant_name);
             task_action=itemView.findViewById(R.id.cardview_task_action);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Utils.applicationContext, SinglePlant.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("plantID", plantID);
+                    Utils.applicationContext.startActivity(intent);
+                }
+            });
         }
     }
     @NonNull
@@ -52,6 +59,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
             if(watering_date!=null&&watering_date.before(tomorrow)){
                 holder.task_action.setText(R.string.task_watering);
             }
+            holder.plantID=task_plants.get(position).getPlantID();
     }
 
     @Override

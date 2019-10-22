@@ -458,7 +458,6 @@ public class Utils extends Activity {
             Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
             Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), notificationDate, notificationID, interval);
         } else {
-            //TODO throws exception
             myPlant.setNotificationWatering(false);
             Toast.makeText(Utils.applicationContext, "Please set up your watering needs first",
                     Toast.LENGTH_LONG).show();
@@ -510,6 +509,26 @@ public class Utils extends Activity {
             }
         }
             return plants;
+    }
+
+    public static ArrayList<String> sortStringBubbleArrayStringArray(ArrayList<String> plants)
+    {
+        int j;
+        boolean flag = true;  // will determine when the sort is finished
+        String temp;
+
+        while (flag) {
+            flag = false;
+            for (j = 0; j < plants.size() - 1; j++) {
+                if (getPictureDateFromPicturePath(plants.get(j)).compareToIgnoreCase(getPictureDateFromPicturePath(plants.get(j + 1))) > 0) {
+                    temp = plants.get(j);
+                    plants.set(j, plants.get(j + 1));
+                    plants.set(j + 1, temp);
+                    flag = true;
+                }
+            }
+        }
+        return plants;
     }
     public static ArrayList<Plant> sortStringBubble(ArrayList<Plant> plants, boolean name) {
         int j;

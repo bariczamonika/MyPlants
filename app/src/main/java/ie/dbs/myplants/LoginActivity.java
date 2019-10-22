@@ -86,23 +86,28 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.this);
-                                builder.setTitle("Verification email sent");
-                                builder.setMessage("You need to verify your email address to continue, please check your inbox");
+                                builder.setTitle("Password reset email sent");
+                                builder.setMessage("Please check your inbox");
                                 builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         finish();
                                     }
                                 });
-                                //Toast.makeText(LoginActivity.this, "An email has been sent to you.", Toast.LENGTH_SHORT).show();
-                                //finish();
                             } else {
-                                Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                AlertDialog dialog=new AlertDialog.Builder(LoginActivity.this).create();
+                                dialog.setTitle("Error");
+                                dialog.setMessage("Failure sending password reset email" + task.getException());
+                                dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
                             }
                         }
                     });
-                   // Toast.makeText(LoginActivity.this, "An email was sent to change your password",
-                           //Toast.LENGTH_SHORT).show();
+
                     Intent intent=new Intent(LoginActivity.this, LoginActivity.class);
                     startActivity(intent);
                     finish();
