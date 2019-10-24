@@ -228,7 +228,7 @@ public class SinglePlant extends AppCompatActivity{
                     String picName=Utils.getPictureDateFromPicturePath(plantImage.getPicturePath());
                     plantImagesMap.put(plantImage.getPicturePath(),picName);
                     picture_date.setText(plantImagesMap.get(plantImages.get(0)));
-                    plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(0)));
+                    plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(0)));
                     index=0;
                     single_pic_count.setText(index+1 + "/" +plantImages.size());
                     Log.v("plantImagePaths", plantImages.toString());
@@ -251,7 +251,7 @@ public class SinglePlant extends AppCompatActivity{
                 {
                     int size=plantImages.size();
                     index=Utils.scrollRight(size, index);
-                    plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(index)));
+                    plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
                     single_pic_count.setText(index+1 + "/" +size);
 
@@ -266,7 +266,7 @@ public class SinglePlant extends AppCompatActivity{
                 {
                     int size=plantImages.size();
                     index=Utils.scrollLeft(size, index);
-                    plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(index)));
+                    plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
                     single_pic_count.setText(index+1 + "/" +size);
                 }
@@ -280,7 +280,7 @@ public class SinglePlant extends AppCompatActivity{
                 {
                     int size=plantImages.size();
                     index=Utils.scrollRight(size, index);
-                    plant_images.setImageBitmap(Utils.getImageFromFile(plantImages.get(index)));
+                    plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
                     single_pic_count.setText(index+1 + "/" +size);
                 }
@@ -396,11 +396,10 @@ public class SinglePlant extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
         String plantID=getIntent().getStringExtra("plantID");
-        String[] stringArray=getIntent().getStringArrayExtra("image");
-        if(stringArray!=null)
+        String string=getIntent().getStringExtra("image");
+        if(string!=null)
         {
-            for (int i=0;i<stringArray.length;i++)
-            Utils.PushPicToDB(plantID, stringArray[i]);
+            Utils.PushPicToDB(plantID, string);
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");

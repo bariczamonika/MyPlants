@@ -54,7 +54,7 @@ public class AddPlant extends AppCompatActivity {
     private Light_Condition plant_light_conditions;
     private boolean plant_outdoor_plant;
     private ImageView img_view_plant_profile_preview;
-    private String[] imgProfilePath;
+    private String imgProfilePath;
     private TextView plant_title;
     private boolean modify=false;
     private TextView change_date_added;
@@ -120,10 +120,10 @@ public class AddPlant extends AppCompatActivity {
                     Plant myPlant=savePlantDetails();
                     addPlant(myPlant);
 
-                    String[] stringArray=getIntent().getStringArrayExtra("image");
-                    if(getIntent().getStringArrayExtra("image")!=null)
+                    String string=getIntent().getStringExtra("image");
+                    if(getIntent().getStringExtra("image")!=null)
                     {
-                        Utils.PushPicToDB(Utils.plantIterator.toString(), stringArray[0]);
+                        Utils.PushPicToDB(Utils.plantIterator.toString(), string);
                     }
                     Utils.plantIterator++;
                     Toast.makeText(AddPlant.this, "Plant saved successfully", Toast.LENGTH_SHORT).show();
@@ -135,10 +135,10 @@ public class AddPlant extends AppCompatActivity {
                 }
                 else
                 {
-                    String[] stringArray=getIntent().getStringArrayExtra("image");
-                    if(getIntent().getStringArrayExtra("image")!=null)
+                    String string=getIntent().getStringExtra("image");
+                    if(getIntent().getStringExtra("image")!=null)
                     {
-                        Utils.PushPicToDB(Utils.temporary_plant.getPlantID(), stringArray[0]);
+                        Utils.PushPicToDB(Utils.temporary_plant.getPlantID(), string);
                     }
                     Toast.makeText(AddPlant.this, "Plant modified successfully", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(AddPlant.this, SinglePlant.class);
@@ -159,8 +159,8 @@ public class AddPlant extends AppCompatActivity {
         modify=getIntent().getBooleanExtra("modify", false);
         if(!modify) {
             try {
-                imgProfilePath = getIntent().getStringArrayExtra("image");
-                img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
+                imgProfilePath = getIntent().getStringExtra("image");
+                img_view_plant_profile_preview.setImageBitmap(Utils.getThumbNailFromFile(imgProfilePath));
                 setSpinners();
 
                 if (Utils.temporary_plant != null) {
@@ -199,11 +199,11 @@ public class AddPlant extends AppCompatActivity {
                             radioButton_outdoor_plant_no.setChecked(true);
                         else
                             radioGroup_outdoor_plant.clearCheck();
-                            imgProfilePath = getIntent().getStringArrayExtra("image");
+                            imgProfilePath = getIntent().getStringExtra("image");
                             if(imgProfilePath!=null)
-                            img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(imgProfilePath[0]));
+                            img_view_plant_profile_preview.setImageBitmap(Utils.getThumbNailFromFile(imgProfilePath));
                             else if(Utils.temporary_plant.getProfilePicPath()!=null)
-                                img_view_plant_profile_preview.setImageBitmap(Utils.getImageFromFile(Utils.temporary_plant.getProfilePicPath()));
+                                img_view_plant_profile_preview.setImageBitmap(Utils.getThumbNailFromFile(Utils.temporary_plant.getProfilePicPath()));
                             plant_title.setText(R.string.plant_modify_plant);
                             btn_add_pic_to_plant.setText(R.string.plant_modify_profile_pic);
 
@@ -254,7 +254,7 @@ public class AddPlant extends AppCompatActivity {
                 plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, "");
         else
             myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,dateAdded,plant_notes,plant_watering_needs,
-                    plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath[0]);}
+                    plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath);}
         else
         {
             String plantID=getIntent().getStringExtra("plantID");
@@ -283,7 +283,7 @@ public class AddPlant extends AppCompatActivity {
             myPlant.setOutdoorPlant(plant_outdoor_plant);
             myPlant.setWateringNeeds(plant_watering_needs);
             if(imgProfilePath!=null)
-                myPlant.setProfilePicPath(imgProfilePath[0]);
+                myPlant.setProfilePicPath(imgProfilePath);
         }
         Log.v("saved temporary plant", myPlant.getFertilizingNeeds().toString());
         return myPlant;
@@ -292,7 +292,7 @@ public class AddPlant extends AppCompatActivity {
 
     private void addPlant(Plant myPlant) {
         if(imgProfilePath==null)
-            imgProfilePath=new String[]{""};
+            imgProfilePath=new String("");
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(myPlant.getPlantID()).setValue(myPlant);
     }
@@ -301,7 +301,7 @@ public class AddPlant extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         if(imgProfilePath!=null)
-        Utils.deletePic(imgProfilePath[0]);
+        Utils.deletePic(imgProfilePath);
         Intent intent=new Intent(AddPlant.this, MainActivity.class);
         startActivity(intent);
         finish();

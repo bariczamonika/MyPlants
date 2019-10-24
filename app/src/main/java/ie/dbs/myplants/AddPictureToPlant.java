@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,6 +34,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +58,11 @@ public class AddPictureToPlant extends AppCompatActivity {
     private boolean modify=false;
     private TextView modify_picture_date;
     private String timeStamp;
+    private ContentValues values;
+    private Uri imageUri;
     int index=0;
+    private Uri photoURI;
+    private String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +106,45 @@ public class AddPictureToPlant extends AppCompatActivity {
 
                 if(ContextCompat.checkSelfPermission(Utils.applicationContext, Manifest.permission.CAMERA)
                         == PackageManager.PERMISSION_GRANTED) {
+                    /*Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);*/
+                   /* values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                    mArrayUri.clear();
+                    mArrayUri.add( getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values));
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mArrayUri.get(0));
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);*/
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    takePictureIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    // Ensure that there's a camera activity to handle the intent
+                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                        // Create the File where the photo should go
+                        File photoFile = null;
+                        try {
+                            photoFile = createImageFile();
+                        } catch (IOException ex) {
+                            // Error occurred while creating the File
+                        }
+                        // Continue only if the File was successfully created
+                        if (photoFile != null) {
+                            photoURI = FileProvider.getUriForFile(AddPictureToPlant.this,
+                                    "ie.dbs.myplants.fileprovider",
+                                    photoFile);
+                            mArrayUri.clear();
+                            mArrayUri.add(photoURI);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                            Log.v("UriContent", photoURI.toString());
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                        }
+                    }
                 }
 
             }
         });
+
 
         preview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,17 +176,12 @@ public class AddPictureToPlant extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String[]imagePath=new String[mArrayUri.size()];
-                for(int i=0;i<mArrayUri.size();i++)
-                {
                     try {
-                        InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(mArrayUri.get(i));
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        imagePath[i]=Utils.createDirectoryAndSaveFile(bitmap, AddPictureToPlant.this, timeStamp);
+
                         if(isProfilePic) {
                             if(!modify) {
                                 Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
-                                intent.putExtra("image", imagePath);
+                                intent.putExtra("image", mCurrentPhotoPath);
                                 intent.putExtra("modify", false);
                                 intent.putExtra("plantID", plantID);
                                 startActivity(intent);
@@ -154,7 +190,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                             else
                             {
                                 Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
-                                intent.putExtra("image", imagePath);
+                                intent.putExtra("image", mCurrentPhotoPath);
                                 intent.putExtra("modify", true);
                                 intent.putExtra("plantID", plantID);
                                 startActivity(intent);
@@ -164,7 +200,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                         else
                         {
                             Intent intent=new Intent(AddPictureToPlant.this, SinglePlant.class);
-                            intent.putExtra("image", imagePath);
+                            intent.putExtra("image", mCurrentPhotoPath);
                             intent.putExtra("plantID", plantID);
                             startActivity(intent);
                             finish();
@@ -173,7 +209,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                     catch (Exception ex)
                     {Log.v("error saving pic", ex.getMessage());
                     Toast.makeText(getApplicationContext(), "Couldn't save picture", Toast.LENGTH_SHORT).show();}
-                }
+
 
             }
         });
@@ -187,6 +223,7 @@ public class AddPictureToPlant extends AppCompatActivity {
                 dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Utils.deletePic(mCurrentPhotoPath);
                         Intent intent=new Intent(AddPictureToPlant.this, AddPlant.class);
                         startActivity(intent);
                         finish();
@@ -248,8 +285,8 @@ public class AddPictureToPlant extends AppCompatActivity {
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+       super.onActivityResult(requestCode, resultCode, data);
         try {
             isProfilePic=getIntent().getBooleanExtra("IsProfilePicture", true);
             //if picking image from gallery selected
@@ -269,29 +306,25 @@ public class AddPictureToPlant extends AppCompatActivity {
                         cursor.close();
                         Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
                         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
                         preview.setImageBitmap(bitmap);
+                        mCurrentPhotoPath=Utils.createDirectoryAndSaveFile(bitmap, this, timeStamp);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
             //if taking pic from camera selected
-            else if(requestCode==REQUEST_IMAGE_CAPTURE && resultCode== RESULT_OK && data!=null)
+            else if(requestCode==REQUEST_IMAGE_CAPTURE && resultCode== RESULT_OK /*&& data!=null*/)
             {
                 try {
-                    Bundle extras = data.getExtras();
-                    if(extras.get("data")!=null) {
-                        Bitmap bitmap = (Bitmap) extras.get("data");
-                        preview.setImageBitmap(bitmap);
-                        mArrayUri.clear();
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                        String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "Title", null);
-                        mArrayUri.add(Uri.parse(path));
-                    }
+                    Uri contentUri=FileProvider.getUriForFile(getApplicationContext(), "ie.dbs.myplants.fileprovider", new File(mCurrentPhotoPath));
+                    preview.setImageURI(contentUri);
+
+
                 } catch (Exception ex)
-                {ex.printStackTrace();}
+                {ex.printStackTrace();
+                Log.v("dataException", ex.getMessage());}
             }
             else {
                 Toast.makeText(this, "You haven't picked Image",
@@ -340,5 +373,29 @@ public class AddPictureToPlant extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File storageDir = new File(Utils.applicationContext.getExternalFilesDir(null) + "/MyPlants/");
+        File file = new File(storageDir, "picture" +
+                timeStamp + ".jpeg");
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = file.getAbsolutePath();
+        return file;
+    }
+
+    private void createImageNewImageFile(Uri uri)
+    {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File storageDir = new File(Utils.applicationContext.getExternalFilesDir(null) + "/MyPlants/");
+        File file = new File(storageDir, "picture" +
+                timeStamp + ".jpeg");
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = file.getAbsolutePath();
     }
 }

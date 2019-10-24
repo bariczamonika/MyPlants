@@ -67,7 +67,7 @@ public class ImageDialog extends Activity {
                     }
                 }
                 plantImages=Utils.sortStringBubbleArrayStringArray(plantImages);
-                mDialog.setImageBitmap(Utils.getImageFromFile(plantImages.get(position)));
+                mDialog.setImageBitmap(Utils.getFullImageFromFile(plantImages.get(position)));
                 date_added.setText(Utils.getPictureDateFromPicturePath(plantImages.get(position)));
                 delete_pic.setOnClickListener(new View.OnClickListener() {
                     @Override

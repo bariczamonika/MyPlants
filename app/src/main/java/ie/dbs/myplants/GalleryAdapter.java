@@ -52,7 +52,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.date_added.setText(Utils.getPictureDateFromPicturePath(plantImages.get(position).getPicturePath()));
-        holder.picture.setImageBitmap(Utils.getImageFromFile(plantImages.get(position).getPicturePath()));
+        holder.picture.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(position).getPicturePath()));
         holder.position=position;
 
     }

@@ -33,7 +33,7 @@ public class PlantRecyclerAdapter extends RecyclerView.Adapter<PlantRecyclerAdap
     public void onBindViewHolder(@NonNull myViewHolder holder, int position) {
         holder.plantName.setText(myPlants.get(position).getName());
         String myPath = myPlants.get(position).getProfilePicPath();
-        Bitmap bitmap=Utils.getImageFromFile(myPath);
+        Bitmap bitmap=Utils.getThumbNailFromFile(myPath);
         if(bitmap.getWidth()>bitmap.getHeight())
             bitmap=Bitmap.createBitmap(bitmap, 0,0,bitmap.getHeight(), bitmap.getHeight());
         else

@@ -16,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,6 +41,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +79,7 @@ public class Utils extends Activity {
     }
 
     //create custom directory and save file
-    public static String createDirectoryAndSaveFile(Bitmap imageToSave, Context context, String timestamp) {
+    public static String createDirectoryAndSaveFile(Bitmap imageToSave,Context context, String timestamp) {
 
         File homeDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
         if (!homeDirectory.exists()) {
@@ -114,6 +116,8 @@ public class Utils extends Activity {
         }
         return imagePath;
     }
+
+
 
     //validate login form
     public static boolean validateForm(@NotNull EditText emailAddress, EditText password) {
@@ -204,7 +208,7 @@ public class Utils extends Activity {
     }
 
     //retrieve image from saved position
-    public static Bitmap getImageFromFile(String path) {
+    public static Bitmap getThumbNailFromFile(String path) {
         Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         bitmap = Bitmap.createScaledBitmap(bitmap, 400, 280, false);
@@ -225,10 +229,26 @@ public class Utils extends Activity {
 
     }
 
+    public static Bitmap getFullImageFromFile(String path)
+    {
+        Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+        if (path != null) {
+            if (!path.equals("")) {
+                final File imgFile = new File(path);
+                if (imgFile.exists()) {
+                    bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                }
+            }
+        }
+        return bitmap;
+    }
+
     public static String getPictureDateFromPicturePath(String picturePath) {
         int length = picturePath.length();
         int index = picturePath.indexOf("20");
-        String trimmedPicturePath = picturePath.substring(index, length - 12);
+        String trimmedPicturePath = picturePath.substring(index, length - 11);
         String year = trimmedPicturePath.substring(0, 4);
         String month = trimmedPicturePath.substring(4, 6);
         String day = trimmedPicturePath.substring(6, 8);

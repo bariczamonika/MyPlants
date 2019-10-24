@@ -53,10 +53,13 @@ public class TomorrowTaskRecyclerAdapter extends RecyclerView.Adapter<TomorrowTa
 
             Date fertilizing_date=task_plants.get(position).getNextFertilizing();
             Date watering_date=task_plants.get(position).getNextWatering();
-            if(fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today)){
+            boolean isFertilizingDateTomorrow=fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today);
+            boolean isWateringDateTomorrow=watering_date!=null&&watering_date.before(day_after_tomorrow) && watering_date.after(today);
+            boolean isWateringDateTodayAndDaily=watering_date!=null && watering_date.before(today)&&task_plants.get(position).getWateringNeeds().value==1;
+            if(isFertilizingDateTomorrow){
                 holder.task_action.setText(R.string.task_fertilizing);
             }
-            if(watering_date!=null&&watering_date.before(day_after_tomorrow) && watering_date.after(today)){
+            if((isWateringDateTomorrow) ||isWateringDateTodayAndDaily){
                 holder.task_action.setText(R.string.task_watering);
             }
             holder.plantID=task_plants.get(position).getPlantID();

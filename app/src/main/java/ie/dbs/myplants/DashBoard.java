@@ -316,6 +316,10 @@ public class DashBoard extends AppCompatActivity {
             }
             else if(isFertilizingDateTomorrow ^ isWateringDateTomorrow)
                 plantList.add(myPlant);
+            if(myPlant.getWateringNeeds().value==1&& watering_date.before(today))
+            {
+                plantList.add(myPlant);
+            }
         }
         return plantList;
     }
