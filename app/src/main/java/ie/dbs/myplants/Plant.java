@@ -46,6 +46,8 @@ public class Plant {
     private Date nextFertilizing;
     private boolean notificationWatering;
     private boolean notificationFertilizing;
+    private boolean taskWateringChecked;
+    private boolean taskFertilizinChecked;
 
     public Plant() {
 
@@ -69,6 +71,7 @@ public class Plant {
         this.nextWatering=anotherPlant.nextWatering;
         this.notificationWatering=anotherPlant.notificationWatering;
         this.notificationFertilizing=anotherPlant.notificationFertilizing;
+
     }
 
     public Plant(String plantID, String name, String description, Date dateAdded, String notes, Watering_Needs wateringNeeds,
@@ -83,6 +86,8 @@ public class Plant {
         this.outdoorPlant = outdoorPlant;
         this.lightCondition = lightCondition;
         this.profilePicPath=profilePicPath;
+        this.taskFertilizinChecked=false;
+        this.taskWateringChecked=false;
 
     }
 
@@ -219,8 +224,26 @@ public class Plant {
         return lightCondition;
     }
 
+    public boolean isTaskWateringChecked() {
+        return taskWateringChecked;
+    }
+
+    public void setTaskWateringChecked(boolean taskWateringChecked) {
+        this.taskWateringChecked = taskWateringChecked;
+    }
+
+    public boolean isTaskFertilizinChecked() {
+        return taskFertilizinChecked;
+    }
+
+    public void setTaskFertilizinChecked(boolean taskFertilizinChecked) {
+        this.taskFertilizinChecked = taskFertilizinChecked;
+    }
+
     public void setLightCondition(Light_Condition lightCondition) {
         this.lightCondition = lightCondition;
+
+
     }
 }
 

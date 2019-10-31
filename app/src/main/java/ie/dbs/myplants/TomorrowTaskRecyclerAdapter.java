@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,10 +22,13 @@ public class TomorrowTaskRecyclerAdapter extends RecyclerView.Adapter<TomorrowTa
         TextView task_plant_name;
         TextView task_action;
         String plantID;
+        CheckBox task_check_box;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             task_plant_name=itemView.findViewById(R.id.cardview_task_plant_name);
             task_action=itemView.findViewById(R.id.cardview_task_action);
+            task_check_box=itemView.findViewById(R.id.cardview_task_check_task);
+            task_check_box.setVisibility(View.INVISIBLE);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

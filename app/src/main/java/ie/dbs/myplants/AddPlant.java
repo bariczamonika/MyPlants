@@ -125,7 +125,6 @@ public class AddPlant extends AppCompatActivity {
                     {
                         Utils.PushPicToDB(Utils.plantIterator.toString(), string);
                     }
-                    Utils.plantIterator++;
                     Toast.makeText(AddPlant.this, "Plant saved successfully", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(AddPlant.this, MainActivity.class);
                     startActivity(intent);

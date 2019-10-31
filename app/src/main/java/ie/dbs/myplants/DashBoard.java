@@ -300,25 +300,24 @@ public class DashBoard extends AppCompatActivity {
         Log.v("today", String.valueOf(today));
         for(int i=0;i<plants.size();i++){
             Plant myPlant=plants.get(i);
-            Date fertilizing_date=myPlant.getNextFertilizing();
-            Date watering_date=myPlant.getNextWatering();
-            boolean isFertilizingDateTomorrow=fertilizing_date!=null&&fertilizing_date.before(day_after_tomorrow)&&fertilizing_date.after(today);
-            boolean isWateringDateTomorrow=watering_date!=null&&watering_date.before(day_after_tomorrow) && (watering_date.after(today));
-            if(isFertilizingDateTomorrow&&isWateringDateTomorrow)
-            {
+            if(myPlant.getLastWatered()!=null || myPlant.getLastFertilized()!=null) {
+                Date fertilizing_date = myPlant.getNextFertilizing();
+                Date watering_date = myPlant.getNextWatering();
+                boolean isFertilizingDateTomorrow = fertilizing_date != null && fertilizing_date.before(day_after_tomorrow) && fertilizing_date.after(today);
+                boolean isWateringDateTomorrow = watering_date != null && watering_date.before(day_after_tomorrow) && (watering_date.after(today));
+                if (isFertilizingDateTomorrow && isWateringDateTomorrow) {
 
-                Plant newPlant=new Plant(myPlant);
-                newPlant.setNextFertilizing(null);
-                plantList.add(newPlant);
-                Plant newNewPlant=new Plant(myPlant);
-                newNewPlant.setNextWatering(null);
-                plantList.add(newNewPlant);
-            }
-            else if(isFertilizingDateTomorrow ^ isWateringDateTomorrow)
-                plantList.add(myPlant);
-            if(myPlant.getWateringNeeds().value==1&& watering_date.before(today))
-            {
-                plantList.add(myPlant);
+                    Plant newPlant = new Plant(myPlant);
+                    newPlant.setNextFertilizing(null);
+                    plantList.add(newPlant);
+                    Plant newNewPlant = new Plant(myPlant);
+                    newNewPlant.setNextWatering(null);
+                    plantList.add(newNewPlant);
+                } else if (isFertilizingDateTomorrow ^ isWateringDateTomorrow)
+                    plantList.add(myPlant);
+                if (myPlant.getWateringNeeds().value == 1 && watering_date.before(today)) {
+                    plantList.add(myPlant);
+                }
             }
         }
         return plantList;

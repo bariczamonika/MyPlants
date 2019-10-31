@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
     private Button addPlantButton;
@@ -85,13 +86,23 @@ public class MainActivity extends AppCompatActivity{
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
                         myPlants=new ArrayList<>();
+                        List<Integer> plantIDs=new ArrayList<>();
                         for(DataSnapshot plantSnapshot:dataSnapshot.getChildren()){
                             Plant myPlant=plantSnapshot.getValue(Plant.class);
                             myPlants.add(myPlant);
-
-
+                            plantIDs.add(Integer.parseInt(myPlant.getPlantID()));
                         }
-                        Utils.plantIterator=myPlants.size();
+                        int currentID=0;
+                        for(int i=0;i<plantIDs.size();i++)
+                        {
+                                if (!plantIDs.contains(i)) {
+                                    currentID = i;
+                                    break;
+                                }
+                                else
+                                    currentID=i+1;
+                        }
+                        Utils.plantIterator=currentID;
                         PlantRecyclerAdapter plantRecyclerAdapter=new PlantRecyclerAdapter(myPlants);
                         recyclerView.setAdapter(plantRecyclerAdapter);
                         filteredPlants=myPlants;

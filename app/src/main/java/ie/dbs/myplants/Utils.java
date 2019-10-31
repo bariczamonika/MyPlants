@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -31,8 +32,11 @@ import androidx.core.content.ContextCompat;
 import com.android.volley.RequestQueue;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -432,6 +436,8 @@ public class Utils extends Activity {
                 .setSmallIcon(R.drawable.my_plant_icon).build();
         return notification;
     }
+
+
 
     public static void setFertilizingNotification(Plant myPlant) {
 
