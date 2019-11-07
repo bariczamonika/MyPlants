@@ -2,13 +2,11 @@ package ie.dbs.myplants;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,37 +17,25 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
-
-
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-
 import com.android.volley.RequestQueue;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,22 +48,22 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class Utils extends Activity {
+class Utils {
     public static FirebaseUser user;
-    public static FirebaseAuth mAuth;
-    public static int MyVersion;
-    public static Context applicationContext;
-    public static FirebaseDatabase firebaseDatabase;
-    public static DatabaseReference databaseReference;
-    public static Plant temporary_plant;
-    public static Integer plantIterator;
-    public static String CHANNEL_ID = "my_channel_01";
-    public static int isCalledFromAlertDialog = 0;
-    public static RequestQueue queue;
-    public static ArrayList<Plant> today_plants_task_string=new ArrayList<>();
+    static FirebaseAuth mAuth;
+    static int MyVersion;
+    static Context applicationContext;
+    static FirebaseDatabase firebaseDatabase;
+    static DatabaseReference databaseReference;
+    static Plant temporary_plant;
+    static Integer plantIterator;
+    final static String CHANNEL_ID = "my_channel_01";
+    static int isCalledFromAlertDialog = 0;
+    static RequestQueue queue;
+    final static ArrayList<Plant> today_plants_task_string=new ArrayList<>();
 
     //asks for permission on SDK>16
-    public static void AskForPermission(String myPermission, Activity whichActivity) {
+    static void AskForPermission(String myPermission, Activity whichActivity) {
 
         if (Utils.MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
             if (ContextCompat.checkSelfPermission(applicationContext, myPermission)
@@ -88,11 +74,12 @@ public class Utils extends Activity {
     }
 
     //create custom directory and save file
-    public static String createDirectoryAndSaveFile(Bitmap imageToSave,Context context, String timestamp) {
+    static String createDirectoryAndSaveFile(Bitmap imageToSave, Context context, String timestamp) {
 
         File homeDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
         if (!homeDirectory.exists()) {
             File plantDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
+            plantDirectory.mkdirs();
         }
         File myFile = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
 
@@ -128,7 +115,7 @@ public class Utils extends Activity {
 
 
     //validate login form
-    public static boolean validateForm(@NotNull EditText emailAddress, EditText password) {
+    static boolean validateForm(@NotNull EditText emailAddress, EditText password) {
         boolean valid = true;
 
         String email = emailAddress.getText().toString();
@@ -151,7 +138,7 @@ public class Utils extends Activity {
     }
 
     //validate registration form
-    public static boolean validateRegistrationForm(@NotNull EditText emailAddress, EditText password, EditText
+    static boolean validateRegistrationForm(@NotNull EditText emailAddress, EditText password, EditText
             passwordConfirmation) {
         boolean valid = true;
 
@@ -187,21 +174,21 @@ public class Utils extends Activity {
 
     //convert Light condition enum to string array for spinners
     @NotNull
-    public static String[] getLightConditionNames() {
+    static String[] getLightConditionNames() {
         String myArray = Arrays.toString(Light_Condition.values());
         myArray = myArray.substring(1, myArray.length() - 1);
         return myArray.replace('_', ' ').split(", ");
     }
 
     @NotNull
-    public static String[] getWateringNeedsNames() {
+    static String[] getWateringNeedsNames() {
         String myArray = Arrays.toString(Watering_Needs.values());
         myArray = myArray.substring(1, myArray.length() - 1);
         return myArray.replace('_', ' ').split(", ");
     }
 
     @NotNull
-    public static String[] getFertilizingNeedsNames() {
+    static String[] getFertilizingNeedsNames() {
         String myArray = Arrays.toString(Fertilizing_Needs.values());
         myArray = myArray.substring(1, myArray.length() - 1);
         return myArray.replace('_', ' ').split(", ");
@@ -209,14 +196,14 @@ public class Utils extends Activity {
 
 
     //push pictures to database
-    public static void PushPicToDB(String plantID, String imagePath) {
+    static void PushPicToDB(String plantID, String imagePath) {
         String userID = Utils.user.getUid();
         PlantImage plantImage = new PlantImage(imagePath);
         Utils.databaseReference.child("users").child(userID).child("plantsPics").child(plantID).child("images").push().setValue(plantImage);
     }
 
     //retrieve image from saved position
-    public static Bitmap getThumbNailFromFile(String path) {
+    static Bitmap getThumbNailFromFile(String path) {
         Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         bitmap = Bitmap.createScaledBitmap(bitmap, 400, 280, false);
@@ -237,7 +224,7 @@ public class Utils extends Activity {
 
     }
 
-    public static Bitmap getFullImageFromFile(String path)
+    static Bitmap getFullImageFromFile(String path)
     {
         Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
@@ -253,7 +240,7 @@ public class Utils extends Activity {
         return bitmap;
     }
 
-    public static String getPictureDateFromPicturePath(String picturePath) {
+    static String getPictureDateFromPicturePath(String picturePath) {
         int length = picturePath.length();
         int index = picturePath.indexOf("20");
         String trimmedPicturePath = picturePath.substring(index, length - 11);
@@ -263,7 +250,7 @@ public class Utils extends Activity {
         return day + "/" + month + "/" + year;
     }
 
-    public static void deletePic(String picturePath) {
+    static void deletePic(String picturePath) {
         File file = new File(picturePath);
         if (file.exists()) {
             if (file.delete())
@@ -274,7 +261,7 @@ public class Utils extends Activity {
     }
 
 
-    public static int convertFertilizingNeedsToInteger(int value) {
+    static int convertFertilizingNeedsToInteger(int value) {
         int newValue = 0;
         switch (value) {
             case 1:
@@ -302,7 +289,7 @@ public class Utils extends Activity {
     }
 
 
-    public static Date addDaysToDate(Date myDate, int days) {
+    static Date addDaysToDate(Date myDate, int days) {
         Date newDate;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(getLastMinuteOfDay(myDate));
@@ -311,8 +298,7 @@ public class Utils extends Activity {
         return newDate;
     }
 
-    //TODO user can choose the time for notification
-    public static Plant autoChangeDatesOnceItIsReached(Plant myPlant) {
+    static Plant autoChangeDatesOnceItIsReached(Plant myPlant) {
 
         Date now = new Date();
         now = addDaysToDate(getLastMinuteOfDay(now), -1);
@@ -347,7 +333,7 @@ public class Utils extends Activity {
         return myPlant;
     }
 
-    public static Date getLastMinuteOfDay(Date now) {
+    static Date getLastMinuteOfDay(Date now) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
         int year = calendar.get(Calendar.YEAR);
@@ -358,7 +344,7 @@ public class Utils extends Activity {
         return now;
     }
 
-    public static Date getTimeOfDay(Date now) {
+    private static Date getTimeOfDay(Date now) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
         int year = calendar.get(Calendar.YEAR);
@@ -382,7 +368,7 @@ public class Utils extends Activity {
         return now;
     }
 
-    public static Date addOneSecondToDate(Date now) {
+    static Date addOneSecondToDate(Date now) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
         calendar.add(Calendar.SECOND, 1);
@@ -390,7 +376,7 @@ public class Utils extends Activity {
         return now;
     }
 
-    public static Date createDateFromString(String string) {
+    static Date createDateFromString(String string) {
         Date date;
         String[] stringArray = string.split(" ");
         String[] dateArray = stringArray[0].split("-");
@@ -402,7 +388,7 @@ public class Utils extends Activity {
         return date;
     }
 
-    public static boolean isDateToday(Date date) {
+    static boolean isDateToday(Date date) {
         boolean check = false;
         Date now = new Date();
         Date today = addOneSecondToDate(addDaysToDate(getLastMinuteOfDay(now), -1));
@@ -412,7 +398,7 @@ public class Utils extends Activity {
         return check;
     }
 
-    public static boolean isDateTomorrow(Date date) {
+    static boolean isDateTomorrow(Date date) {
         boolean check = false;
         Date now = new Date();
         Date day_after_tomorrow = addDaysToDate(getLastMinuteOfDay(now), 1);
@@ -423,7 +409,7 @@ public class Utils extends Activity {
     }
 
 
-    public static void cancelNotification(int notificationID, Activity whichActivity) {
+    static void cancelNotification(int notificationID, Activity whichActivity) {
         Intent notificationIntent = new Intent(whichActivity, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(whichActivity, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -432,7 +418,7 @@ public class Utils extends Activity {
         Toast.makeText(whichActivity, "Notification " + notificationID + "cancelled", Toast.LENGTH_SHORT).show();
     }
 
-    public static void scheduleNotification(Notification notification, Date whenToStart, int notificationID, long interval) {
+    private static void scheduleNotification(Notification notification, Date whenToStart, int notificationID, long interval) {
 
         Intent notificationIntent = new Intent(Utils.applicationContext, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
@@ -450,7 +436,7 @@ public class Utils extends Activity {
     }
 
 
-    public static Notification getNotification(String content) {
+    private static Notification getNotification(String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID);
         return builder
                 .setContentTitle("Scheduled Notification")
@@ -460,7 +446,7 @@ public class Utils extends Activity {
 
 
 
-    public static void setFertilizingNotification(Plant myPlant) {
+    static void setFertilizingNotification(Plant myPlant) {
 
         if (myPlant.getFertilizingNeeds() != Fertilizing_Needs.None) {
             if (myPlant.getNextFertilizing() == null) {
@@ -473,9 +459,7 @@ public class Utils extends Activity {
             Date notificationDate = getTimeOfDay(myPlant.getNextFertilizing());
             if (now.getTime() > notificationDate.getTime())
                 notificationDate = getTimeOfDay((addDaysToDate(notificationDate, convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value))));
-            long delay = notificationDate.getTime();
             int notificationID = generateNotificationID(myPlant.getPlantID(), false);
-
             Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs fertilizing"), notificationDate, notificationID, interval);
         } else {
             myPlant.setNotificationFertilizing(false);
@@ -485,7 +469,7 @@ public class Utils extends Activity {
         }
     }
 
-    public static void setWateringNotification(Plant myPlant) {
+    static void setWateringNotification(Plant myPlant) {
 
         if (myPlant.getWateringNeeds() != Watering_Needs.None) {
             if (myPlant.getNextWatering() == null) {
@@ -513,7 +497,7 @@ public class Utils extends Activity {
     }
 
 
-    public static int generateNotificationID(String plantID, boolean isWatering) {
+    static int generateNotificationID(String plantID, boolean isWatering) {
         int notificationID = 0;
         if (isWatering) {
             if (plantID != null) {
@@ -538,7 +522,7 @@ public class Utils extends Activity {
     }
 
 
-    public static ArrayList<PlantImage> sortStringBubbleArray(ArrayList<PlantImage> plants)
+    static ArrayList<PlantImage> sortStringBubbleArray(ArrayList<PlantImage> plants)
     {
         int j;
         boolean flag = true;  // will determine when the sort is finished
@@ -558,7 +542,7 @@ public class Utils extends Activity {
             return plants;
     }
 
-    public static ArrayList<String> sortStringBubbleArrayStringArray(ArrayList<String> plants)
+    static ArrayList<String> sortStringBubbleArrayStringArray(ArrayList<String> plants)
     {
         int j;
         boolean flag = true;  // will determine when the sort is finished
@@ -577,7 +561,7 @@ public class Utils extends Activity {
         }
         return plants;
     }
-    public static ArrayList<Plant> sortStringBubble(ArrayList<Plant> plants, boolean name) {
+    static ArrayList<Plant> sortStringBubble(ArrayList<Plant> plants, boolean name) {
         int j;
         boolean flag = true;  // will determine when the sort is finished
         Plant temp;
@@ -605,7 +589,7 @@ public class Utils extends Activity {
         return plants;
     }
 
-    public static ArrayList<Plant> sortByOutDoorPlant(ArrayList<Plant> plants, boolean outdoor) {
+    static ArrayList<Plant> sortByOutDoorPlant(ArrayList<Plant> plants, boolean outdoor) {
         ArrayList<Plant> sortedPlants = new ArrayList<>();
         for (Plant plant : plants) {
             if (outdoor) {
@@ -621,7 +605,7 @@ public class Utils extends Activity {
         return sortedPlants;
     }
 
-    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+    private static Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<>();
         Iterator<String> keysItr = object.keys();
         while (keysItr.hasNext()) {
@@ -637,7 +621,7 @@ public class Utils extends Activity {
         return map;
     }
 
-    public static List<Object> toList(JSONArray array) {
+    private static List<Object> toList(JSONArray array) {
         List<Object> list = new ArrayList<>();
         try {
             for (int i = 0; i < array.length(); i++) {
@@ -656,12 +640,12 @@ public class Utils extends Activity {
         return list;
     }
 
-    public static void addPlant(Plant plant) {
+    static void addPlant(Plant plant) {
         String userID = Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
     }
 
-    public static int scrollRight(int size, int index) {
+    static int scrollRight(int size, int index) {
 
         if (size > index + 1)
             index = index + 1;
@@ -670,7 +654,7 @@ public class Utils extends Activity {
         return index;
     }
 
-    public static int scrollLeft(int size, int index) {
+    static int scrollLeft(int size, int index) {
 
         if (index > 0)
             index = index - 1;

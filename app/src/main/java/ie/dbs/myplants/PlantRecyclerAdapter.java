@@ -16,9 +16,9 @@ import java.util.ArrayList;
 
 
 public class PlantRecyclerAdapter extends RecyclerView.Adapter<PlantRecyclerAdapter.myViewHolder> {
-    ArrayList<Plant> myPlants;
+    final private ArrayList<Plant> myPlants;
 
-    public PlantRecyclerAdapter(ArrayList<Plant> myPlants){
+    PlantRecyclerAdapter(ArrayList<Plant> myPlants){
         this.myPlants=myPlants;
     }
 
@@ -49,11 +49,11 @@ public class PlantRecyclerAdapter extends RecyclerView.Adapter<PlantRecyclerAdap
     }
 
     class myViewHolder extends RecyclerView.ViewHolder {
-        TextView plantName;
-        ImageView plantImg;
+        final TextView plantName;
+        final ImageView plantImg;
         String plantID;
 
-        public myViewHolder(@NonNull View itemView) {
+        myViewHolder(@NonNull View itemView) {
             super(itemView);
             plantName=itemView.findViewById(R.id.cardview_plant_name);
             plantImg=itemView.findViewById(R.id.cardview_avatar);

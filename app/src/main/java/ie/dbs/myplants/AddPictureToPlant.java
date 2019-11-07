@@ -1,8 +1,6 @@
 package ie.dbs.myplants;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -10,8 +8,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.ClipData;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,18 +18,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -45,23 +35,16 @@ import java.util.Date;
 
 
 public class AddPictureToPlant extends Activity {
-    private Button takePicture;
-    private Button addFromGallery;
-    private Button save;
-    private Button cancel;
-    public static final int PICK_IMAGE_FROM_GALLERY=5;
-    public static final int REQUEST_IMAGE_CAPTURE=6;
+    private static final int PICK_IMAGE_FROM_GALLERY=5;
+    private static final int REQUEST_IMAGE_CAPTURE=6;
     private ArrayList<Uri> mArrayUri;
-    private String imageEncoded;
     private ImageView preview;
     private boolean isProfilePic;
     private String plantID;
     private boolean modify=false;
     private TextView modify_picture_date;
     private String timeStamp;
-    private ContentValues values;
-    private Uri imageUri;
-    int index=0;
+    private int index=0;
     private Uri photoURI;
     private String mCurrentPhotoPath;
 
@@ -69,12 +52,12 @@ public class AddPictureToPlant extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
-        takePicture=(Button)findViewById(R.id.takePictureButton);
-        addFromGallery= (Button)findViewById(R.id.chooseFromGalleryButton);
-        preview=(ImageView)findViewById(R.id.preview);
+        Button takePicture = findViewById(R.id.takePictureButton);
+        Button addFromGallery =findViewById(R.id.chooseFromGalleryButton);
+        preview=findViewById(R.id.preview);
         mArrayUri=new ArrayList<>();
-        save=(Button)findViewById(R.id.saveImages);
-        cancel=(Button)findViewById(R.id.cancel);
+        Button save =findViewById(R.id.saveImages);
+        Button cancel = findViewById(R.id.cancel);
         modify_picture_date=findViewById(R.id.pic_modify_date);
         plantID=getIntent().getStringExtra("plantID");
         modify=getIntent().getBooleanExtra("modify",false);
@@ -300,16 +283,19 @@ public class AddPictureToPlant extends Activity {
                         Uri ImageUri = data.getData();
                         mArrayUri.add(ImageUri);
                         Cursor cursor = getContentResolver().query(ImageUri, filePathColumn, null, null, null);
-                        if(cursor!=null)
-                        cursor.moveToFirst();
-                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        imageEncoded = cursor.getString(columnIndex);
-                        cursor.close();
-                        Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                        preview.setImageBitmap(bitmap);
-                        mCurrentPhotoPath=Utils.createDirectoryAndSaveFile(bitmap, this, timeStamp);
+                        String imageEncoded;
+                        if(cursor!=null) {
+                            cursor.moveToFirst();
+                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                            imageEncoded = cursor.getString(columnIndex);
+                            cursor.close();
+                            Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
+                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                            preview.setImageBitmap(bitmap);
+                            mCurrentPhotoPath=Utils.createDirectoryAndSaveFile(bitmap, this, timeStamp);
+                        }
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -336,7 +322,7 @@ public class AddPictureToPlant extends Activity {
                     .show();
         }
     }
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
@@ -375,7 +361,7 @@ public class AddPictureToPlant extends Activity {
         }
         return true;
     }
-
+*/
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -389,14 +375,5 @@ public class AddPictureToPlant extends Activity {
         return file;
     }
 
-    private void createImageNewImageFile(Uri uri)
-    {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File storageDir = new File(Utils.applicationContext.getExternalFilesDir(null) + "/MyPlants/");
-        File file = new File(storageDir, "picture" +
-                timeStamp + ".jpeg");
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = file.getAbsolutePath();
-    }
 }

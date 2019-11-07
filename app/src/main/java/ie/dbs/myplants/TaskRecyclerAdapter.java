@@ -19,15 +19,15 @@ import java.util.Date;
 
 
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
-    private ArrayList<Plant> task_plants;
+    final private ArrayList<Plant> task_plants;
 
 
     public TaskRecyclerAdapter(ArrayList<Plant>task_plants){this.task_plants=task_plants;}
 
     class ViewHolder extends RecyclerView.ViewHolder{
-        TextView task_plant_name;
-        TextView task_action;
-        CheckBox task_check_box;
+        final TextView task_plant_name;
+        final TextView task_action;
+        final CheckBox task_check_box;
         String plantID;
         private ViewHolder(@NonNull final View itemView) {
             super(itemView);

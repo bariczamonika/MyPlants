@@ -1,26 +1,21 @@
 package ie.dbs.myplants;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-public class PlantImage {
+class PlantImage {
     private String picturePath;
 
     public PlantImage()
     {}
 
-    public PlantImage(String picturePath) {
+    PlantImage(String picturePath) {
         this.picturePath = picturePath;
     }
 
-    public String getPicturePath() {
+    String getPicturePath() {
         return picturePath;
     }
 
 
 
-    public void setPicturePath(String picturePath) {
-        this.picturePath = picturePath;
-    }
 
 }

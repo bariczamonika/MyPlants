@@ -1,12 +1,12 @@
 package ie.dbs.myplants;
 
-public class WeatherInfo {
+class WeatherInfo {
     private double currentTemp;
     private double currentMinTemp;
     private double currentMaxTemp;
     private double currentWindSpeed;
 
-    public WeatherInfo() {
+    WeatherInfo() {
 
     }
 
@@ -17,35 +17,35 @@ public class WeatherInfo {
         this.currentWindSpeed = currentWindSpeed;
     }
 
-    public double getCurrentTemp() {
+    double getCurrentTemp() {
         return currentTemp;
     }
 
-    public void setCurrentTemp(double currentTemp) {
+    void setCurrentTemp(double currentTemp) {
         this.currentTemp = currentTemp;
     }
 
-    public double getCurrentMinTemp() {
+    double getCurrentMinTemp() {
         return currentMinTemp;
     }
 
-    public void setCurrentMinTemp(double currentMinTemp) {
+    void setCurrentMinTemp(double currentMinTemp) {
         this.currentMinTemp = currentMinTemp;
     }
 
-    public double getCurrentMaxTemp() {
+    double getCurrentMaxTemp() {
         return currentMaxTemp;
     }
 
-    public void setCurrentMaxTemp(double currentMaxTemp) {
+    void setCurrentMaxTemp(double currentMaxTemp) {
         this.currentMaxTemp = currentMaxTemp;
     }
 
-    public double getCurrentWindSpeed() {
+    double getCurrentWindSpeed() {
         return currentWindSpeed;
     }
 
-    public void setCurrentWindSpeed(double currentWindSpeed) {
+    void setCurrentWindSpeed(double currentWindSpeed) {
         this.currentWindSpeed = currentWindSpeed;
     }
 

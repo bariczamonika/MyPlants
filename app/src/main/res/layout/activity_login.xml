@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:textSize="50sp"
             android:textAlignment="center"
-            android:text="Login"
+            android:text="@string/login"
             android:layout_marginTop="40dp"
             android:textColor="@color/colorWhite"
             android:fontFamily="cursive"/>
@@ -67,7 +67,6 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="20sp"
                 android:layout_marginTop="30dp"
-                android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"/>
             <TextView
                 android:layout_width="0dp"
@@ -79,7 +78,6 @@
                 android:textSize="20sp"
                 android:gravity="end"
                 android:textAlignment="viewEnd"
-                android:layout_marginRight="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="30dp"/>
 

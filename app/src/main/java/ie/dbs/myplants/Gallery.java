@@ -1,25 +1,19 @@
 package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-import java.util.List;
 
 public class Gallery extends Activity {
 private String plantID;
@@ -28,6 +22,7 @@ private RecyclerView gallery_recycler_view;
 private ArrayList<PlantImage> plantImages=new ArrayList<>();
 private ConnectionReceiver receiver;
 private TextView empty_gallery;
+private String plant_name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +34,7 @@ private TextView empty_gallery;
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, filter);
+        plant_name=getIntent().getStringExtra("plantName");
 
         gallery_recycler_view=findViewById(R.id.gallery_recycler_view);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,2);
@@ -57,7 +53,8 @@ private TextView empty_gallery;
                     PlantImage plantImage=plantSnapshot.getValue(PlantImage.class);
                     plantImages.add(plantImage);
                 }
-                if(plantImages!=null) {
+                if(plantImages.size()!=0) {
+                    gallery_plant_name.setText(plant_name);
                     plantImages=Utils.sortStringBubbleArray(plantImages);
                     GalleryAdapter galleryAdapter = new GalleryAdapter(plantImages, plantID);
                     gallery_recycler_view.setAdapter(galleryAdapter);

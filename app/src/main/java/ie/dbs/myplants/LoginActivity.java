@@ -1,34 +1,26 @@
 package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
 
 public class LoginActivity extends Activity {
     private EditText emailAddress;
     private EditText passwordField;
-    private Button submitButton;
-    private TextView register;
-    private TextView forgotPassword;
     private static final String TAG="LoginActivity";
     private ConnectionReceiver receiver;
 
@@ -38,9 +30,9 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
         emailAddress=findViewById(R.id.email);
         passwordField=findViewById(R.id.password);
-        submitButton=findViewById(R.id.submit);
-        register=findViewById(R.id.register);
-        forgotPassword=findViewById(R.id.forgotPassword);
+        Button submitButton = findViewById(R.id.submit);
+        TextView register = findViewById(R.id.register);
+        TextView forgotPassword = findViewById(R.id.forgotPassword);
         receiver=new ConnectionReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
@@ -86,32 +78,36 @@ public class LoginActivity extends Activity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                AlertDialog.Builder builder=new AlertDialog.Builder(LoginActivity.this);
-                                builder.setTitle("Password reset email sent");
-                                builder.setMessage("Please check your inbox");
-                                builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        finish();
-                                    }
-                                });
+                                AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+                                alertDialog.setTitle("Alert");
+                                alertDialog.setMessage("Forgotten password email sent, please check your inbox");
+                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                alertDialog.show();
+
+
                             } else {
-                                AlertDialog dialog=new AlertDialog.Builder(LoginActivity.this).create();
-                                dialog.setTitle("Error");
-                                dialog.setMessage("Failure sending password reset email" + task.getException());
-                                dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                                AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+                                alertDialog.setTitle("Alert");
+                                alertDialog.setMessage(task.getException().getMessage());
+                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                alertDialog.show();
                             }
                         }
                     });
 
-                    Intent intent=new Intent(LoginActivity.this, LoginActivity.class);
+                    /*Intent intent=new Intent(LoginActivity.this, LoginActivity.class);
                     startActivity(intent);
-                    finish();
+                    finish();*/
                 }
             }
         });
@@ -134,7 +130,7 @@ public class LoginActivity extends Activity {
                             Utils.user = Utils.mAuth.getCurrentUser();
                             if (Utils.user.isEmailVerified())
                             {
-                                Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                                Intent intent=new Intent(LoginActivity.this,DashBoard.class);
                                 startActivity(intent);
                                 Toast.makeText(LoginActivity.this, "User signed in successfully",
                                         Toast.LENGTH_SHORT).show();
@@ -162,8 +158,17 @@ public class LoginActivity extends Activity {
 
                         } else {
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+                            alertDialog.setTitle("Alert");
+                            alertDialog.setMessage("Authentication failed");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            alertDialog.show();
+
                         }
                     }
                 });

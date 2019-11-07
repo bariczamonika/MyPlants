@@ -13,20 +13,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
-    ArrayList<PlantImage> plantImages;
-    String plantID;
+    final private ArrayList<PlantImage> plantImages;
+    final private String plantID;
 
 
-    public GalleryAdapter (ArrayList<PlantImage> plantImages, String plantID)
+    GalleryAdapter(ArrayList<PlantImage> plantImages, String plantID)
     {
         this.plantImages=plantImages;
         this.plantID=plantID;
     }
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView date_added;
-        ImageView picture;
+        final TextView date_added;
+        final ImageView picture;
         int position;
-        public ViewHolder(@NonNull final View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
             date_added=itemView.findViewById(R.id.gallery_date_added);
             picture=itemView.findViewById(R.id.gallery_image);

@@ -1,5 +1,7 @@
 package ie.dbs.myplants;
 
+import androidx.annotation.NonNull;
+
 import java.util.Date;
 
 enum Light_Condition {
@@ -28,7 +30,7 @@ enum Fertilizing_Needs {None(0),Weekly(1),Every_2_weeks(2),Every_3_weeks(3),
 }
 
 
-public class Plant {
+class Plant {
     private String plantID;
     private String name;
     private String description;
@@ -71,6 +73,8 @@ public class Plant {
         this.nextWatering=anotherPlant.nextWatering;
         this.notificationWatering=anotherPlant.notificationWatering;
         this.notificationFertilizing=anotherPlant.notificationFertilizing;
+        this.taskWateringChecked=anotherPlant.taskWateringChecked;
+        this.taskFertilizinChecked=anotherPlant.taskFertilizinChecked;
 
     }
 
@@ -94,11 +98,11 @@ public class Plant {
     }
 
 
-    public String getProfilePicPath() {
+    String getProfilePicPath() {
         return profilePicPath;
     }
 
-    public void setProfilePicPath(String profilePicPath) {
+    void setProfilePicPath(String profilePicPath) {
         this.profilePicPath = profilePicPath;
     }
 
@@ -106,41 +110,38 @@ public class Plant {
         return plantID;
     }
 
-    public Date getNextWatering() {
+    Date getNextWatering() {
         return nextWatering;
     }
 
-    public void setNextWatering(Date nextWatering) {
+    void setNextWatering(Date nextWatering) {
         this.nextWatering = nextWatering;
     }
 
-    public Date getNextFertilizing() {
+    Date getNextFertilizing() {
         return nextFertilizing;
     }
 
-    public void setNextFertilizing(Date nextFertilizing) {
+    void setNextFertilizing(Date nextFertilizing) {
         this.nextFertilizing = nextFertilizing;
     }
 
-    public boolean isNotificationWatering() {
+    boolean isNotificationWatering() {
         return notificationWatering;
     }
 
-    public void setNotificationWatering(boolean notificationWatering) {
+    void setNotificationWatering(boolean notificationWatering) {
         this.notificationWatering = notificationWatering;
     }
 
-    public boolean isNotificationFertilizing() {
+    boolean isNotificationFertilizing() {
         return notificationFertilizing;
     }
 
-    public void setNotificationFertilizing(boolean notificationFertilizing) {
+    void setNotificationFertilizing(boolean notificationFertilizing) {
         this.notificationFertilizing = notificationFertilizing;
     }
 
-    public void setPlantID(String plantID) {
-        this.plantID = plantID;
-    }
 
     public String getName() {
         return name;
@@ -150,99 +151,96 @@ public class Plant {
         this.name = name;
     }
 
-    public String getDescription() {
+    String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    void setDescription(String description) {
         this.description = description;
     }
 
-    public Date getDateAdded() {
+    Date getDateAdded() {
         return dateAdded;
     }
 
-    public void setDateAdded(Date dateAdded) {
-        this.dateAdded = dateAdded;
-    }
 
-    public String getNotes() {
+    String getNotes() {
         return notes;
     }
 
-    public void setNotes(String notes) {
+    void setNotes(String notes) {
         this.notes = notes;
     }
 
-    public Watering_Needs getWateringNeeds() {
+    Watering_Needs getWateringNeeds() {
         return wateringNeeds;
     }
 
-    public void setWateringNeeds(Watering_Needs wateringNeeds) {
+    void setWateringNeeds(Watering_Needs wateringNeeds) {
         this.wateringNeeds = wateringNeeds;
     }
 
-    public Fertilizing_Needs getFertilizingNeeds() {
+    Fertilizing_Needs getFertilizingNeeds() {
         return fertilizingNeeds;
     }
 
-    public void setFertilizingNeeds(Fertilizing_Needs fertilizingNeeds) {
+    void setFertilizingNeeds(Fertilizing_Needs fertilizingNeeds) {
         this.fertilizingNeeds = fertilizingNeeds;
     }
 
-    public Date getLastWatered() {
+    Date getLastWatered() {
         return lastWatered;
     }
 
-    public void setLastWatered(Date lastWatered) {
+    void setLastWatered(Date lastWatered) {
         this.lastWatered = lastWatered;
     }
 
-    public Date getLastFertilized() {
+    Date getLastFertilized() {
         return lastFertilized;
     }
 
-    public void setLastFertilized(Date lastFertilized) {
+    void setLastFertilized(Date lastFertilized) {
         this.lastFertilized = lastFertilized;
     }
 
-    public Date getLastReplanted() {
+    Date getLastReplanted() {
         return lastReplanted;
     }
 
-    public void setLastReplanted(Date lastReplanted) {
+    void setLastReplanted(Date lastReplanted) {
         this.lastReplanted = lastReplanted;
     }
 
-    public boolean isOutdoorPlant() {
+    boolean isOutdoorPlant() {
         return outdoorPlant;
     }
 
-    public void setOutdoorPlant(boolean outdoorPlant) {
+    void setOutdoorPlant(boolean outdoorPlant) {
         this.outdoorPlant = outdoorPlant;
     }
 
-    public Light_Condition getLightCondition() {
+    Light_Condition getLightCondition() {
         return lightCondition;
     }
 
-    public boolean isTaskWateringChecked() {
+    boolean isTaskWateringChecked() {
         return taskWateringChecked;
     }
 
-    public void setTaskWateringChecked(boolean taskWateringChecked) {
+    void setTaskWateringChecked(boolean taskWateringChecked) {
         this.taskWateringChecked = taskWateringChecked;
     }
 
-    public boolean isTaskFertilizinChecked() {
+    boolean isTaskFertilizinChecked() {
         return taskFertilizinChecked;
     }
 
-    public void setTaskFertilizinChecked(boolean taskFertilizinChecked) {
+    void setTaskFertilizinChecked(boolean taskFertilizinChecked) {
         this.taskFertilizinChecked = taskFertilizinChecked;
     }
 
-    public void setLightCondition(Light_Condition lightCondition) {
+    void setLightCondition(Light_Condition lightCondition) {
         this.lightCondition = lightCondition;
 
 

@@ -47,7 +47,8 @@
                 android:layout_weight="0.1"
                 android:layout_gravity="center"
                 android:background="@drawable/left_arrow"
-                android:id="@+id/single_scroll_left"/>
+                android:id="@+id/single_scroll_left"
+                android:contentDescription="@string/left_arrow_content_description"/>
 
             <ImageView
                 android:layout_width="0dp"
@@ -55,6 +56,7 @@
                 android:id="@+id/single_images"
                 android:layout_gravity="center"
                 android:layout_weight="0.6"
+                android:contentDescription="@string/image_content_description"
             />
             <ImageView
                 android:layout_width="0dp"
@@ -62,7 +64,8 @@
                 android:layout_weight="0.1"
                 android:layout_gravity="center"
                 android:background="@drawable/right_arrow"
-                android:id="@+id/single_scroll_right"/>
+                android:id="@+id/single_scroll_right"
+                android:contentDescription="@string/right_arrow_content_description"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -88,7 +91,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
                 android:id="@+id/single_add_pic_icon"
-                android:background="@drawable/plus_icon"/>
+                android:background="@drawable/plus_icon"
+                android:contentDescription="@string/plus_content_description"/>
         </LinearLayout>
         <Button
             android:layout_width="wrap_content"
@@ -124,10 +128,10 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorWhite"
                     android:textSize="20sp"
-                    android:text="+"
+                    android:text="@string/plus"
                     android:id="@+id/single_information_plus_minus"/>
             </LinearLayout>
-        <com.github.aakira.expandablelayout.ExpandableRelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.github.aakira.expandablelayout.ExpandableRelativeLayout
             android:id="@+id/expandableLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -333,10 +337,10 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorWhite"
                     android:textSize="20sp"
-                    android:text="+"
+                    android:text="@string/plus"
                     android:id="@+id/single_information_plus_minus_action"/>
             </LinearLayout>
-            <com.github.aakira.expandablelayout.ExpandableRelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.github.aakira.expandablelayout.ExpandableRelativeLayout
                 android:id="@+id/expandableLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -427,10 +431,10 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorWhite"
                     android:textSize="20sp"
-                    android:text="+"
+                    android:text="@string/plus"
                     android:id="@+id/single_tasks_plus_minus_action"/>
             </LinearLayout>
-            <com.github.aakira.expandablelayout.ExpandableRelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.github.aakira.expandablelayout.ExpandableRelativeLayout
                 android:id="@+id/expandableLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

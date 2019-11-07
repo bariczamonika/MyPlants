@@ -28,7 +28,7 @@ public class ImageDialog extends Activity {
     private String plantID;
     private int position;
     private Plant myPlant;
-    private List<String> keys=new ArrayList<>();
+    final private List<String> keys=new ArrayList<>();
 
 
     @Override
@@ -37,7 +37,7 @@ public class ImageDialog extends Activity {
         setContentView(R.layout.dialog_layout);
         date_added=findViewById(R.id.image_date_added);
         delete_pic=findViewById(R.id.delete_pic);
-        mDialog = (ImageView)findViewById(R.id.your_image);
+        mDialog = findViewById(R.id.your_image);
         plantID=getIntent().getStringExtra("plantID");
         position=getIntent().getIntExtra("position",0);
 

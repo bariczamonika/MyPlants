@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import java.util.AbstractList;
 
 
 public class ConnectionReceiver extends BroadcastReceiver{

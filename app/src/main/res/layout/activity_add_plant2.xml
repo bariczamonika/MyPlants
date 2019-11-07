@@ -44,7 +44,8 @@
             android:layout_marginBottom="30sp"
             android:background="@drawable/rounded_edittext"
             android:padding="5dp"
-            android:id="@+id/edit_text_plant_name"/>
+            android:id="@+id/edit_text_plant_name"
+            />
         <EditText
             android:layout_width="match_parent"
             android:layout_height="60sp"
@@ -246,6 +247,7 @@
             android:layout_gravity="center"
             android:background="@color/colorWhite"
             android:id="@+id/img_view_plant_profile_preview"
+            android:contentDescription="@string/preview_content_description"
             />
         <Button
             android:layout_width="match_parent"

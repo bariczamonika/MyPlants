@@ -1,7 +1,6 @@
 package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,9 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -34,21 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 
 
-
-//TODO onDragListener
-
-
 public class SinglePlant extends Activity {
     private Plant myPlant;
     private TextView plant_name;
     private ImageView plant_images;
-    private ImageView add_pic;
     private TextView picture_date;
-    private ImageView scroll_left;
-    private ImageView scroll_right;
-    private TextView single_information;
-    private TextView single_action;
-    private TextView single_task;
     private TextView single_task_plus_minus;
     private TextView single_action_plus_minus;
     private TextView single_information_plus_minus;
@@ -65,32 +51,27 @@ public class SinglePlant extends Activity {
     private TextView single_action_last_replanted;
     private TextView single_task_watered;
     private TextView single_task_fertilized;
-    private TextView single_task_replanted;
     private TextView single_pic_count;
-    private Button modify_information;
-    private Button gallery;
-    private List<String> plantImages=new ArrayList<>();
-    private HashMap<String, String> plantImagesMap=new HashMap<>();
+    final private List<String> plantImages=new ArrayList<>();
+    final private HashMap<String, String> plantImagesMap=new HashMap<>();
     private ExpandableRelativeLayout expandableRelativeLayout;
     private ExpandableRelativeLayout expandableRelativeLayout2;
     private ExpandableRelativeLayout expandableRelativeLayout3;
-    private Button delete_plant;
     private ConnectionReceiver receiver;
 
-    private Button notificationButton;
-    Date myDate=new Date();
-    int index=0;
+    private Date myDate=new Date();
+    private int index=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_plant);
-        add_pic=findViewById(R.id.single_add_pic_icon);
+        ImageView add_pic = findViewById(R.id.single_add_pic_icon);
         plant_images=findViewById(R.id.single_images);
         picture_date=findViewById(R.id.picture_date);
-        scroll_left=findViewById(R.id.single_scroll_left);
-        scroll_right=findViewById(R.id.single_scroll_right);
+        ImageView scroll_left = findViewById(R.id.single_scroll_left);
+        ImageView scroll_right = findViewById(R.id.single_scroll_right);
         expandableRelativeLayout=findViewById(R.id.expandableLayout);
-        single_information=findViewById(R.id.single_information);
+        TextView single_information = findViewById(R.id.single_information);
         single_information_plus_minus=findViewById(R.id.single_information_plus_minus);
         single_information_date_added=findViewById(R.id.single_info_value_date_added);
         single_information_fertilizing_needs=findViewById(R.id.single_info_value_fertilizing_needs);
@@ -106,16 +87,16 @@ public class SinglePlant extends Activity {
         single_task_fertilized=findViewById(R.id.single_task_value_fertilized);
         single_task_watered=findViewById(R.id.single_task_value_watered);
         single_pic_count=findViewById(R.id.single_pic_count);
-        single_action=findViewById(R.id.single_action);
-        single_task=findViewById(R.id.single_tasks);
+        TextView single_action = findViewById(R.id.single_action);
+        TextView single_task = findViewById(R.id.single_tasks);
         single_task_plus_minus=findViewById(R.id.single_tasks_plus_minus_action);
         single_action_plus_minus=findViewById(R.id.single_information_plus_minus_action);
         expandableRelativeLayout2=findViewById(R.id.expandableLayout2);
         expandableRelativeLayout3=findViewById(R.id.expandableLayout3);
-        modify_information=findViewById(R.id.modify_information);
-        notificationButton=findViewById(R.id.notifications);
-        gallery=findViewById(R.id.single_gallery_button);
-        delete_plant=findViewById(R.id.single_delete_plant);
+        Button modify_information = findViewById(R.id.modify_information);
+        Button notificationButton = findViewById(R.id.notifications);
+        Button gallery = findViewById(R.id.single_gallery_button);
+        Button delete_plant = findViewById(R.id.single_delete_plant);
         expandableRelativeLayout.collapse();
         expandableRelativeLayout2.collapse();
         expandableRelativeLayout3.collapse();
@@ -160,6 +141,7 @@ public class SinglePlant extends Activity {
         public void onClick(View v) {
             Intent intent=new Intent(SinglePlant.this, Gallery.class);
             intent.putExtra("plantID", plantID);
+            intent.putExtra("plantName", plant_name.getText());
             startActivity(intent);
         }
     });
@@ -170,7 +152,6 @@ public class SinglePlant extends Activity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     myPlant=dataSnapshot.getValue(Plant.class);
-                    Log.v("myplantsingleplant", myPlant.getFertilizingNeeds().toString());
                     plant_name=findViewById(R.id.single_plant_name);
                     plant_name.setText(myPlant.getName());
                     single_information_plant_name.setText(myPlant.getName());
@@ -180,9 +161,9 @@ public class SinglePlant extends Activity {
                     single_information_light_condition.setText(myPlant.getLightCondition().name().replace("_"," "));
                     single_information_watering_needs.setText(myPlant.getWateringNeeds().name().replace("_"," "));
                     if(myPlant.isOutdoorPlant())
-                        single_information_outdoor_plant.setText("Yes");
+                        single_information_outdoor_plant.setText(getResources().getString(R.string.yes));
                     else
-                        single_information_outdoor_plant.setText("No");
+                        single_information_outdoor_plant.setText(getResources().getString(R.string.no));
                     single_information_notes.setText(myPlant.getNotes());
                     single_information_description.setText(myPlant.getDescription());
                     if(myPlant.getLastWatered()!=null)
@@ -225,14 +206,17 @@ public class SinglePlant extends Activity {
                 for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
 
                     PlantImage plantImage=plantSnapshot.getValue(PlantImage.class);
-                    plantImages.add(plantImage.getPicturePath());
-                    String picName=Utils.getPictureDateFromPicturePath(plantImage.getPicturePath());
-                    plantImagesMap.put(plantImage.getPicturePath(),picName);
-                    picture_date.setText(plantImagesMap.get(plantImages.get(0)));
-                    plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(0)));
-                    index=0;
-                    single_pic_count.setText(index+1 + "/" +plantImages.size());
-                    Log.v("plantImagePaths", plantImages.toString());
+                    if(plantImage!=null) {
+                        plantImages.add(plantImage.getPicturePath());
+                        String picName = Utils.getPictureDateFromPicturePath(plantImage.getPicturePath());
+                        plantImagesMap.put(plantImage.getPicturePath(), picName);
+                        picture_date.setText(plantImagesMap.get(plantImages.get(0)));
+                        plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(0)));
+                        index = 0;
+                        single_pic_count.setText(getResources().getString(R.string.pic_count, index + 1, plantImages.size()));
+                        //single_pic_count.setText(index+1 + "/" +plantImages.size());
+                        Log.v("plantImagePaths", plantImages.toString());
+                    }
                 }
             }
 
@@ -254,7 +238,8 @@ public class SinglePlant extends Activity {
                     index=Utils.scrollRight(size, index);
                     plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
-                    single_pic_count.setText(index+1 + "/" +size);
+                    single_pic_count.setText(getString(R.string.pic_count, index+1, size));
+                    //single_pic_count.setText(index+1 + "/" +size);
 
                 }
             }
@@ -269,7 +254,8 @@ public class SinglePlant extends Activity {
                     index=Utils.scrollLeft(size, index);
                     plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
-                    single_pic_count.setText(index+1 + "/" +size);
+                    single_pic_count.setText(getString(R.string.pic_count, index+1, size));
+                    //single_pic_count.setText(index+1 + "/" +size);
                 }
             }
         });
@@ -283,7 +269,8 @@ public class SinglePlant extends Activity {
                     index=Utils.scrollRight(size, index);
                     plant_images.setImageBitmap(Utils.getThumbNailFromFile(plantImages.get(index)));
                     picture_date.setText(plantImagesMap.get(plantImages.get(index)));
-                    single_pic_count.setText(index+1 + "/" +size);
+                    single_pic_count.setText(getString(R.string.pic_count, index+1, size));
+                    //single_pic_count.setText(index+1 + "/" +size);
                 }
             }
         });
@@ -434,7 +421,7 @@ public class SinglePlant extends Activity {
                             textView.setText(dateString);
                             if (whatToUseItFor == 0) {
                                 myPlant.setLastWatered(myDate);
-                                Date newDate = new Date();
+                                Date newDate;
                                 int days = myPlant.getWateringNeeds().value;
                                 if ((myPlant.getLastWatered() != null) && (myPlant.getWateringNeeds() != null)) {
                                     newDate = Utils.addDaysToDate(myDate, days);
@@ -445,7 +432,7 @@ public class SinglePlant extends Activity {
 
                             } else if (whatToUseItFor == 1) {
                                 myPlant.setLastFertilized(myDate);
-                                Date newDate = new Date();
+                                Date newDate;
                                 int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
                                 if ((myPlant.getLastFertilized() != null) && (myPlant.getFertilizingNeeds() != null)) {
                                     newDate = Utils.addDaysToDate(myDate, days);
@@ -510,7 +497,7 @@ public class SinglePlant extends Activity {
     }
 
 
-    protected void createAlertDialogWithRadioButtons() {
+    private void createAlertDialogWithRadioButtons() {
         final String[]optionsArray=new String[]{
                 "Watering",
                 "Fertilizing"

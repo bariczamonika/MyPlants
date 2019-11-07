@@ -1,9 +1,6 @@
 package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -22,13 +19,10 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,19 +34,12 @@ public class AddPlant extends Activity {
     private EditText edit_text_plant_description;
     private EditText edit_text_plant_notes;
     private Button btn_add_pic_to_plant;
-    private Button btn_plant_submit;
     private Spinner spinner_watering_needs;
     private Spinner spinner_fertilizing_needs;
     private Spinner spinner_light_conditions;
     private RadioGroup radioGroup_outdoor_plant;
     private RadioButton radioButton_outdoor_plant_yes;
     private RadioButton radioButton_outdoor_plant_no;
-    private String plant_name;
-    private String plant_description;
-    private String plant_notes;
-    private Watering_Needs plant_watering_needs;
-    private Fertilizing_Needs plant_fertilizing_needs;
-    private Light_Condition plant_light_conditions;
     private boolean plant_outdoor_plant;
     private ImageView img_view_plant_profile_preview;
     private String imgProfilePath;
@@ -66,18 +53,18 @@ public class AddPlant extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant2);
-        edit_text_plant_name=(EditText)findViewById(R.id.edit_text_plant_name);
-        edit_text_plant_description=(EditText)findViewById(R.id.edit_text_plant_description);
-        edit_text_plant_notes=(EditText)findViewById(R.id.edit_text_plant_notes);
-        btn_add_pic_to_plant=(Button)findViewById(R.id.btn_add_profile_pic);
-        btn_plant_submit=(Button)findViewById(R.id.btn_plant_submit);
-        spinner_watering_needs=(Spinner)findViewById(R.id.spinner_watering_needs);
-        spinner_fertilizing_needs=(Spinner)findViewById(R.id.spinner_fertilizing_needs);
-        spinner_light_conditions=(Spinner)findViewById(R.id.spinner_light_conditions);
-        radioGroup_outdoor_plant=(RadioGroup)findViewById(R.id.radio_group_outdoor_plant);
-        radioButton_outdoor_plant_yes=(RadioButton)findViewById(R.id.radio_button_yes);
-        radioButton_outdoor_plant_no=(RadioButton)findViewById(R.id.radio_button_no);
-        img_view_plant_profile_preview=(ImageView)findViewById(R.id.img_view_plant_profile_preview);
+        edit_text_plant_name=findViewById(R.id.edit_text_plant_name);
+        edit_text_plant_description=findViewById(R.id.edit_text_plant_description);
+        edit_text_plant_notes=findViewById(R.id.edit_text_plant_notes);
+        btn_add_pic_to_plant=findViewById(R.id.btn_add_profile_pic);
+        Button btn_plant_submit =  findViewById(R.id.btn_plant_submit);
+        spinner_watering_needs=findViewById(R.id.spinner_watering_needs);
+        spinner_fertilizing_needs=findViewById(R.id.spinner_fertilizing_needs);
+        spinner_light_conditions=findViewById(R.id.spinner_light_conditions);
+        radioGroup_outdoor_plant=findViewById(R.id.radio_group_outdoor_plant);
+        radioButton_outdoor_plant_yes=findViewById(R.id.radio_button_yes);
+        radioButton_outdoor_plant_no=findViewById(R.id.radio_button_no);
+        img_view_plant_profile_preview=findViewById(R.id.img_view_plant_profile_preview);
         plant_title=findViewById(R.id.plant_title);
         change_date_added=findViewById(R.id.change_date_added);
         simpleDateFormat=new SimpleDateFormat("dd/MM/yyyy");
@@ -232,16 +219,16 @@ public class AddPlant extends Activity {
     {
         if(Utils.plantIterator==null)
             Utils.plantIterator=0;
-        plant_name=edit_text_plant_name.getText().toString();
-        plant_description=edit_text_plant_description.getText().toString();
-        plant_notes=edit_text_plant_notes.getText().toString();
+        String plant_name = edit_text_plant_name.getText().toString();
+        String plant_description = edit_text_plant_description.getText().toString();
+        String plant_notes = edit_text_plant_notes.getText().toString();
         try {
             dateAdded = simpleDateFormat.parse(change_date_added.getText().toString());
         }catch (ParseException ex)
         {ex.printStackTrace();}
-        plant_fertilizing_needs= Fertilizing_Needs.valueOf(spinner_fertilizing_needs.getSelectedItem().toString().replace(" ","_"));
-        plant_watering_needs=Watering_Needs.valueOf(spinner_watering_needs.getSelectedItem().toString().replace(" ","_"));
-        plant_light_conditions=Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString().replace(" ","_"));
+        Fertilizing_Needs plant_fertilizing_needs = Fertilizing_Needs.valueOf(spinner_fertilizing_needs.getSelectedItem().toString().replace(" ", "_"));
+        Watering_Needs plant_watering_needs = Watering_Needs.valueOf(spinner_watering_needs.getSelectedItem().toString().replace(" ", "_"));
+        Light_Condition plant_light_conditions = Light_Condition.valueOf(spinner_light_conditions.getSelectedItem().toString().replace(" ", "_"));
         if(radioButton_outdoor_plant_yes.isChecked())
             plant_outdoor_plant=true;
         else if(radioButton_outdoor_plant_no.isChecked())
@@ -250,11 +237,11 @@ public class AddPlant extends Activity {
         if(!modify)
         {
         if (imgProfilePath==null)
-        myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,dateAdded,plant_notes,plant_watering_needs,
-                plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, "");
+        myPlant=new Plant(Utils.plantIterator.toString(), plant_name, plant_description,dateAdded, plant_notes, plant_watering_needs,
+                plant_fertilizing_needs,plant_outdoor_plant, plant_light_conditions, "");
         else
-            myPlant=new Plant(Utils.plantIterator.toString(),plant_name,plant_description,dateAdded,plant_notes,plant_watering_needs,
-                    plant_fertilizing_needs,plant_outdoor_plant,plant_light_conditions, imgProfilePath);}
+            myPlant=new Plant(Utils.plantIterator.toString(), plant_name, plant_description,dateAdded, plant_notes, plant_watering_needs,
+                    plant_fertilizing_needs,plant_outdoor_plant, plant_light_conditions, imgProfilePath);}
         else
         {
             String plantID=getIntent().getStringExtra("plantID");
@@ -292,7 +279,7 @@ public class AddPlant extends Activity {
 
     private void addPlant(Plant myPlant) {
         if(imgProfilePath==null)
-            imgProfilePath=new String("");
+            imgProfilePath="";
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(myPlant.getPlantID()).setValue(myPlant);
     }

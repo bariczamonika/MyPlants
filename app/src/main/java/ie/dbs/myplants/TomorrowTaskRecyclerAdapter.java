@@ -14,16 +14,16 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class TomorrowTaskRecyclerAdapter extends RecyclerView.Adapter<TomorrowTaskRecyclerAdapter.ViewHolder> {
-    ArrayList<Plant> task_plants;
+    final private ArrayList<Plant> task_plants;
 
-    public TomorrowTaskRecyclerAdapter(ArrayList<Plant>task_plants){this.task_plants=task_plants;}
+    TomorrowTaskRecyclerAdapter(ArrayList<Plant> task_plants){this.task_plants=task_plants;}
 
     class ViewHolder extends RecyclerView.ViewHolder{
-        TextView task_plant_name;
-        TextView task_action;
+        final TextView task_plant_name;
+        final TextView task_action;
         String plantID;
-        CheckBox task_check_box;
-        public ViewHolder(@NonNull View itemView) {
+        final CheckBox task_check_box;
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             task_plant_name=itemView.findViewById(R.id.cardview_task_plant_name);
             task_action=itemView.findViewById(R.id.cardview_task_action);

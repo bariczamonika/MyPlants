@@ -3,20 +3,12 @@ package ie.dbs.myplants;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 /**
  * Implementation of App Widget functionality.
@@ -24,17 +16,11 @@ import com.google.firebase.database.ValueEventListener;
 public class NewAppWidget extends AppWidgetProvider {
 
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+    private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        CharSequence widgetText = context.getString(R.string.appwidget_text);
-        // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
         setRemoteAdapter(context, views);
-
-
-
-        // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
@@ -46,8 +32,6 @@ public class NewAppWidget extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(
                     context.getPackageName(),
                     R.layout.new_app_widget);
-
-            //launch app from widget
             Intent intent = new Intent(context, Splash.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId    );
             PendingIntent pendingIntent =

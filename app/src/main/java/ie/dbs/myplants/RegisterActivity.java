@@ -2,8 +2,6 @@ package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,17 +12,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+
 
 public class RegisterActivity extends Activity {
     private EditText emailAddress;
     private EditText passwordField;
     private EditText confirmPasswordField;
-    private Button registerButton;
     private static final String TAG="RegisterActivity";
     private ConnectionReceiver receiver;
 
@@ -36,7 +32,7 @@ public class RegisterActivity extends Activity {
         emailAddress=findViewById(R.id.email);
         passwordField=findViewById(R.id.password);
         confirmPasswordField=findViewById(R.id.confirmPassword);
-        registerButton=findViewById(R.id.register);
+        Button registerButton = findViewById(R.id.register);
         receiver=new ConnectionReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");

@@ -14,18 +14,21 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:id="@+id/preview"
+            android:contentDescription="@string/preview_content_description"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="?android:attr/buttonBarStyle">
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/pic_choose_from_gallery"
                 android:id="@+id/chooseFromGalleryButton"
+                style="?android:attr/buttonBarButtonStyle"
                 />
             <Button
                 android:layout_width="0dp"
@@ -33,26 +36,31 @@
                 android:layout_weight="1"
                 android:text="@string/pic_take_picture"
                 android:id="@+id/takePictureButton"
+                style="?android:attr/buttonBarButtonStyle"
                 />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/pic_save_image"
-                android:id="@+id/saveImages"
-                />
+            android:orientation="horizontal"
+            style="?android:attr/buttonBarStyle">
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/cancel"
                 android:id="@+id/cancel"
+                style="?android:attr/buttonBarButtonStyle"
                 />
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pic_save_image"
+                android:id="@+id/saveImages"
+                style="?android:attr/buttonBarButtonStyle"
+                />
+
         </LinearLayout>
         <TextView
             android:layout_width="match_parent"

@@ -13,12 +13,12 @@
     app:cardCornerRadius="@android:dimen/notification_large_icon_height"
     app:cardElevation="0dp"
     app:cardMaxElevation="0dp">
-    >
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/cardview_avatar"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        android:contentDescription="@string/plant_image_content_description"/>
 
                 <TextView
                     android:layout_width="wrap_content"

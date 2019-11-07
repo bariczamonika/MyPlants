@@ -1,20 +1,15 @@
 package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -30,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
-    private Button addPlantButton;
     private ArrayList<Plant> myPlants;
     private DatabaseReference databaseReference;
     private SearchView searchView;
@@ -38,8 +32,8 @@ public class MainActivity extends Activity {
     private ArrayList<Plant> filteredPlants;
     private ConnectionReceiver receiver;
 
-    RecyclerView recyclerView;
-    CharSequence[] values = {"Name", "Date Added", "Outdoor Plants", "Indoor Plants"};
+    private RecyclerView recyclerView;
+    final private CharSequence[] values = {"Name", "Date Added", "Outdoor Plants", "Indoor Plants"};
 
 
     @Override
@@ -60,7 +54,7 @@ public class MainActivity extends Activity {
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, filter);
         searchView=findViewById(R.id.searchBar);
-        addPlantButton = findViewById(R.id.addPlant);
+        Button addPlantButton = findViewById(R.id.addPlant);
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,7 +81,7 @@ public class MainActivity extends Activity {
         displayPlants();
     }
 
-    public void displayPlants(){
+    private void displayPlants(){
         if(databaseReference!=null){
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -198,7 +192,7 @@ public class MainActivity extends Activity {
     }*/
 
 //
-    protected void CreateAlertDialogWithRadioButtons() {
+    private void CreateAlertDialogWithRadioButtons() {
         if(searchView.getQuery()==null)
             filteredPlants=myPlants;
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
@@ -245,11 +239,6 @@ public class MainActivity extends Activity {
         alertDialog1.show();
     }
 
-
-    private void addPlant(Plant plant) {
-        String userID=Utils.user.getUid();
-        Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
-    }
 
     @Override
     public void onBackPressed() {

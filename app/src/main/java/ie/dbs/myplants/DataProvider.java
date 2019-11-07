@@ -2,25 +2,21 @@ package ie.dbs.myplants;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.CompoundButton;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import static android.R.id.text1;
-import static android.R.layout.simple_list_item_1;
 
-public class DataProvider implements RemoteViewsService.RemoteViewsFactory {
-    private List<String> plantNames = new ArrayList<>();
-    private List<String> plantTasks=new ArrayList<>();
-    private List<Boolean> plantTasksDone=new ArrayList<>();
-    private Context mContext;
 
-    protected DataProvider(Context context, Intent intent) {
+class DataProvider implements RemoteViewsService.RemoteViewsFactory {
+    final private List<String> plantNames = new ArrayList<>();
+    final private List<String> plantTasks=new ArrayList<>();
+    final private List<Boolean> plantTasksDone=new ArrayList<>();
+    final private Context mContext;
+
+    DataProvider(Context context) {
         mContext = context;
     }
     @Override

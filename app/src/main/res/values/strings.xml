@@ -16,12 +16,20 @@
     <string name="api_key">bf9fa411797e941a3536db50a36c86d5</string>
     <string name="plus">+</string>
 
+    //Splash
+    <string name="background_content_desc">Background image</string>
+
     //Login Activity
     <string name="login_email">Email Address</string>
     <string name="login_password">Password</string>
     <string name="login_submit_button">Login</string>
     <string name="login_forgot_password">Forgot Password?</string>
     <string name="login_register">Register</string>
+    <string name="login">Login</string>
+
+    //Register activity
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm password</string>
 
     //Add picture to plant activity
 
@@ -44,9 +52,11 @@
     <string name="plant_modify_plant">Modify plant</string>
     <string name="plant_modify_profile_pic">Modify profile picture</string>
     <string name="plant_change_date_added">Change date added</string>
+    <string name="preview_content_description">Preview</string>
 
     //Mainactivity
     <string name="all_my_plants">My Plants</string>
+    <string name="plant_image_content_description">Plant image</string>
 
     //Single plant
     <string name="single_gallery">Gallery</string>
@@ -71,6 +81,11 @@
     <string name="single_tasks_replanting">Next replanting</string>
     <string name="notification_button">Manage notifications</string>
     <string name="delete_plant">Delete plant</string>
+    <string name="left_arrow_content_description">Left arrow</string>
+    <string name="right_arrow_content_description">Right arrow</string>
+    <string name="image_content_description">Image</string>
+    <string name="plus_content_description">Plus</string>
+    <string name="pic_count">%1$d / %2$d</string>
 
     //TaskRecyclerAdapter
     <string name="task_fertilizing">Fertilizing</string>
@@ -89,8 +104,8 @@
     <string name="current_min">Minimum temperature</string>
     <string name="current_max">Maximum temperature</string>
     <string name="current_wind_speed">Wind speed</string>
-    <string name="celsius">°C</string>
-    <string name="kmh">km/h</string>
+    <string name="celsius">%1$s °C</string>
+    <string name="kmh">%1$s km/h</string>
 
     <string name="tomorrow_forecast">Tomorrow\'s forecast</string>
     <string name="tomorrow_temperature">Average temperature</string>
