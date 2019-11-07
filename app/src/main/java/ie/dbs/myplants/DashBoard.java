@@ -12,13 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Notification;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,11 +33,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.facebook.internal.CollectionMapper;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
+import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,6 +55,7 @@ import java.security.Permission;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +82,8 @@ public class DashBoard extends AppCompatActivity {
     private ExpandableRelativeLayout expandable_tomorrow_weather;
     private TextView tomorrows_forecast, todays_forecast, tomorrows_forecast_plus_minus, todays_forecast_plus_minus;
     private ConnectionReceiver receiver;
+    private boolean isExpanded=false;
+    private SharedPreferences sharedPreferences;
     String url;
 
     @Override
@@ -107,6 +117,27 @@ public class DashBoard extends AppCompatActivity {
         tomorrows_forecast_plus_minus=findViewById(R.id.tomorrows_forecast_plus_minus);
         expandable_tomorrow_weather.collapse();
         expandable_today_weather.collapse();
+
+        //settings part
+        FloatingActionButton floatingActionButton=findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isExpanded) {
+
+                    isExpanded=true;
+                    Toast.makeText(DashBoard.this, "Settings", Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    isExpanded=false;
+
+                }
+
+            }
+        });
+
+
 
         todays_forecast.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,8 +180,8 @@ public class DashBoard extends AppCompatActivity {
                         latitude=(int)location.getLatitude();
                         Log.v("longitude", String.valueOf(longitude));
                         Log.v("latitude", String.valueOf(latitude));
-                        url = getResources().getString(R.string.api_url) + "lat="+String.valueOf(latitude)+"&lon="
-                                +String.valueOf(longitude)+"&APPID=bf9fa411797e941a3536db50a36c86d5&units=metric";
+                        url = getResources().getString(R.string.api_url) + "lat="+latitude+"&lon="
+                                +longitude+"&APPID=bf9fa411797e941a3536db50a36c86d5&units=metric";
                         Log.v("apiURL", url);
                         callAPI(url);
                     }
@@ -197,14 +228,22 @@ public class DashBoard extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
+                       Utils.today_plants_task_string.clear();
+                       // my_task_plants.clear();
+                       // tomorrow_task_plants.clear();
                         task_plants = new ArrayList<>();
                         for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                             Plant myPlant=plantSnapshot.getValue(Plant.class);
+                            if (myPlant!=null){
                             myPlant=Utils.autoChangeDatesOnceItIsReached(myPlant);
                             task_plants.add(Utils.autoChangeDatesOnceItIsReached(myPlant));
-                            addPlant(myPlant);
+                            Utils.addPlant(myPlant);}
                         }
                         my_task_plants=todaysPlants(task_plants);
+                        Utils.today_plants_task_string.addAll(my_task_plants);
+                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(Utils.applicationContext);
+                        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(Utils.applicationContext, NewAppWidget.class));
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
                         TaskRecyclerAdapter taskRecyclerAdapter = new TaskRecyclerAdapter(my_task_plants);
                         task_recycler_view.setAdapter(taskRecyclerAdapter);
                         tomorrow_task_plants=tomorrowsPlants(task_plants);
@@ -362,9 +401,9 @@ public class DashBoard extends AppCompatActivity {
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
                                                     .setSmallIcon(R.drawable.my_plant_icon)
                                                     .setContentTitle(getResources().getString(R.string.weather_alert))
-                                                    .setContentText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject))
+                                                    .setContentText(getResources().getString(R.string.frost_expected) + timeObject)
                                                     .setStyle(new NotificationCompat.BigTextStyle()
-                                                            .bigText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject)))
+                                                            .bigText(getResources().getString(R.string.frost_expected) + timeObject))
                                                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
                                             NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
                                             notificationManagerCompat.notify(notificationIterator,builder.build());
@@ -376,16 +415,16 @@ public class DashBoard extends AppCompatActivity {
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
                                                     .setSmallIcon(R.drawable.my_plant_icon)
                                                     .setContentTitle(getResources().getString(R.string.weather_alert))
-                                                    .setContentText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject))
+                                                    .setContentText(getResources().getString(R.string.wind_expected) + timeObject)
                                                     .setStyle(new NotificationCompat.BigTextStyle()
-                                                            .bigText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject)))
+                                                            .bigText(getResources().getString(R.string.wind_expected) + timeObject))
                                                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
                                             NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
                                             notificationManagerCompat.notify(notificationIterator,builder.build());
                                             notificationIterator++;
                                         }
 
-                                        Log.v("weatherTimeToday", String.valueOf(timeObject));
+                                        Log.v("weatherTimeToday", timeObject);
                                     }
                                     else if (Utils.isDateTomorrow(Utils.createDateFromString(timeObject)))
                                     {
@@ -400,9 +439,9 @@ public class DashBoard extends AppCompatActivity {
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
                                                     .setSmallIcon(R.drawable.my_plant_icon)
                                                     .setContentTitle(getResources().getString(R.string.weather_alert))
-                                                    .setContentText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject))
+                                                    .setContentText(getResources().getString(R.string.frost_expected) + timeObject)
                                                     .setStyle(new NotificationCompat.BigTextStyle()
-                                                            .bigText(getResources().getString(R.string.frost_expected) + String.valueOf(timeObject)))
+                                                            .bigText(getResources().getString(R.string.frost_expected) + timeObject))
                                                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
                                             NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
                                             notificationManagerCompat.notify(notificationIterator,builder.build());
@@ -413,15 +452,15 @@ public class DashBoard extends AppCompatActivity {
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
                                                     .setSmallIcon(R.drawable.my_plant_icon)
                                                     .setContentTitle(getResources().getString(R.string.weather_alert))
-                                                    .setContentText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject))
+                                                    .setContentText(getResources().getString(R.string.wind_expected) + timeObject)
                                                     .setStyle(new NotificationCompat.BigTextStyle()
-                                                            .bigText(getResources().getString(R.string.wind_expected) + String.valueOf(timeObject)))
+                                                            .bigText(getResources().getString(R.string.wind_expected) + timeObject))
                                                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
                                             NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(Utils.applicationContext);
                                             notificationManagerCompat.notify(notificationIterator,builder.build());
                                             notificationIterator++;
                                         }
-                                        Log.v("weatherTimeTomorrow", String.valueOf(timeObject));
+                                        Log.v("weatherTimeTomorrow", timeObject);
                                     }
 
                                 }
@@ -458,10 +497,10 @@ public class DashBoard extends AppCompatActivity {
                               todaysWeather.setCurrentMaxTemp(avgMaxTemp);
                               todaysWeather.setCurrentMinTemp(avgMinTemp);
                               todaysWeather.setCurrentWindSpeed(avgWindSpeed);
-                              current_temp.setText(decimalFormat.format(todaysWeather.getCurrentTemp()) + "°C");
-                              current_max_temp.setText(decimalFormat.format(todaysWeather.getCurrentMaxTemp()) + "°C");
-                              current_min_temp.setText(decimalFormat.format(todaysWeather.getCurrentMinTemp())+"°C");
-                              current_wind_speed.setText(decimalFormat.format(todaysWeather.getCurrentWindSpeed()) + "km/h");
+                              current_temp.setText(decimalFormat.format(todaysWeather.getCurrentTemp()) + R.string.celsius);
+                              current_max_temp.setText(decimalFormat.format(todaysWeather.getCurrentMaxTemp()) + R.string.celsius);
+                              current_min_temp.setText(decimalFormat.format(todaysWeather.getCurrentMinTemp())+R.string.celsius);
+                              current_wind_speed.setText(decimalFormat.format(todaysWeather.getCurrentWindSpeed()) + R.string.kmh);
                           }
 
                           if(tomorrowWeatherList!=null)
@@ -480,10 +519,10 @@ public class DashBoard extends AppCompatActivity {
                               tomorrowsWeather.setCurrentMaxTemp(avgMaxTemp);
                               tomorrowsWeather.setCurrentMinTemp(avgMinTemp);
                               tomorrowsWeather.setCurrentWindSpeed(avgWindSpeed);
-                              tomorrow_max_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentMaxTemp()) + "°C");
-                              tomorrow_min_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentMinTemp()) + "°C");
-                              tomorrow_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentTemp())+"°C");
-                              tomorrow_wind_speed.setText(decimalFormat.format(tomorrowsWeather.getCurrentWindSpeed()) + "km/h");
+                              tomorrow_max_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentMaxTemp()) + R.string.celsius);
+                              tomorrow_min_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentMinTemp()) + R.string.celsius);
+                              tomorrow_temp.setText(decimalFormat.format(tomorrowsWeather.getCurrentTemp())+R.string.celsius);
+                              tomorrow_wind_speed.setText(decimalFormat.format(tomorrowsWeather.getCurrentWindSpeed()) + R.string.kmh);
                           }
 
                       }
@@ -504,8 +543,7 @@ public class DashBoard extends AppCompatActivity {
         }) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                return params;
+                return new HashMap<>();
             }
         };
         final Handler handler = new Handler();
@@ -516,10 +554,7 @@ public class DashBoard extends AppCompatActivity {
             }
         }, 200);
     }
-    private void addPlant(Plant plant) {
-        String userID=Utils.user.getUid();
-        Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
-    }
+
 
     @Override
     public void onBackPressed() {

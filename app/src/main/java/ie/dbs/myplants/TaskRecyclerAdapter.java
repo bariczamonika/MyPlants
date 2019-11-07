@@ -1,5 +1,7 @@
 package ie.dbs.myplants;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,14 +13,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-;
 import java.util.ArrayList;
 
 import java.util.Date;
 
 
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
-    ArrayList<Plant> task_plants;
+    private ArrayList<Plant> task_plants;
 
 
     public TaskRecyclerAdapter(ArrayList<Plant>task_plants){this.task_plants=task_plants;}
@@ -28,7 +29,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         TextView task_action;
         CheckBox task_check_box;
         String plantID;
-        public ViewHolder(@NonNull final View itemView) {
+        private ViewHolder(@NonNull final View itemView) {
             super(itemView);
             task_plant_name=itemView.findViewById(R.id.cardview_task_plant_name);
             task_action=itemView.findViewById(R.id.cardview_task_action);
@@ -100,6 +101,14 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
                     }
                 }
                 Utils.addPlant(myPlant);
+                for (int i=0;i<Utils.today_plants_task_string.size();i++)
+                {
+                    if(Utils.today_plants_task_string.get(i).getPlantID().equals(myPlant.getPlantID()))
+                        Utils.today_plants_task_string.set(i, myPlant);
+                }
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(Utils.applicationContext);
+                int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(Utils.applicationContext, NewAppWidget.class));
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
             }
         });
 

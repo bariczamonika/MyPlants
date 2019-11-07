@@ -10,7 +10,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
 
     <application
@@ -20,7 +22,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Gallery"></activity>
+
+        <service
+            android:name=".WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name=".NewAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/new_app_widget_info" />
+        </receiver>
+
+        <activity android:name=".Gallery" />
         <activity android:name=".DashBoard">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
@@ -33,7 +51,9 @@
         <activity android:name=".AddPictureToPlant" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".ImageDialog" android:theme="@style/myDialogTheme" />
+        <activity
+            android:name=".ImageDialog"
+            android:theme="@style/myDialogTheme" />
         <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -68,6 +88,7 @@
                 <action android:name="ie.dbs.AN_INTENT" />
             </intent-filter>
         </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="ie.dbs.myplants.fileprovider"
@@ -75,7 +96,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 

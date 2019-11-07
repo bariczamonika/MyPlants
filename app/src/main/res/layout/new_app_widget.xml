@@ -1,0 +1,39 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#09C"
+    android:padding="@dimen/widget_margin"
+
+    android:clickable="true"
+    android:focusable="true">
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/widget_click_on_me"
+        android:text="@string/widget_open_app"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/widget_update"
+        android:layout_below="@id/widget_click_on_me"
+        android:text="@string/widget_refresh_widget"
+        />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/widget_list"
+        android:background="@color/colorPrimary"
+        tools:listitem="@layout/widget_list_view_row"
+        android:clickable="false"
+        android:duplicateParentState="true"
+        android:layout_below="@+id/widget_click_on_me"
+        >
+
+
+    </ListView>
+
+</RelativeLayout>

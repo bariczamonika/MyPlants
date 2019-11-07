@@ -14,6 +14,7 @@
     <string name="sort_by">Sort by</string>
     <string name="api_url">http://api.openweathermap.org/data/2.5/forecast?</string>
     <string name="api_key">bf9fa411797e941a3536db50a36c86d5</string>
+    <string name="plus">+</string>
 
     //Login Activity
     <string name="login_email">Email Address</string>
@@ -86,6 +87,8 @@
     <string name="current_min">Minimum temperature</string>
     <string name="current_max">Maximum temperature</string>
     <string name="current_wind_speed">Wind speed</string>
+    <string name="celsius">°C</string>
+    <string name="kmh">km/h</string>
 
     <string name="tomorrow_forecast">Tomorrow\'s forecast</string>
     <string name="tomorrow_temperature">Average temperature</string>
@@ -101,4 +104,31 @@
 
     //ImageDialog
     <string name="delete_picture">Delete picture</string>
+    //Widget
+    <string name="appwidget_text">MyPlants</string>
+    <string name="add_widget">Add widget</string>
+    <string name="widget_open_app">Open app</string>
+    <string name="widget_refresh_widget">Refresh</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+
+    <string name="sync_header">Notifications</string>
+
+    <!-- Messages Preferences -->
+
+    <string name="wind_title">Wind speed in km/h above which notification is sent</string>
+    <string name="temp_title">Temperature in celsius below which notification is sent</string>
+    <string name="notification_time_hour_title">Notification time (hour)</string>
+    <string name="notification_time_minute_title">Notification time (minute)</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

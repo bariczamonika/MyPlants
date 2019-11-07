@@ -5,6 +5,8 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -70,6 +72,7 @@ public class Utils extends Activity {
     public static String CHANNEL_ID = "my_channel_01";
     public static int isCalledFromAlertDialog = 0;
     public static RequestQueue queue;
+    public static ArrayList<Plant> today_plants_task_string=new ArrayList<>();
 
     //asks for permission on SDK>16
     public static void AskForPermission(String myPermission, Activity whichActivity) {
@@ -88,11 +91,10 @@ public class Utils extends Activity {
         File homeDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants");
         if (!homeDirectory.exists()) {
             File plantDirectory = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
-            plantDirectory.mkdirs();
         }
         File myFile = new File(applicationContext.getExternalFilesDir(null) + "/MyPlants/");
 
-        if(timestamp==" ")
+        if(timestamp.equals(" "))
         timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File file = new File(myFile, "picture" +
                 timestamp + ".jpeg");
@@ -256,8 +258,7 @@ public class Utils extends Activity {
         String year = trimmedPicturePath.substring(0, 4);
         String month = trimmedPicturePath.substring(4, 6);
         String day = trimmedPicturePath.substring(6, 8);
-        String picDate = day + "/" + month + "/" + year;
-        return picDate;
+        return day + "/" + month + "/" + year;
     }
 
     public static void deletePic(String picturePath) {
@@ -319,6 +320,10 @@ public class Utils extends Activity {
                     myPlant.setLastWatered(myPlant.getNextWatering());
                     int days = myPlant.getWateringNeeds().value;
                     myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), days));
+                    myPlant.setTaskWateringChecked(false);
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(Utils.applicationContext);
+                    int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(Utils.applicationContext, NewAppWidget.class));
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
                 }
             }
 
@@ -326,8 +331,12 @@ public class Utils extends Activity {
                 while (myPlant.getNextFertilizing().before(now) || (myPlant.getNextFertilizing() == now)) {
 
                     myPlant.setLastFertilized(myPlant.getNextFertilizing());
+                    myPlant.setTaskFertilizinChecked(false);
                     int days = Utils.convertFertilizingNeedsToInteger(myPlant.getFertilizingNeeds().value);
                     myPlant.setNextFertilizing(Utils.addDaysToDate(myPlant.getLastFertilized(), days));
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(Utils.applicationContext);
+                    int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(Utils.applicationContext, NewAppWidget.class));
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
 
                 }
 
@@ -367,7 +376,7 @@ public class Utils extends Activity {
     }
 
     public static Date createDateFromString(String string) {
-        Date date = new Date();
+        Date date;
         String[] stringArray = string.split(" ");
         String[] dateArray = stringArray[0].split("-");
         String[] timeArray = stringArray[1].split(":");
@@ -424,17 +433,16 @@ public class Utils extends Activity {
         AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval, pendingIntent);
         //alarmManager.setRepeating(AlarmManager.RTC, delay, interval, pendingIntent);
-        Toast.makeText(Utils.applicationContext, "Notification set" + notificationID+" "+String.valueOf(date), Toast.LENGTH_SHORT).show();
+        Toast.makeText(Utils.applicationContext, "Notification set" + notificationID+" "+date, Toast.LENGTH_SHORT).show();
     }
 
 
     public static Notification getNotification(String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID);
-        Notification notification = builder
+        return builder
                 .setContentTitle("Scheduled Notification")
                 .setContentText(content)
                 .setSmallIcon(R.drawable.my_plant_icon).build();
-        return notification;
     }
 
 
@@ -601,7 +609,7 @@ public class Utils extends Activity {
     }
 
     public static Map<String, Object> toMap(JSONObject object) throws JSONException {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         Iterator<String> keysItr = object.keys();
         while (keysItr.hasNext()) {
             String key = keysItr.next();
@@ -617,7 +625,7 @@ public class Utils extends Activity {
     }
 
     public static List<Object> toList(JSONArray array) {
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         try {
             for (int i = 0; i < array.length(); i++) {
                 Object value = array.get(i);
