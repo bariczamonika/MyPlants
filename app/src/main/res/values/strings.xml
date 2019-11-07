@@ -81,6 +81,8 @@
     //Dashboard
     <string name="all_plants_button">All plants</string>
 
+    //Gallery
+    <string name="gallery_empty">Gallery is empty, add some pictures</string>
     //Weather forecast
     <string name="today_forecast">Today\'s forecast</string>
     <string name="current_temperature">Current temperature</string>
@@ -113,7 +115,9 @@
 
     <!-- Preference Titles -->
 
-    <string name="sync_header">Notifications</string>
+    <string name="wind_header">Wind</string>
+    <string name="temp_header">Temperature </string>
+    <string name="notification_header">Notification</string>
 
     <!-- Messages Preferences -->
 
@@ -122,13 +126,4 @@
     <string name="notification_time_hour_title">Notification time (hour)</string>
     <string name="notification_time_minute_title">Notification time (minute)</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

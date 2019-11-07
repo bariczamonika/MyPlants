@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ClipData;
@@ -43,7 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class AddPictureToPlant extends AppCompatActivity {
+public class AddPictureToPlant extends Activity {
     private Button takePicture;
     private Button addFromGallery;
     private Button save;

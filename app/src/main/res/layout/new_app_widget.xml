@@ -30,7 +30,7 @@
         tools:listitem="@layout/widget_list_view_row"
         android:clickable="false"
         android:duplicateParentState="true"
-        android:layout_below="@+id/widget_click_on_me"
+        android:layout_below="@+id/widget_update"
         >
 
 

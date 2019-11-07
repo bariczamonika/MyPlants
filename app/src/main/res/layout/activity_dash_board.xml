@@ -25,6 +25,25 @@
             app:queryHint="@string/search_hint"
             app:queryBackground="@color/colorWhite"
             />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/settings_icon_menu"
+            android:foregroundGravity="center"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/logout_icon_menu"
+                android:id="@+id/fab_logout"
+                android:foregroundGravity="center"/>
+        </LinearLayout>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -267,12 +286,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/task_tomorrow_recycler_view">
         </androidx.recyclerview.widget.RecyclerView>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:src="@drawable/settings_icon_menu" />
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
     </LinearLayout>

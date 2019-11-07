@@ -6,14 +6,18 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -61,7 +65,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DashBoard extends AppCompatActivity {
+public class DashBoard extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private RecyclerView task_recycler_view;
     private Button all_plants_button;
     private ArrayList<Plant> task_plants;
@@ -77,13 +81,12 @@ public class DashBoard extends AppCompatActivity {
     private ArrayList<Plant> tomorrow_task_plants;
     private TextView current_temp, current_max_temp, current_min_temp,current_wind_speed,tomorrow_temp,
     tomorrow_min_temp,tomorrow_max_temp,tomorrow_wind_speed;
-    private List<Object> data;
     private ExpandableRelativeLayout expandable_today_weather;
     private ExpandableRelativeLayout expandable_tomorrow_weather;
     private TextView tomorrows_forecast, todays_forecast, tomorrows_forecast_plus_minus, todays_forecast_plus_minus;
     private ConnectionReceiver receiver;
-    private boolean isExpanded=false;
     private SharedPreferences sharedPreferences;
+
     String url;
 
     @Override
@@ -117,25 +120,47 @@ public class DashBoard extends AppCompatActivity {
         tomorrows_forecast_plus_minus=findViewById(R.id.tomorrows_forecast_plus_minus);
         expandable_tomorrow_weather.collapse();
         expandable_today_weather.collapse();
+        sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         //settings part
         FloatingActionButton floatingActionButton=findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isExpanded) {
-
-                    isExpanded=true;
-                    Toast.makeText(DashBoard.this, "Settings", Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    isExpanded=false;
-
-                }
+                Intent intent=new Intent(DashBoard.this, SettingsActivity.class);
+                startActivity(intent);
 
             }
         });
+
+        FloatingActionButton floatingActionButton1=findViewById(R.id.fab_logout);
+        floatingActionButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog dialog = new AlertDialog.Builder(DashBoard.this).create();
+                dialog.setTitle("Logout");
+                dialog.setMessage("Are you sure?");
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Utils.mAuth.signOut();
+                        Intent intent = new Intent(DashBoard.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
+
+
 
 
 
@@ -372,6 +397,9 @@ public class DashBoard extends AppCompatActivity {
                 try {
                     final JSONObject jsonObject=new JSONObject(response);
                     final JSONArray listArray=jsonObject.getJSONArray("list");
+
+
+
                   new AsyncTask<Void, Void, Void>() {
 
                       List<WeatherInfo> todayWeatherList=new ArrayList<>();
@@ -396,7 +424,20 @@ public class DashBoard extends AppCompatActivity {
                                         weather.setCurrentMaxTemp(Double.parseDouble(tempObject.getString("temp_max")));
                                         weather.setCurrentWindSpeed(Double.parseDouble(windObject.getString("speed"))*3.6);
                                         todayWeatherList.add(weather);
-                                        if(weather.getCurrentMinTemp()<0)
+
+                                        sharedPreferences= PreferenceManager.getDefaultSharedPreferences(Utils.applicationContext);
+                                        Log.v("sharedprefs",sharedPreferences.getAll().toString());
+                                        Log.v("sharedpreftemp", sharedPreferences.getString("temperature","0"));
+                                        int windSpeed=50;
+                                        int temp=0;
+                                        if(sharedPreferences.getString("wind", "50")!=null)
+                                            windSpeed=Integer.parseInt(sharedPreferences.getString("wind", "50"));
+                                        Log.v("windspeedpref", String.valueOf(windSpeed));
+
+                                        if(sharedPreferences.getString("temperature", "0")!=null)
+                                            temp=Integer.parseInt(sharedPreferences.getString("temperature", "0"));
+                                        Log.v("temperaturepref", String.valueOf(temp));
+                                        if(weather.getCurrentMinTemp()<temp)
                                         {
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
                                                     .setSmallIcon(R.drawable.my_plant_icon)
@@ -410,7 +451,7 @@ public class DashBoard extends AppCompatActivity {
                                             notificationIterator++;
                                         }
 
-                                        if(weather.getCurrentWindSpeed()>50)
+                                        if(weather.getCurrentWindSpeed()>windSpeed)
                                         {
                                             NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID)
                                                     .setSmallIcon(R.drawable.my_plant_icon)
@@ -574,5 +615,40 @@ public class DashBoard extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        sharedPreferences=PreferenceManager.getDefaultSharedPreferences(Utils.applicationContext);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        if(key.equals("notification_time_minute")||key.equals("notification_time_hour")){
+            String userID = Utils.user.getUid();
+            databaseReference = Utils.databaseReference.child("users").child(userID).child("plants");
+            if(databaseReference!=null)
+            {
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
+                            Plant myPlant=plantSnapshot.getValue(Plant.class);
+                            if(myPlant.isNotificationWatering())
+                            {
+                                Utils.setWateringNotification(myPlant);
+                            }
+                            if(myPlant.isNotificationFertilizing())
+                            {
+                                Utils.setFertilizingNotification(myPlant);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+        }
     }
 }

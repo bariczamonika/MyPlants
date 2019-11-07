@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -20,16 +21,18 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gallery extends AppCompatActivity {
+public class Gallery extends Activity {
 private String plantID;
 private TextView gallery_plant_name;
 private RecyclerView gallery_recycler_view;
 private ArrayList<PlantImage> plantImages=new ArrayList<>();
 private ConnectionReceiver receiver;
+private TextView empty_gallery;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        empty_gallery=findViewById(R.id.empty_gallery);
         plantID=getIntent().getStringExtra("plantID");
         gallery_plant_name=findViewById(R.id.gallery_plant_name);
         receiver=new ConnectionReceiver();
@@ -58,6 +61,11 @@ private ConnectionReceiver receiver;
                     plantImages=Utils.sortStringBubbleArray(plantImages);
                     GalleryAdapter galleryAdapter = new GalleryAdapter(plantImages, plantID);
                     gallery_recycler_view.setAdapter(galleryAdapter);
+                    empty_gallery.setVisibility(View.INVISIBLE);
+                }
+                else
+                {
+                    empty_gallery.setVisibility(View.VISIBLE);
                 }
                 }
 

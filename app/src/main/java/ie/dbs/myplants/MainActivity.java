@@ -6,6 +6,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,7 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends Activity {
     private Button addPlantButton;
     private ArrayList<Plant> myPlants;
     private DatabaseReference databaseReference;
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        recyclerView = findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),3);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setLayoutManager(layoutManager);
@@ -68,7 +70,13 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-
+        FloatingActionButton floatingActionButton=findViewById(R.id.fab_sort_by);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CreateAlertDialogWithRadioButtons();
+            }
+        });
         String userID = Utils.user.getUid();
         databaseReference = Utils.databaseReference.child("users").child(userID).child("plants");
     }
@@ -146,7 +154,7 @@ public class MainActivity extends AppCompatActivity{
         return list;
     }
 
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
@@ -187,7 +195,7 @@ public class MainActivity extends AppCompatActivity{
                 break;
         }
         return true;
-    }
+    }*/
 
 //
     protected void CreateAlertDialogWithRadioButtons() {

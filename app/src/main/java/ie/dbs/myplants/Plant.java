@@ -88,6 +88,8 @@ public class Plant {
         this.profilePicPath=profilePicPath;
         this.taskFertilizinChecked=false;
         this.taskWateringChecked=false;
+        this.notificationFertilizing=false;
+        this.notificationWatering=false;
 
     }
 

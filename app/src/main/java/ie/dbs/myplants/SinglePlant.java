@@ -3,6 +3,7 @@ package ie.dbs.myplants;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -37,7 +38,7 @@ import java.util.List;
 //TODO onDragListener
 
 
-public class SinglePlant extends AppCompatActivity{
+public class SinglePlant extends Activity {
     private Plant myPlant;
     private TextView plant_name;
     private ImageView plant_images;
@@ -568,7 +569,7 @@ public class SinglePlant extends AppCompatActivity{
         dialog.show();
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
@@ -605,7 +606,7 @@ public class SinglePlant extends AppCompatActivity{
                 break;
         }
         return true;
-    }
+    }*/
 
 
 

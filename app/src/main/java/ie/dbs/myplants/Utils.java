@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +21,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
@@ -362,7 +364,20 @@ public class Utils extends Activity {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 15, 0, 0);
+        SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(Utils.applicationContext);
+        String hour=sharedPreferences.getString("notification_time_hour", "11");
+        String minute=sharedPreferences.getString("notification_time_minute", "00");
+        int hourInt=11;
+        int minuteInt=0;
+        if(hour!=null)
+            hourInt=Integer.parseInt(hour);
+        if(minute!=null){
+            if(minute.equals("00"))
+                minuteInt=0;
+            else
+                minuteInt=Integer.parseInt(minute);
+        }
+        calendar.set(year, month, day, hourInt, minuteInt, 0);
         now = calendar.getTime();
         return now;
     }
@@ -425,8 +440,6 @@ public class Utils extends Activity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(Utils.applicationContext, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(whenToStart);
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, 0);
         Date date = calendar.getTime();
         Log.v("notification time", String.valueOf(date));
 

@@ -22,6 +22,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
 
         <service
             android:name=".WidgetService"
@@ -30,7 +33,7 @@
         <receiver android:name=".NewAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
             </intent-filter>
 
             <meta-data
