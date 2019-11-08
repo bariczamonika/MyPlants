@@ -61,16 +61,18 @@ class Utils {
     static int isCalledFromAlertDialog = 0;
     static RequestQueue queue;
     final static ArrayList<Plant> today_plants_task_string=new ArrayList<>();
+    static ArrayList<Plant>myPlants=new ArrayList<>();
 
     //asks for permission on SDK>16
-    static void AskForPermission(String myPermission, Activity whichActivity) {
-
-        if (Utils.MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            if (ContextCompat.checkSelfPermission(applicationContext, myPermission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(whichActivity, new String[]{myPermission}, 1);
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
             }
         }
+        return true;
     }
 
     //create custom directory and save file

@@ -9,46 +9,62 @@
 <androidx.core.widget.NestedScrollView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:overScrollMode="never">
+    android:overScrollMode="never"
+    android:background="@drawable/proba1">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         >
-        <androidx.appcompat.widget.SearchView
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:id="@+id/dashboardSearchBar"
-            android:padding="10dp"
-            android:layout_margin="5dp"
-            app:queryHint="@string/search_hint"
-            app:queryBackground="@color/colorWhite"
-            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+            <androidx.appcompat.widget.SearchView
+                android:layout_width="0dp"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_weight="0.7"
+                android:id="@+id/dashboardSearchBar"
+                android:padding="10dp"
+                android:layout_margin="5dp"
+                app:queryHint="@string/search_hint"
+                app:queryBackground="@color/colorWhite"
+                />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15"
             android:layout_gravity="center"
-            android:src="@drawable/settings_icon_menu"
+            android:src="@drawable/icon_settings_2"
+            android:backgroundTint="@android:color/transparent"
+            app:borderWidth="0dp"
             android:foregroundGravity="center"/>
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/logout_icon_menu"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:layout_gravity="center"
+                android:src="@drawable/icon_exit_2"
                 android:id="@+id/fab_logout"
+                android:backgroundTint="@android:color/transparent"
+                app:borderWidth="0dp"
                 android:foregroundGravity="center"/>
         </LinearLayout>
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/all_plants_button"
-        android:text="@string/all_plants_button"/>
+        android:layout_gravity="center"
+        android:text="@string/all_plants_button"
+        android:textSize="20sp"
+        android:padding="20sp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:textColor="@color/colorWhite"
+        android:textAllCaps="false"
+        android:background="@drawable/rounded_button"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,18 +76,21 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/today_forecast"
                 android:gravity="center"
-                android:id="@+id/todays_forecast"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/todays_forecast_plus_minus"
-                    android:text="@string/plus"/>
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="15sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-smallcaps"
+                android:id="@+id/todays_forecast"
+                />
             </LinearLayout>
-            <com.github.aakira.expandablelayout.ExpandableRelativeLayout
+         <!--   <com.github.aakira.expandablelayout.ExpandableRelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/expandable_layout_today"
@@ -154,25 +173,32 @@
                     android:id="@+id/current_wind_speed"
                     />
             </LinearLayout>
-            </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+            </com.github.aakira.expandablelayout.ExpandableRelativeLayout>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_recyclerview"
+                android:id="@+id/today_weather_recycler_view"></androidx.recyclerview.widget.RecyclerView>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/tomorrow_forecast"
                 android:gravity="center"
-                android:id="@+id/tomorrows_forecast"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/plus"
-                    android:id="@+id/tomorrows_forecast_plus_minus"/>
+                android:id="@+id/tomorrows_forecast"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-smallcaps"
+                android:layout_gravity="center"
+                android:layout_marginTop="15sp"/>
             </LinearLayout>
-            <com.github.aakira.expandablelayout.ExpandableRelativeLayout
+           <!-- <com.github.aakira.expandablelayout.ExpandableRelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:ael_expanded="false"
@@ -257,7 +283,12 @@
                     android:id="@+id/tomorrow_wind_speed"
                     />
             </LinearLayout>
-            </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+            </com.github.aakira.expandablelayout.ExpandableRelativeLayout>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_recyclerview"
+                android:id="@+id/tomorrow_weather_recycler_view"></androidx.recyclerview.widget.RecyclerView>
         </LinearLayout>
 
 
@@ -266,11 +297,19 @@
             android:layout_height="wrap_content"
             android:text="@string/task_todays_tasks"
             android:id="@+id/todays_tasks"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="5dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-smallcaps"
+            android:layout_gravity="center"
+            android:layout_marginTop="15sp"
             />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_recyclerview"
             android:id="@+id/task_recycler_view">
         </androidx.recyclerview.widget.RecyclerView>
 
@@ -278,12 +317,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/task_tomorrows_tasks"
-            android:id="@+id/tomorrows_tasks"/>
+            android:id="@+id/tomorrows_tasks"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="5dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-smallcaps"
+            android:layout_gravity="center"
+            android:layout_marginTop="15sp"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_recyclerview"
             android:id="@+id/task_tomorrow_recycler_view">
         </androidx.recyclerview.widget.RecyclerView>
 

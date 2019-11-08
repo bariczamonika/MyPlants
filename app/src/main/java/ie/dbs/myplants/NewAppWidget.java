@@ -9,6 +9,11 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import androidx.annotation.NonNull;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 
 /**
  * Implementation of App Widget functionality.
@@ -27,7 +32,10 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
-
+            for(int i=0;i<Utils.myPlants.size();i++) {
+                Utils.autoChangeDatesOnceItIsReached(Utils.myPlants.get(i));
+                Utils.addPlant(Utils.myPlants.get(i));
+            }
             updateAppWidget(context, appWidgetManager, appWidgetId);
             RemoteViews views = new RemoteViews(
                     context.getPackageName(),

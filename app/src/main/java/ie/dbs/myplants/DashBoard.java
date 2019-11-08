@@ -2,6 +2,7 @@ package ie.dbs.myplants;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -65,8 +66,6 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
     tomorrow_min_temp,tomorrow_max_temp,tomorrow_wind_speed;
     private ExpandableRelativeLayout expandable_today_weather;
     private ExpandableRelativeLayout expandable_tomorrow_weather;
-    private TextView tomorrows_forecast_plus_minus;
-    private TextView todays_forecast_plus_minus;
     private ConnectionReceiver receiver;
     private SharedPreferences sharedPreferences;
 
@@ -80,29 +79,38 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, filter);
-        Utils.AskForPermission(Manifest.permission.CAMERA, DashBoard.this);
-        Utils.AskForPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DashBoard.this);
-        Utils.AskForPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, DashBoard.this);
+
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.INTERNET
+        };
+
+        if(!Utils.hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
         Button all_plants_button = findViewById(R.id.all_plants_button);
         task_recycler_view = findViewById(R.id.task_recycler_view);
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        current_temp=findViewById(R.id.current_temp);
+        /*current_temp=findViewById(R.id.current_temp);
         current_max_temp=findViewById(R.id.current_max);
         current_min_temp=findViewById(R.id.current_min);
-        current_wind_speed=findViewById(R.id.current_wind_speed);
-        tomorrow_max_temp=findViewById(R.id.tomorrow_max);
+        current_wind_speed=findViewById(R.id.current_wind_speed);*/
+       /* tomorrow_max_temp=findViewById(R.id.tomorrow_max);
         tomorrow_min_temp=findViewById(R.id.tomorrow_min);
         tomorrow_temp=findViewById(R.id.tomorrow_temperature);
-        tomorrow_wind_speed=findViewById(R.id.tomorrow_wind_speed);
+        tomorrow_wind_speed=findViewById(R.id.tomorrow_wind_speed);*/
         searchView=findViewById(R.id.dashboardSearchBar);
-        expandable_today_weather=findViewById(R.id.expandable_layout_today);
-        expandable_tomorrow_weather=findViewById(R.id.expandable_layout_tomorrow);
+        //expandable_today_weather=findViewById(R.id.expandable_layout_today);
+       // expandable_tomorrow_weather=findViewById(R.id.expandable_layout_tomorrow);
         TextView todays_forecast = findViewById(R.id.todays_forecast);
         TextView tomorrows_forecast = findViewById(R.id.tomorrows_forecast);
-        todays_forecast_plus_minus=findViewById(R.id.todays_forecast_plus_minus);
-        tomorrows_forecast_plus_minus=findViewById(R.id.tomorrows_forecast_plus_minus);
-        expandable_tomorrow_weather.collapse();
-        expandable_today_weather.collapse();
+       // expandable_tomorrow_weather.collapse();
+//        expandable_today_weather.collapse();
         sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
@@ -147,37 +155,31 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
 
 
-        todays_forecast.setOnClickListener(new View.OnClickListener() {
+        /*todays_forecast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(expandable_today_weather.isExpanded()){
                     expandable_today_weather.collapse();
-                    todays_forecast_plus_minus.setText("+");
                 }
                 else{
                     expandable_today_weather.expand();
-                    todays_forecast_plus_minus.setText("-");
                 }
             }
-        });
+        });*/
 
         tomorrows_forecast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(expandable_tomorrow_weather.isExpanded()){
                     expandable_tomorrow_weather.collapse();
-                    tomorrows_forecast_plus_minus.setText("+");
+
                 }
                 else{
                     expandable_tomorrow_weather.expand();
-                    tomorrows_forecast_plus_minus.setText("-");
                 }
             }
         });
 
-        Utils.AskForPermission(Manifest.permission.ACCESS_COARSE_LOCATION, DashBoard.this);
-        Utils.AskForPermission(Manifest.permission.ACCESS_NETWORK_STATE, DashBoard.this);
-        Utils.AskForPermission(Manifest.permission.INTERNET, DashBoard.this);
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED
         && (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)==PackageManager.PERMISSION_GRANTED)) {
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -237,14 +239,14 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                        Utils.today_plants_task_string.clear();
-                       // my_task_plants.clear();
-                       // tomorrow_task_plants.clear();
+                       Utils.myPlants.clear();
                         task_plants = new ArrayList<>();
                         for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                             Plant myPlant=plantSnapshot.getValue(Plant.class);
                             if (myPlant!=null){
+                                Utils.myPlants.add(myPlant);
                             Plant plant=Utils.autoChangeDatesOnceItIsReached(myPlant);
-                            task_plants.add(Utils.autoChangeDatesOnceItIsReached(plant));
+                            task_plants.add(plant);
                             Utils.addPlant(plant);}
                         }
                         my_task_plants=todaysPlants(task_plants);
@@ -385,8 +387,8 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
                   new AsyncTask<Void, Void, Void>() {
 
-                      final List<WeatherInfo> todayWeatherList=new ArrayList<>();
-                      final List<WeatherInfo> tomorrowWeatherList=new ArrayList<>();
+                      final ArrayList<WeatherInfo> todayWeatherList=new ArrayList<>();
+                      final ArrayList<WeatherInfo> tomorrowWeatherList=new ArrayList<>();
                       final WeatherInfo todaysWeather=new WeatherInfo();
                       final WeatherInfo tomorrowsWeather=new WeatherInfo();
                       int notificationIterator=0;
@@ -399,6 +401,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                                     JSONObject tempObject=jsonTempObject.getJSONObject("main");
                                     JSONObject windObject=jsonTempObject.getJSONObject("wind");
                                     String timeObject=jsonTempObject.getString("dt_txt");
+                                    JSONArray weatherObject=jsonTempObject.getJSONArray("weather");
                                     if(Utils.isDateToday(Utils.createDateFromString(timeObject)))
                                     {
                                         WeatherInfo weather=new WeatherInfo();
@@ -406,7 +409,16 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                                         weather.setCurrentMinTemp(Double.parseDouble(tempObject.getString("temp_min")));
                                         weather.setCurrentMaxTemp(Double.parseDouble(tempObject.getString("temp_max")));
                                         weather.setCurrentWindSpeed(Double.parseDouble(windObject.getString("speed"))*3.6);
+                                        weather.setDateTime(timeObject);
+                                        JSONObject weatherObj=weatherObject.getJSONObject(0);
+                                        weather.setBriefDescription(weatherObj.getString("main"));
+                                        weather.setDetailedDescription(weatherObj.getString("description"));
+                                        weather.setWeatherIcon(weatherObj.getString("icon"));
+
                                         todayWeatherList.add(weather);
+                                        Log.v("todaystemp",String.valueOf(weather.getCurrentTemp()));
+                                        Log.v("todaystempmin",String.valueOf(weather.getCurrentMinTemp()));
+                                        Log.v("todaystempmax",String.valueOf(weather.getCurrentMaxTemp()));
 
                                         sharedPreferences= PreferenceManager.getDefaultSharedPreferences(Utils.applicationContext);
                                         Log.v("sharedprefs",sharedPreferences.getAll().toString());
@@ -457,6 +469,11 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                                         weather.setCurrentMinTemp(Double.parseDouble(tempObject.getString("temp_min")));
                                         weather.setCurrentMaxTemp(Double.parseDouble(tempObject.getString("temp_max")));
                                         weather.setCurrentWindSpeed(Double.parseDouble(windObject.getString("speed"))*3.6);
+                                        weather.setDateTime(timeObject);
+                                        JSONObject weatherObj=weatherObject.getJSONObject(0);
+                                        weather.setBriefDescription(weatherObj.getString("main"));
+                                        weather.setDetailedDescription(weatherObj.getString("description"));
+                                        weather.setWeatherIcon(weatherObj.getString("icon"));
                                         tomorrowWeatherList.add(weather);
                                         if(weather.getCurrentMinTemp()<0)
                                         {
@@ -499,7 +516,27 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                       @Override
                       protected void onPostExecute(Void aVoid) {
                           super.onPostExecute(aVoid);
-                          double avgTemp=0;
+                          RecyclerView recyclerView=findViewById(R.id.today_weather_recycler_view);
+                          RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext(),
+                                  LinearLayoutManager.HORIZONTAL,false);
+                          recyclerView.setLayoutManager(layoutManager);
+                          recyclerView.hasFixedSize();
+                          recyclerView.setItemViewCacheSize(20);
+                          recyclerView.setDrawingCacheEnabled(true);
+                          recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+                          RecyclerView.Adapter mAdapter=new WeatherForecastRecyclerAdapter(todayWeatherList);
+                          recyclerView.setAdapter(mAdapter);
+                          RecyclerView recyclerView1=findViewById(R.id.tomorrow_weather_recycler_view);
+                          RecyclerView.LayoutManager layoutManager1=new LinearLayoutManager(getApplicationContext(),
+                                  LinearLayoutManager.HORIZONTAL,false);
+                          recyclerView1.setLayoutManager(layoutManager1);
+                          recyclerView1.hasFixedSize();
+                          recyclerView1.setItemViewCacheSize(20);
+                          recyclerView1.setDrawingCacheEnabled(true);
+                          recyclerView1.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+                          RecyclerView.Adapter mAdapter1=new WeatherForecastRecyclerAdapter(tomorrowWeatherList);
+                          recyclerView1.setAdapter(mAdapter1);
+                          /*double avgTemp=0;
                           double avgMinTemp=0;
                           double avgMaxTemp=0;
                           double avgWindSpeed=0;
@@ -552,7 +589,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                               tomorrow_min_temp.setText(getString(R.string.celsius,decimalFormat.format(tomorrowsWeather.getCurrentMinTemp())));
                               tomorrow_temp.setText(getString(R.string.celsius,decimalFormat.format(tomorrowsWeather.getCurrentTemp())));
                               tomorrow_wind_speed.setText(getString(R.string.kmh,decimalFormat.format(tomorrowsWeather.getCurrentWindSpeed())));
-                          }
+                          }*/
 
                       }
                   }.execute();

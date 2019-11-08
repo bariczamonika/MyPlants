@@ -66,12 +66,6 @@ public class Splash extends Activity {
             startActivity(intent);
             finish();
         }
-       /* if (Utils.user == null) {
-            ;
-        } else {
-
-        }
-*/
         if (Utils.queue == null) {
             Utils.queue = Volley.newRequestQueue(getApplicationContext());}
 

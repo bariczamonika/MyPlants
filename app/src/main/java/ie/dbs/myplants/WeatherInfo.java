@@ -5,7 +5,10 @@ class WeatherInfo {
     private double currentMinTemp;
     private double currentMaxTemp;
     private double currentWindSpeed;
-
+    private String weatherIcon;
+    private String dateTime;
+    private String briefDescription;
+    private String detailedDescription;
     WeatherInfo() {
 
     }
@@ -15,6 +18,38 @@ class WeatherInfo {
         this.currentMinTemp = currentMinTemp;
         this.currentMaxTemp = currentMaxTemp;
         this.currentWindSpeed = currentWindSpeed;
+    }
+
+    public String getWeatherIcon() {
+        return weatherIcon;
+    }
+
+    public void setWeatherIcon(String weatherIcon) {
+        this.weatherIcon = weatherIcon;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public String getBriefDescription() {
+        return briefDescription;
+    }
+
+    public void setBriefDescription(String briefDescription) {
+        this.briefDescription = briefDescription;
+    }
+
+    public String getDetailedDescription() {
+        return detailedDescription;
+    }
+
+    public void setDetailedDescription(String detailedDescription) {
+        this.detailedDescription = detailedDescription;
     }
 
     double getCurrentTemp() {

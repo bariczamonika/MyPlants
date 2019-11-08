@@ -227,14 +227,15 @@
             </LinearLayout>
 
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10sp"
-            android:layout_marginRight="10sp"
-            android:layout_marginBottom="30sp"
-            android:textSize="16sp"
-            android:background="@drawable/rounded_edittext"
-            android:padding="5dp"
+            android:textSize="20sp"
+            android:padding="20sp"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@color/colorWhite"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_button"
             android:id="@+id/btn_add_profile_pic"
             android:text="@string/plant_add_profile_picture"
             />
@@ -250,14 +251,15 @@
             android:contentDescription="@string/preview_content_description"
             />
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10sp"
-            android:layout_marginRight="10sp"
-            android:layout_marginBottom="30sp"
-            android:textSize="16sp"
-            android:background="@drawable/rounded_edittext"
-            android:padding="5dp"
+            android:textSize="20sp"
+            android:padding="20sp"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@color/colorWhite"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_button"
             android:id="@+id/btn_plant_submit"
             android:text="@string/submit_button"
             />

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/background_image">
+    android:background="@drawable/proba2">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,42 +13,45 @@
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         >
-        <androidx.appcompat.widget.SearchView
+        <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <androidx.appcompat.widget.SearchView
+            android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
+            android:layout_weight="0.85"
             android:id="@+id/searchBar"
             android:padding="10dp"
             android:layout_margin="5dp"
             app:queryHint="@string/search_hint"
             app:queryBackground="@color/colorWhite"/>
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
             android:layout_height="wrap_content"
             android:id="@+id/fab_sort_by"
-            android:src="@drawable/sort_by"
+            android:backgroundTint="@android:color/transparent"
+            app:borderWidth="0dp"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_sort_2"
             />
+        </LinearLayout>
 
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_plant_activity_name"
         android:layout_marginTop="10dp"
         android:id="@+id/addPlant"
-        android:layout_marginRight="20sp"
-        android:layout_marginLeft="20sp"
-        android:textSize="15sp"
-        android:background="@drawable/rounded_edittext"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/all_my_plants"
-            android:fontFamily="cursive"
-            android:textStyle="bold"
-            android:textSize="30sp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:textColor="@color/colorWhite"/>
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:padding="20sp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:textColor="@color/colorWhite"
+        android:textAllCaps="false"
+        android:background="@drawable/rounded_button"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/my_recycler_view"
             android:layout_width="match_parent"

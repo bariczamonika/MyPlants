@@ -23,10 +23,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/gallery_plant_name"/>
+            android:layout_gravity="center"
+            android:id="@+id/gallery_plant_name"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="5dp"
+            android:layout_marginTop="15sp"
+            android:textColor="@android:color/black"/>
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15sp"
             android:id="@+id/gallery_recycler_view">
         </androidx.recyclerview.widget.RecyclerView>
 

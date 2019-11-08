@@ -16,7 +16,7 @@ class DataProvider implements RemoteViewsService.RemoteViewsFactory {
     final private List<Boolean> plantTasksDone=new ArrayList<>();
     final private Context mContext;
 
-    DataProvider(Context context) {
+    DataProvider(Context context, Intent intent) {
         mContext = context;
     }
     @Override
