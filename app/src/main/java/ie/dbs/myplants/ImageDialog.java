@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,11 +24,13 @@ import java.util.List;
 public class ImageDialog extends Activity {
     private ImageView mDialog;
     private TextView date_added;
-    private Button delete_pic;
+    private ImageView delete_pic;
     private ArrayList<String> plantImages=new ArrayList<>();
     private String plantID;
     private int position;
     private Plant myPlant;
+    private ImageView left;
+    private ImageView right;
     final private List<String> keys=new ArrayList<>();
 
 
@@ -38,6 +41,8 @@ public class ImageDialog extends Activity {
         date_added=findViewById(R.id.image_date_added);
         delete_pic=findViewById(R.id.delete_pic);
         mDialog = findViewById(R.id.your_image);
+        left=findViewById(R.id.image_dialog_left);
+        right=findViewById(R.id.image_dialog_right);
         plantID=getIntent().getStringExtra("plantID");
         position=getIntent().getIntExtra("position",0);
 
@@ -134,6 +139,24 @@ public class ImageDialog extends Activity {
             }
         });
 
+        left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int new_position=Utils.scrollLeft(plantImages.size(), position);
+                position=new_position;
+                mDialog.setImageBitmap(Utils.getFullImageFromFile(plantImages.get(new_position)));
+            }
+        });
+
+        right.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int new_position=Utils.scrollRight(plantImages.size(), position);
+                position=new_position;
+                Log.v("newposition", String.valueOf(new_position));
+                mDialog.setImageBitmap(Utils.getFullImageFromFile(plantImages.get(new_position)));
+            }
+        });
 
 
 

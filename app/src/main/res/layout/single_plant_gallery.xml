@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp"
     tools:context=".Gallery">
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,7 +15,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/gallery_date_added"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@android:color/black"/>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">MyPlants</string>
     <string name="splash_app_name" translatable="false">My Plants</string>
@@ -80,12 +81,12 @@
     <string name="single_tasks_fertilizing">Next fertilizing</string>
     <string name="single_tasks_replanting">Next replanting</string>
     <string name="notification_button">Notifications</string>
-    <string name="single_plant_add_pictures">Add pictures</string>
     <string name="delete_plant">Delete plant</string>
     <string name="left_arrow_content_description">Left arrow</string>
     <string name="right_arrow_content_description">Right arrow</string>
     <string name="image_content_description">Image</string>
     <string name="plus_content_description">Plus</string>
+    <string name="single_plant_add_pictures">Add pictures</string>
     <string name="pic_count" translatable="false">%1$d / %2$d</string>
 
     //TaskRecyclerAdapter

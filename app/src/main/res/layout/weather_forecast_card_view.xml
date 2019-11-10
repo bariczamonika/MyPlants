@@ -6,12 +6,13 @@
     android:id="@+id/card_view_weather"
     android:layout_marginTop="6dp"
     android:layout_marginBottom="6dp"
-    android:layout_marginLeft="6dp"
-    android:layout_marginRight="6dp"
+    android:layout_marginStart="6dp"
+    android:layout_marginEnd="6dp"
     android:layout_gravity="center"
     app:layout_anchorGravity="center"
-    app:cardElevation="0dp"
-    app:cardMaxElevation="0dp">
+    app:cardElevation="3dp"
+    app:cardMaxElevation="0dp"
+    app:cardBackgroundColor="#CEF0D3">
 
     <LinearLayout
         android:layout_width="234dp"
@@ -22,7 +23,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:id="@+id/card_view_weather_date"/>
+            android:id="@+id/card_view_weather_date"
+            android:textStyle="bold"
+            android:gravity="center"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,7 +36,7 @@
                 android:id="@+id/card_view_weather_icon"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.4"
+                android:layout_weight="0.3"
                 android:contentDescription="@string/weather_forecast_content_desc" />
 
             <TextView
@@ -48,7 +51,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_weight="0.4" />
+                android:layout_weight="0.5" />
 
         </LinearLayout>
 

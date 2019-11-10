@@ -116,4 +116,12 @@
         <item>50</item>
     </string-array>
 
+    <string-array name="language_entries">
+        <item>English</item>
+        <item>Hungarian</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>hu</item>
+    </string-array>
 </resources>

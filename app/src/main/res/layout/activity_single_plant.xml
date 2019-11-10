@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/single_plant_background">
+        android:background="@drawable/proba1">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,33 +20,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/single_plant_name"
-            android:fontFamily="cursive"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="30sp"
+            android:padding="5dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-smallcaps"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/colorWhite"
+            android:layout_marginTop="15sp"
             />
-        <Button
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/single_gallery_button"
-            android:text="@string/single_gallery"
-            android:background="@drawable/rounded_edittext"/>
+            android:src="@drawable/gallery"
+            android:layout_gravity="center"
+            android:layout_marginTop="15sp"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="20sp"
-            android:padding="10dp">
+            android:padding="5dp">
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
                 android:layout_gravity="center"
-                android:background="@drawable/left_arrow"
+                android:background="@drawable/left_arrow_final"
                 android:id="@+id/single_scroll_left"
                 android:contentDescription="@string/left_arrow_content_description"/>
 
@@ -63,49 +66,90 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
                 android:layout_gravity="center"
-                android:background="@drawable/right_arrow"
+                android:background="@drawable/right_arrow_final"
                 android:id="@+id/single_scroll_right"
                 android:contentDescription="@string/right_arrow_content_description"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             >
             <TextView
-                android:layout_width="0dp"
-                android:layout_weight="0.4"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/picture_date"
-                android:textSize="20sp"
-                android:textColor="@color/colorWhite"/>
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-smallcaps"
+                android:layout_gravity="center"
+                android:textAlignment="center"/>
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-smallcaps"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:id="@+id/single_pic_count"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
                 android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:id="@+id/notifications"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/colorWhite"
+                android:textAllCaps="false"
+                android:text="@string/notification_button"
+                android:background="@drawable/rounded_button"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/delete_plant"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@color/colorWhite"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_button"
+            android:id="@+id/single_delete_plant"/>
+        </LinearLayout>
+            <Button
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
                 android:textColor="@color/colorWhite"
-                android:layout_weight="0.3"
-                android:id="@+id/single_pic_count"/>
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.2"
+                android:textAllCaps="false"
                 android:id="@+id/single_add_pic_icon"
-                android:background="@drawable/plus_icon"
-                android:contentDescription="@string/plus_content_description"/>
+                android:background="@drawable/rounded_button"
+                android:text="@string/single_plant_add_pictures"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/colorWhite"
+                android:textAllCaps="false"
+                android:text="@string/single_modify_information"
+                android:background="@drawable/rounded_button"
+                android:id="@+id/modify_information"/>
         </LinearLayout>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/notifications"
-            android:text="@string/notification_button"
-            android:background="@drawable/rounded_edittext"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/delete_plant"
-            android:background="@drawable/rounded_edittext"
-            android:id="@+id/single_delete_plant"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -118,16 +162,24 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorWhite"
-                android:textSize="26sp"
                 android:text="@string/single_information"
                 android:id="@+id/single_information"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-smallcaps"
+                android:layout_marginTop="15sp"
                 />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorWhite"
                     android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:layout_marginTop="15sp"
                     android:text="@string/plus"
                     android:id="@+id/single_information_plus_minus"/>
             </LinearLayout>
@@ -149,16 +201,19 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
                     android:text="@string/single_information_plant_name"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"/>
                 <TextView
                     android:id="@+id/single_info_value_plant_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"/>
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -171,16 +226,19 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:text="@string/single_information_date_added"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
+                    android:text="@string/single_information_date_added" />
                 <TextView
                     android:id="@+id/single_info_value_date_added"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"/>
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -193,16 +251,19 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:text="@string/single_information_watering_needs"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
+                    android:text="@string/single_information_watering_needs" />
                 <TextView
                     android:id="@+id/single_info_value_watering_needs"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"/>
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -215,16 +276,19 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:text="@string/single_information_fertilizing_needs"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
+                    android:text="@string/single_information_fertilizing_needs" />
                 <TextView
                     android:id="@+id/single_info_value_fertilizing_needs"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"/>
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -237,16 +301,20 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
                     android:text="@string/single_information_outdoor_plant"
-                    android:textColor="@color/colorWhite"/>
+                    />
                 <TextView
                     android:id="@+id/single_info_value_outdoor_plant"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"/>
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -259,16 +327,19 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:text="@string/single_information_light_condition"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
+                    android:text="@string/single_information_light_condition" />
                 <TextView
                     android:id="@+id/single_info_value_light_condition"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"/>
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -280,15 +351,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/single_information_description"
-                    android:textSize="18sp"
-                    android:text="@string/single_information_description"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
+                    android:text="@string/single_information_description" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/single_information_value_description"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
                     />
             </LinearLayout>
             <LinearLayout
@@ -301,25 +375,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/single_information_notes"
-                    android:textSize="18sp"
-                    android:text="@string/single_information_notes"
-                    android:textColor="@color/colorWhite"/>
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
+                    android:text="@string/single_information_notes" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/single_information_value_notes"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:textColor="@android:color/black"
                     />
             </LinearLayout>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/single_modify_information"
-                android:layout_below="@+id/linear_notes"
-                android:background="@drawable/rounded_edittext"
-                android:id="@+id/modify_information"/>
+
         </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -327,16 +400,24 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="26sp"
                     android:text="@string/single_action"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:layout_marginTop="15sp"
                     android:id="@+id/single_action"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorWhite"
                     android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:layout_marginTop="15sp"
                     android:text="@string/plus"
                     android:id="@+id/single_information_plus_minus_action"/>
             </LinearLayout>
@@ -358,16 +439,20 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:text="@string/single_action_last_watered"
-                        android:textColor="@color/colorWhite"/>
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"
+                        android:text="@string/single_action_last_watered" />
                     <TextView
                         android:id="@+id/single_action_value_watered"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:textColor="@color/colorWhite"/>
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"
+                        />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -380,16 +465,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:text="@string/single_action_last_fertilized"
-                        android:textColor="@color/colorWhite"/>
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"
+                        android:text="@string/single_action_last_fertilized" />
                     <TextView
                         android:id="@+id/single_action_value_fertilized"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:textColor="@color/colorWhite"/>
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -402,18 +490,23 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:text="@string/single_action_last_replanted"
-                        android:textColor="@color/colorWhite"/>
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"
+                        android:text="@string/single_action_last_replanted" />
                     <TextView
                         android:id="@+id/single_action_value_replanted"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:textColor="@color/colorWhite"/>
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"/>
                 </LinearLayout>
             </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -421,16 +514,24 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="26sp"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:layout_marginTop="15sp"
                     android:text="@string/single_upcoming_tasks"
                     android:id="@+id/single_tasks"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorWhite"
                     android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:layout_marginTop="15sp"
                     android:text="@string/plus"
                     android:id="@+id/single_tasks_plus_minus_action"/>
             </LinearLayout>
@@ -452,16 +553,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:text="@string/single_tasks_watering"
-                        android:textColor="@color/colorWhite"/>
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"
+                        android:text="@string/single_tasks_watering" />
                     <TextView
                         android:id="@+id/single_task_value_watered"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:textColor="@color/colorWhite"/>
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -474,16 +578,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:text="@string/single_tasks_fertilizing"
-                        android:textColor="@color/colorWhite"/>
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"
+                        android:text="@string/single_tasks_fertilizing" />
                     <TextView
                         android:id="@+id/single_task_value_fertilized"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="18sp"
-                        android:textColor="@color/colorWhite"/>
+                        android:textSize="15sp"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:textColor="@android:color/black"/>
                 </LinearLayout>
 
 

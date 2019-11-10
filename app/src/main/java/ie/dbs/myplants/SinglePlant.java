@@ -65,7 +65,7 @@ public class SinglePlant extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_plant);
-        ImageView add_pic = findViewById(R.id.single_add_pic_icon);
+        Button add_pic = findViewById(R.id.single_add_pic_icon);
         plant_images=findViewById(R.id.single_images);
         picture_date=findViewById(R.id.picture_date);
         ImageView scroll_left = findViewById(R.id.single_scroll_left);
@@ -95,7 +95,7 @@ public class SinglePlant extends Activity {
         expandableRelativeLayout3=findViewById(R.id.expandableLayout3);
         Button modify_information = findViewById(R.id.modify_information);
         Button notificationButton = findViewById(R.id.notifications);
-        Button gallery = findViewById(R.id.single_gallery_button);
+        ImageView gallery = findViewById(R.id.single_gallery_button);
         Button delete_plant = findViewById(R.id.single_delete_plant);
         expandableRelativeLayout.collapse();
         expandableRelativeLayout2.collapse();

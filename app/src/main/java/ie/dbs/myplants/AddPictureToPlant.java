@@ -42,7 +42,7 @@ public class AddPictureToPlant extends Activity {
     private boolean isProfilePic;
     private String plantID;
     private boolean modify=false;
-    private TextView modify_picture_date;
+    private Button modify_picture_date;
     private String timeStamp;
     private int index=0;
     private Uri photoURI;

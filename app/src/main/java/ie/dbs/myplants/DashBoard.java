@@ -18,11 +18,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -48,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class DashBoard extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -68,6 +72,8 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
     private ExpandableRelativeLayout expandable_tomorrow_weather;
     private ConnectionReceiver receiver;
     private SharedPreferences sharedPreferences;
+    private boolean isTodayExpanded=false;
+    RecyclerView recyclerView;
 
     private String url;
 
@@ -96,23 +102,10 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         Button all_plants_button = findViewById(R.id.all_plants_button);
         task_recycler_view = findViewById(R.id.task_recycler_view);
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        /*current_temp=findViewById(R.id.current_temp);
-        current_max_temp=findViewById(R.id.current_max);
-        current_min_temp=findViewById(R.id.current_min);
-        current_wind_speed=findViewById(R.id.current_wind_speed);*/
-       /* tomorrow_max_temp=findViewById(R.id.tomorrow_max);
-        tomorrow_min_temp=findViewById(R.id.tomorrow_min);
-        tomorrow_temp=findViewById(R.id.tomorrow_temperature);
-        tomorrow_wind_speed=findViewById(R.id.tomorrow_wind_speed);*/
         searchView=findViewById(R.id.dashboardSearchBar);
-        //expandable_today_weather=findViewById(R.id.expandable_layout_today);
-       // expandable_tomorrow_weather=findViewById(R.id.expandable_layout_tomorrow);
-        TextView todays_forecast = findViewById(R.id.todays_forecast);
-        TextView tomorrows_forecast = findViewById(R.id.tomorrows_forecast);
-       // expandable_tomorrow_weather.collapse();
-//        expandable_today_weather.collapse();
         sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        recyclerView=findViewById(R.id.today_weather_recycler_view);
 
         //settings part
         FloatingActionButton floatingActionButton=findViewById(R.id.fab);
@@ -124,6 +117,10 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
             }
         });
+
+
+
+
 
         FloatingActionButton floatingActionButton1=findViewById(R.id.fab_logout);
         floatingActionButton1.setOnClickListener(new View.OnClickListener() {
@@ -155,30 +152,6 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
 
 
-        /*todays_forecast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(expandable_today_weather.isExpanded()){
-                    expandable_today_weather.collapse();
-                }
-                else{
-                    expandable_today_weather.expand();
-                }
-            }
-        });*/
-
-        tomorrows_forecast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(expandable_tomorrow_weather.isExpanded()){
-                    expandable_tomorrow_weather.collapse();
-
-                }
-                else{
-                    expandable_tomorrow_weather.expand();
-                }
-            }
-        });
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED
         && (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)==PackageManager.PERMISSION_GRANTED)) {
@@ -516,7 +489,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                       @Override
                       protected void onPostExecute(Void aVoid) {
                           super.onPostExecute(aVoid);
-                          RecyclerView recyclerView=findViewById(R.id.today_weather_recycler_view);
+
                           RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext(),
                                   LinearLayoutManager.HORIZONTAL,false);
                           recyclerView.setLayoutManager(layoutManager);
@@ -671,8 +644,23 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
                     }
                 });
-
-
         }
+
+        if(key.equals("language")){
+            String lang=sharedPreferences.getString("language", "en");
+            setLocale(lang);
+        }
+    }
+
+    public void setLocale(String lang) {
+        Locale myLocale = new Locale(lang);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
+        Intent refresh = new Intent(this, DashBoard.class);
+        finish();
+        startActivity(refresh);
     }
 }

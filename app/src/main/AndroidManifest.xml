@@ -24,6 +24,7 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".SettingsActivity"
+            android:configChanges="locale|orientation"
             android:label="@string/title_activity_settings"></activity>
 
         <service
@@ -42,7 +43,8 @@
         </receiver>
 
         <activity android:name=".Gallery" />
-        <activity android:name=".DashBoard">
+        <activity android:name=".DashBoard"
+            android:configChanges="locale|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
 

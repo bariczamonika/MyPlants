@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddPictureToPlant">
+    tools:context=".AddPictureToPlant"
+    android:background="@drawable/proba1">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,59 +16,66 @@
             android:layout_height="300dp"
             android:id="@+id/preview"
             android:contentDescription="@string/preview_content_description"
+            android:elevation="1dp"
+            android:layout_margin="10dp"
+            android:background="#88CEF0D3"
             />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            style="?android:attr/buttonBarStyle">
             <Button
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/pic_choose_from_gallery"
                 android:id="@+id/chooseFromGalleryButton"
-                style="?android:attr/buttonBarButtonStyle"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/colorWhite"
+                android:textAllCaps="false"
+                android:background="@drawable/rounded_button"
                 />
             <Button
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/pic_take_picture"
                 android:id="@+id/takePictureButton"
-                style="?android:attr/buttonBarButtonStyle"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            style="?android:attr/buttonBarStyle">
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/cancel"
-                android:id="@+id/cancel"
-                style="?android:attr/buttonBarButtonStyle"
-                />
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/pic_save_image"
-                android:id="@+id/saveImages"
-                style="?android:attr/buttonBarButtonStyle"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/colorWhite"
+                android:textAllCaps="false"
+                android:background="@drawable/rounded_button"
                 />
 
-        </LinearLayout>
-        <TextView
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:id="@+id/cancel"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/colorWhite"
+                android:textAllCaps="false"
+                android:background="@drawable/rounded_button"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pic_save_image"
+                android:id="@+id/saveImages"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textColor="@color/colorWhite"
+                android:textAllCaps="false"
+                android:background="@drawable/rounded_button"
+                />
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pic_modify_date"
+            android:text="@string/pic_modify_date"
             android:id="@+id/pic_modify_date"
-            />
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:textColor="@color/colorWhite"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_button"/>
     </LinearLayout>
 
 
