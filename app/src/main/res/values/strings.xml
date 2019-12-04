@@ -130,6 +130,8 @@
     <string name="widget_open_app">Open app</string>
     <string name="widget_refresh_widget">Refresh</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="widget_done">Done</string>
+    <string name="widget_todo">TODO</string>
 
     <!-- Preference Titles -->
 

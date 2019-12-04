@@ -8,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -65,6 +66,7 @@ public class SinglePlant extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_plant);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Button add_pic = findViewById(R.id.single_add_pic_icon);
         plant_images=findViewById(R.id.single_images);
         picture_date=findViewById(R.id.picture_date);
@@ -400,6 +402,8 @@ public class SinglePlant extends Activity {
         unregisterReceiver(receiver);
     }
 
+    //choose date for last watering, fertilizing or replanting
+
     private void chooseDate(final TextView textView, final int whatToUseItFor) {
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
@@ -491,12 +495,14 @@ public class SinglePlant extends Activity {
         }
     }
 
+    //add plant to Firebase
     private void addPlant(Plant plant) {
         String userID=Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(myPlant.getPlantID()).setValue(plant);
     }
 
 
+    //create notification alert dialog
     private void createAlertDialogWithRadioButtons() {
         final String[]optionsArray=new String[]{
                 "Watering",
@@ -555,50 +561,6 @@ public class SinglePlant extends Activity {
         AlertDialog dialog=builder.create();
         dialog.show();
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.user_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.logout: {
-                final AlertDialog dialog = new AlertDialog.Builder(SinglePlant.this).create();
-                dialog.setTitle("Logout");
-                dialog.setMessage("Are you sure?");
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Utils.mAuth.signOut();
-                        Intent intent = new Intent(SinglePlant.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                break;
-            }
-
-            default:
-                break;
-        }
-        return true;
-    }*/
-
-
-
-
-
 
 
 

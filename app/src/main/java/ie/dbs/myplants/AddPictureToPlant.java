@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -22,7 +23,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +52,7 @@ public class AddPictureToPlant extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Button takePicture = findViewById(R.id.takePictureButton);
         Button addFromGallery =findViewById(R.id.chooseFromGalleryButton);
         preview=findViewById(R.id.preview);
@@ -90,17 +91,6 @@ public class AddPictureToPlant extends Activity {
 
                 if(ContextCompat.checkSelfPermission(Utils.applicationContext, Manifest.permission.CAMERA)
                         == PackageManager.PERMISSION_GRANTED) {
-                    /*Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);*/
-                   /* values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-                    mArrayUri.clear();
-                    mArrayUri.add( getContentResolver().insert(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values));
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mArrayUri.get(0));
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);*/
                     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     takePictureIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     // Ensure that there's a camera activity to handle the intent
@@ -232,6 +222,7 @@ public class AddPictureToPlant extends Activity {
 
     }
 
+    //choose a different date for the picture than today
     private void chooseDate() {
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
@@ -267,7 +258,7 @@ public class AddPictureToPlant extends Activity {
             });
         }
 
-
+        //depending on if the user chose to take a picture or choose from gallery
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
        super.onActivityResult(requestCode, resultCode, data);
@@ -322,47 +313,9 @@ public class AddPictureToPlant extends Activity {
                     .show();
         }
     }
-  /*  @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.user_menu, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId())
-        {
-            case R.id.logout: {
-                final AlertDialog dialog=new AlertDialog.Builder(AddPictureToPlant.this).create();
-                dialog.setTitle("Logout");
-                dialog.setMessage("Are you sure?");
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Utils.mAuth.signOut();
-                        Intent intent=new Intent(AddPictureToPlant.this,LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE,"No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                break;
-            }
 
-            default:
-                break;
-        }
-        return true;
-    }
-*/
-
+    //create image file
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -370,7 +323,7 @@ public class AddPictureToPlant extends Activity {
         File file = new File(storageDir, "picture" +
                 timeStamp + ".jpeg");
 
-        // Save a file: path for use with ACTION_VIEW intents
+
         mCurrentPhotoPath = file.getAbsolutePath();
         return file;
     }

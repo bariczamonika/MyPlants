@@ -10,7 +10,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 
-
+//connection receiver class to handle if there is internet connection or not
 public class ConnectionReceiver extends BroadcastReceiver{
 
 

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 
+//widget
 class DataProvider implements RemoteViewsService.RemoteViewsFactory {
     final private List<String> plantNames = new ArrayList<>();
     final private List<String> plantTasks=new ArrayList<>();
@@ -24,21 +25,25 @@ class DataProvider implements RemoteViewsService.RemoteViewsFactory {
         initData();
     }
 
+    //if the widget's dataset changed
     @Override
     public void onDataSetChanged() {
         initData();
     }
 
+    //if the widget is destroyed
     @Override
     public void onDestroy() {
 
     }
 
+    //count how many rows are to be displayed
     @Override
     public int getCount() {
         return plantNames.size();
     }
 
+    //return a certain view
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
@@ -48,22 +53,16 @@ class DataProvider implements RemoteViewsService.RemoteViewsFactory {
         view.setTextViewText(R.id.widget_plant_task, plantTasks.get(position));
         if(plantTasksDone.get(position))
         {
-            view.setTextViewText(R.id.widget_plant_task_done, "Done");
+            view.setTextViewText(R.id.widget_plant_task_done, Utils.applicationContext.getResources().getString(R.string.widget_done));
             view.setInt(R.id.widget_list_row_linear, "setBackgroundResource", R.color.colorPrimary);
 
         }
         else
         {
-            view.setTextViewText(R.id.widget_plant_task_done, "TODO");
+            view.setTextViewText(R.id.widget_plant_task_done, Utils.applicationContext.getResources().getString(R.string.widget_todo));
             view.setInt(R.id.widget_list_row_linear, "setBackgroundResource", R.color.colorWhite);
 
         }
-     /*   Bundle extras = new Bundle();
-        extras.putString("plantID", Utils.today_plants_task_string.get(position).getPlantID());
-        extras.putString("task", plantTasks.get(position));
-        Intent fillInIntent = new Intent();
-        fillInIntent.putExtras(extras);
-        view.setOnClickFillInIntent(R.id.widget_list_row_linear,fillInIntent);*/
         return view;
     }
 
@@ -87,6 +86,7 @@ class DataProvider implements RemoteViewsService.RemoteViewsFactory {
         return true;
     }
 
+    //initialize dataset
     private void initData() {
         plantNames.clear();
         plantTasks.clear();

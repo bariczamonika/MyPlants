@@ -1,5 +1,6 @@
 package ie.dbs.myplants;
 
+//weather info class
 class WeatherInfo {
     private double currentTemp;
     private double currentMinTemp;

@@ -20,6 +20,7 @@ public class Splash extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //set up Firebase
         Utils.firebaseDatabase = FirebaseDatabase.getInstance();
         Utils.databaseReference = Utils.firebaseDatabase.getReference("EDMT_FIREBASE");
         setContentView(R.layout.activity_splash);
@@ -70,6 +71,7 @@ public class Splash extends Activity {
             Utils.queue = Volley.newRequestQueue(getApplicationContext());}
 
     }
+    //create the notification channel
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);

@@ -99,4 +99,6 @@
     <string name="yes">"Igen "</string>
     <string name="language_header">Nyelvek</string>
     <string name="language_title">Válassz nyelvet</string>
+    <string name="widget_done">Kész</string>
+    <string name="widget_todo">Kell</string>
 </resources>

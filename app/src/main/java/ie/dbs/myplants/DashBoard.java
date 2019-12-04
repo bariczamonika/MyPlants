@@ -17,9 +17,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.icu.util.LocaleData;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Request;
@@ -66,26 +69,31 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
     private ArrayList<Plant> filteredTomorrowPlants;
     private ArrayList<Plant> my_task_plants;
     private ArrayList<Plant> tomorrow_task_plants;
-    private TextView current_temp, current_max_temp, current_min_temp,current_wind_speed,tomorrow_temp,
-    tomorrow_min_temp,tomorrow_max_temp,tomorrow_wind_speed;
-    private ExpandableRelativeLayout expandable_today_weather;
-    private ExpandableRelativeLayout expandable_tomorrow_weather;
     private ConnectionReceiver receiver;
     private SharedPreferences sharedPreferences;
     private boolean isTodayExpanded=false;
     RecyclerView recyclerView;
 
     private String url;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
+        String lang=sharedPreferences.getString("language", "en");
+        Toast.makeText(this, lang, Toast.LENGTH_LONG).show();
+        Resources res = getResources();
+        // Change locale settings in the app.
+        DisplayMetrics dm = res.getDisplayMetrics();
+        android.content.res.Configuration conf = res.getConfiguration();
+        conf.locale = new Locale(lang);
+        res.updateConfiguration(conf, dm);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         setContentView(R.layout.activity_dash_board);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         receiver = new ConnectionReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, filter);
-
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
                 Manifest.permission.CAMERA,
@@ -103,8 +111,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         task_recycler_view = findViewById(R.id.task_recycler_view);
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         searchView=findViewById(R.id.dashboardSearchBar);
-        sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
         recyclerView=findViewById(R.id.today_weather_recycler_view);
 
         //settings part
@@ -178,6 +185,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         task_recycler_view.hasFixedSize();
         task_recycler_view.setItemViewCacheSize(20);
         task_recycler_view.setDrawingCacheEnabled(true);
+        task_recycler_view.smoothScrollToPosition(0);
         task_recycler_view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
         task_tomorrow_recycler_view=findViewById(R.id.task_tomorrow_recycler_view);
@@ -185,6 +193,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         task_tomorrow_recycler_view.setLayoutManager(layoutManager1);
         task_tomorrow_recycler_view.hasFixedSize();
         task_tomorrow_recycler_view.setItemViewCacheSize(20);
+        task_tomorrow_recycler_view.smoothScrollToPosition(0);
         task_tomorrow_recycler_view.setDrawingCacheEnabled(true);
         task_tomorrow_recycler_view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
@@ -205,6 +214,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         displayTasks();
     }
 
+    //display today's and tomorrow's tasks
     private void displayTasks() {
         if(databaseReference!=null){
             databaseReference.addValueEventListener(new ValueEventListener() {
@@ -224,14 +234,22 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                         }
                         my_task_plants=todaysPlants(task_plants);
                         Utils.today_plants_task_string.addAll(my_task_plants);
+                        tomorrow_task_plants=tomorrowsPlants(task_plants);
+                        //notifies the widget
                         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(Utils.applicationContext);
                         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(Utils.applicationContext, NewAppWidget.class));
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
+
                         TaskRecyclerAdapter taskRecyclerAdapter = new TaskRecyclerAdapter(my_task_plants);
                         task_recycler_view.setAdapter(taskRecyclerAdapter);
-                        tomorrow_task_plants=tomorrowsPlants(task_plants);
+                        taskRecyclerAdapter.notifyDataSetChanged();
+                        task_recycler_view.smoothScrollToPosition(0);
                         TomorrowTaskRecyclerAdapter tomorrowTaskRecyclerAdapter=new TomorrowTaskRecyclerAdapter(tomorrow_task_plants);
                         task_tomorrow_recycler_view.setAdapter(tomorrowTaskRecyclerAdapter);
+                        tomorrowTaskRecyclerAdapter.notifyDataSetChanged();
+                        task_tomorrow_recycler_view.smoothScrollToPosition(0);
+
+
                     }
                     if(searchView!=null){
                         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -248,7 +266,10 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                             }
                         });
                     }
+
+
                 }
+
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -256,9 +277,13 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
                 }
             });
+
+
+
         }
     }
 
+    //search among today's tasks
     private ArrayList<Plant> searchToday(String str){
         ArrayList<Plant> list=new ArrayList<>();
         for(Plant plant:my_task_plants){
@@ -271,6 +296,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         return list;
     }
 
+    //search among tomorrow's tasks
     private ArrayList<Plant> searchTomorrow(String str){
         ArrayList<Plant> list=new ArrayList<>();
         for(Plant plant:tomorrow_task_plants){
@@ -285,6 +311,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
 
 
 
+    //return the plants that are due for some tasks today
     private ArrayList<Plant> todaysPlants(ArrayList<Plant> plants)
     {
         ArrayList<Plant>plantList=new ArrayList<>();
@@ -313,6 +340,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         return plantList;
     }
 
+    //return the plants that are due for some tasks tomorrow
     private ArrayList<Plant> tomorrowsPlants(ArrayList<Plant> plants)
     {
         ArrayList<Plant>plantList=new ArrayList<>();
@@ -346,6 +374,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
     }
 
 
+    //call the weather API
     private void callAPI(final String url){
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -509,61 +538,6 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
                           recyclerView1.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                           RecyclerView.Adapter mAdapter1=new WeatherForecastRecyclerAdapter(tomorrowWeatherList);
                           recyclerView1.setAdapter(mAdapter1);
-                          /*double avgTemp=0;
-                          double avgMinTemp=0;
-                          double avgMaxTemp=0;
-                          double avgWindSpeed=0;
-                          DecimalFormat decimalFormat=new DecimalFormat("#.##");
-                          if(todayWeatherList!=null) {
-                              for (int i = 0; i < todayWeatherList.size(); i++) {
-                                  avgTemp = avgTemp + todayWeatherList.get(i).getCurrentTemp();
-                                  Log.v("weatherAVGTemp",String.valueOf(avgTemp));
-                                  avgMaxTemp = avgMaxTemp + todayWeatherList.get(i).getCurrentMaxTemp();
-                                  avgMinTemp = avgMinTemp + todayWeatherList.get(i).getCurrentMinTemp();
-                                  Log.v("weatherAVGMinTemp", String.valueOf(avgMinTemp));
-                                  avgWindSpeed = avgWindSpeed + todayWeatherList.get(i).getCurrentWindSpeed();
-                              }
-                              avgTemp = avgTemp / todayWeatherList.size();
-                              avgMaxTemp=avgMaxTemp/todayWeatherList.size();
-                              avgMinTemp=avgMinTemp/todayWeatherList.size();
-                              avgWindSpeed=avgWindSpeed/todayWeatherList.size();
-                              Log.v("weatherAVGTempFinal",String.valueOf(avgTemp));
-                              Log.v("weatherAVGMinTempFinal", String.valueOf(avgMinTemp));
-                              Log.v("weatherAVGsize", String.valueOf(todayWeatherList.size()));
-                              todaysWeather.setCurrentTemp(avgTemp);
-                              todaysWeather.setCurrentMaxTemp(avgMaxTemp);
-                              todaysWeather.setCurrentMinTemp(avgMinTemp);
-                              todaysWeather.setCurrentWindSpeed(avgWindSpeed);
-                              current_temp.setText(getString(R.string.celsius,decimalFormat.format(todaysWeather.getCurrentTemp())));
-                              //current_temp.setText(decimalFormat.format(todaysWeather.getCurrentTemp()) + getResources().getString(R.string.celsius));
-                              Log.v("weatherAVGsetText", getResources().getString(R.string.celsius));
-                              current_max_temp.setText( getString(R.string.celsius, decimalFormat.format(todaysWeather.getCurrentMaxTemp())));
-                              current_min_temp.setText(getString(R.string.celsius, decimalFormat.format(todaysWeather.getCurrentMinTemp())));
-                              current_wind_speed.setText(getString(R.string.kmh,decimalFormat.format(todaysWeather.getCurrentWindSpeed())));
-                          }
-
-                          if(tomorrowWeatherList!=null)
-                          {
-                              for (int i = 0; i < tomorrowWeatherList.size(); i++) {
-                                  avgTemp = avgTemp + tomorrowWeatherList.get(i).getCurrentTemp();
-                                  avgMaxTemp = avgMaxTemp + tomorrowWeatherList.get(i).getCurrentMaxTemp();
-                                  avgMinTemp = avgMinTemp + tomorrowWeatherList.get(i).getCurrentMinTemp();
-                                  avgWindSpeed = avgWindSpeed + tomorrowWeatherList.get(i).getCurrentWindSpeed();
-                              }
-                              avgTemp = avgTemp / tomorrowWeatherList.size();
-                              avgMaxTemp=avgMaxTemp/tomorrowWeatherList.size();
-                              avgMinTemp=avgMinTemp/tomorrowWeatherList.size();
-                              avgWindSpeed=avgWindSpeed/tomorrowWeatherList.size();
-                              tomorrowsWeather.setCurrentTemp(avgTemp);
-                              tomorrowsWeather.setCurrentMaxTemp(avgMaxTemp);
-                              tomorrowsWeather.setCurrentMinTemp(avgMinTemp);
-                              tomorrowsWeather.setCurrentWindSpeed(avgWindSpeed);
-                              tomorrow_max_temp.setText(getString(R.string.celsius,decimalFormat.format(tomorrowsWeather.getCurrentMaxTemp())));
-                              tomorrow_min_temp.setText(getString(R.string.celsius,decimalFormat.format(tomorrowsWeather.getCurrentMinTemp())));
-                              tomorrow_temp.setText(getString(R.string.celsius,decimalFormat.format(tomorrowsWeather.getCurrentTemp())));
-                              tomorrow_wind_speed.setText(getString(R.string.kmh,decimalFormat.format(tomorrowsWeather.getCurrentWindSpeed())));
-                          }*/
-
                       }
                   }.execute();
 
@@ -608,6 +582,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, filter);
+
     }
 
     @Override
@@ -616,6 +591,7 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         unregisterReceiver(receiver);
     }
 
+    //if the user changes the settings
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         sharedPreferences=PreferenceManager.getDefaultSharedPreferences(Utils.applicationContext);
@@ -649,18 +625,30 @@ public class DashBoard extends Activity implements SharedPreferences.OnSharedPre
         if(key.equals("language")){
             String lang=sharedPreferences.getString("language", "en");
             setLocale(lang);
+
         }
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    //change the language
     public void setLocale(String lang) {
+
         Locale myLocale = new Locale(lang);
+        Locale.setDefault(Locale.ENGLISH);
         Resources res = getResources();
         DisplayMetrics dm = res.getDisplayMetrics();
         Configuration conf = res.getConfiguration();
         conf.locale = myLocale;
         res.updateConfiguration(conf, dm);
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(Utils.applicationContext);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(Utils.applicationContext, NewAppWidget.class));
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
+        RemoteViews views=new RemoteViews(getPackageName(), R.layout.new_app_widget);
+        appWidgetManager.updateAppWidget(appWidgetIds,views);
         Intent refresh = new Intent(this, DashBoard.class);
         finish();
         startActivity(refresh);
     }
+
+
 }

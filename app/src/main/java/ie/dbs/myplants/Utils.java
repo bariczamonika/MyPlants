@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -18,7 +20,9 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -35,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -90,6 +96,7 @@ class Utils {
         File file = new File(myFile, "picture" +
                 timestamp + ".jpeg");
         String imagePath = file.getAbsolutePath();
+        Log.v("imagePath", file.getAbsolutePath());
         if (file.exists()) {
             file.delete();
         }
@@ -98,15 +105,12 @@ class Utils {
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
-            //TODO check mediascanner it's not showing in gallery
-            MediaScannerConnection.scanFile(context,
-                    new String[]{file.toString()}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.v("ExternalStorage", "Scanned " + path + ":");
-                            Log.v("ExternalStorage", "-> uri=" + uri);
-                        }
-                    });
+
+                MediaStore.Images.Media.insertImage(applicationContext.getContentResolver(),
+                        file.getAbsolutePath(), file.getName(), null);
+                applicationContext.sendBroadcast(new Intent(
+                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+
             Toast.makeText(Utils.applicationContext, "Image saved", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,6 +186,7 @@ class Utils {
         return myArray.replace('_', ' ').split(", ");
     }
 
+    //convert watering needs enum to string array for spinner
     @NotNull
     static String[] getWateringNeedsNames() {
         String myArray = Arrays.toString(Watering_Needs.values());
@@ -189,6 +194,7 @@ class Utils {
         return myArray.replace('_', ' ').split(", ");
     }
 
+    //convert fertilizing needs enum to string array for spinner
     @NotNull
     static String[] getFertilizingNeedsNames() {
         String myArray = Arrays.toString(Fertilizing_Needs.values());
@@ -204,7 +210,7 @@ class Utils {
         Utils.databaseReference.child("users").child(userID).child("plantsPics").child(plantID).child("images").push().setValue(plantImage);
     }
 
-    //retrieve image from saved position
+    //retrieve image thumbnail from saved position
     static Bitmap getThumbNailFromFile(String path) {
         Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
@@ -226,6 +232,7 @@ class Utils {
 
     }
 
+    //retrieve full image from saved directory
     static Bitmap getFullImageFromFile(String path)
     {
         Drawable drawable = applicationContext.getResources().getDrawable(R.drawable.replacement_pic);
@@ -242,6 +249,7 @@ class Utils {
         return bitmap;
     }
 
+    //retrieve the pictures' creation date from the timestamp
     static String getPictureDateFromPicturePath(String picturePath) {
         int length = picturePath.length();
         int index = picturePath.indexOf("20");
@@ -252,6 +260,7 @@ class Utils {
         return day + "/" + month + "/" + year;
     }
 
+    //delete picture
     static void deletePic(String picturePath) {
         File file = new File(picturePath);
         if (file.exists()) {
@@ -263,6 +272,7 @@ class Utils {
     }
 
 
+    //convert fertilizing enum to integer
     static int convertFertilizingNeedsToInteger(int value) {
         int newValue = 0;
         switch (value) {
@@ -291,6 +301,7 @@ class Utils {
     }
 
 
+    //add a certain amount of days to a date
     static Date addDaysToDate(Date myDate, int days) {
         Date newDate;
         Calendar calendar = Calendar.getInstance();
@@ -300,13 +311,14 @@ class Utils {
         return newDate;
     }
 
+    //automatically change a plant's next watering and fertilizing date to a new date once the old date is reached
     static Plant autoChangeDatesOnceItIsReached(Plant myPlant) {
 
         Date now = new Date();
         now = addDaysToDate(getLastMinuteOfDay(now), -1);
         if (myPlant != null) {
             if (myPlant.getNextWatering() != null) {
-                while (myPlant.getNextWatering().before(now) || myPlant.getNextWatering().equals(now)) {
+                while (myPlant.getNextWatering().before(now) || myPlant.getNextWatering().toString().equals(now.toString())) {
                     myPlant.setLastWatered(myPlant.getNextWatering());
                     int days = myPlant.getWateringNeeds().value;
                     myPlant.setNextWatering(Utils.addDaysToDate(myPlant.getLastWatered(), days));
@@ -318,7 +330,7 @@ class Utils {
             }
 
             if (myPlant.getNextFertilizing() != null) {
-                while (myPlant.getNextFertilizing().before(now) || (myPlant.getNextFertilizing() == now)) {
+                while (myPlant.getNextFertilizing().before(now) || (myPlant.getNextFertilizing().toString().equals(now.toString()))) {
 
                     myPlant.setLastFertilized(myPlant.getNextFertilizing());
                     myPlant.setTaskFertilizinChecked(false);
@@ -335,6 +347,7 @@ class Utils {
         return myPlant;
     }
 
+    //returns the last minute of a certain day
     static Date getLastMinuteOfDay(Date now) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
@@ -346,6 +359,7 @@ class Utils {
         return now;
     }
 
+    //return time of a day (time set by user in settings)
     private static Date getTimeOfDay(Date now) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
@@ -370,6 +384,7 @@ class Utils {
         return now;
     }
 
+    //add one second to a date
     static Date addOneSecondToDate(Date now) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
@@ -378,6 +393,7 @@ class Utils {
         return now;
     }
 
+    //create a date file from string
     static Date createDateFromString(String string) {
         Date date;
         String[] stringArray = string.split(" ");
@@ -390,6 +406,7 @@ class Utils {
         return date;
     }
 
+    //check if a certain date is today
     static boolean isDateToday(Date date) {
         boolean check = false;
         Date now = new Date();
@@ -400,6 +417,7 @@ class Utils {
         return check;
     }
 
+    //check if a certain date is tomorrow
     static boolean isDateTomorrow(Date date) {
         boolean check = false;
         Date now = new Date();
@@ -411,15 +429,17 @@ class Utils {
     }
 
 
+    //cancel a notification
     static void cancelNotification(int notificationID, Activity whichActivity) {
         Intent notificationIntent = new Intent(whichActivity, AlarmReceiver.class);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationID);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(whichActivity, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) whichActivity.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
-        Toast.makeText(whichActivity, "Notification " + notificationID + "cancelled", Toast.LENGTH_SHORT).show();
+        Toast.makeText(whichActivity, "Notification cancelled", Toast.LENGTH_SHORT).show();
     }
 
+    //schedule a notification
     private static void scheduleNotification(Notification notification, Date whenToStart, int notificationID, long interval) {
 
         Intent notificationIntent = new Intent(Utils.applicationContext, AlarmReceiver.class);
@@ -434,10 +454,10 @@ class Utils {
         AlarmManager alarmManager = (AlarmManager) Utils.applicationContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval, pendingIntent);
         //alarmManager.setRepeating(AlarmManager.RTC, delay, interval, pendingIntent);
-        Toast.makeText(Utils.applicationContext, "Notification set" + notificationID+" "+date, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Utils.applicationContext, "Notification set "+date, Toast.LENGTH_SHORT).show();
     }
 
-
+    //get a notification
     private static Notification getNotification(String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.applicationContext, Utils.CHANNEL_ID);
         return builder
@@ -447,7 +467,7 @@ class Utils {
     }
 
 
-
+//set a fertilizing notification
     static void setFertilizingNotification(Plant myPlant) {
 
         if (myPlant.getFertilizingNeeds() != Fertilizing_Needs.None) {
@@ -471,6 +491,7 @@ class Utils {
         }
     }
 
+    //set a watering notification
     static void setWateringNotification(Plant myPlant) {
 
         if (myPlant.getWateringNeeds() != Watering_Needs.None) {
@@ -489,7 +510,7 @@ class Utils {
             Log.v("notification date", String.valueOf(notificationDate));
             Log.v("delayAlarm", String.valueOf(delay));
             Log.v("intervalAlarm", String.valueOf(TimeUnit.DAYS.toMillis(myPlant.getWateringNeeds().value)));
-            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering" + notificationID), notificationDate, notificationID, interval);
+            Utils.scheduleNotification(Utils.getNotification(myPlant.getName() + " needs watering"), notificationDate, notificationID, interval);
         } else {
             myPlant.setNotificationWatering(false);
             Toast.makeText(Utils.applicationContext, "Please set up your watering needs first",
@@ -499,6 +520,7 @@ class Utils {
     }
 
 
+    //generate a unique notification id
     static int generateNotificationID(String plantID, boolean isWatering) {
         int notificationID = 0;
         if (isWatering) {
@@ -524,6 +546,7 @@ class Utils {
     }
 
 
+    //bubble sort of a plant image array
     static ArrayList<PlantImage> sortStringBubbleArray(ArrayList<PlantImage> plants)
     {
         int j;
@@ -544,6 +567,8 @@ class Utils {
             return plants;
     }
 
+
+    //bubble sort of a string array
     static ArrayList<String> sortStringBubbleArrayStringArray(ArrayList<String> plants)
     {
         int j;
@@ -563,6 +588,8 @@ class Utils {
         }
         return plants;
     }
+
+    //bubble sort of a plant array
     static ArrayList<Plant> sortStringBubble(ArrayList<Plant> plants, boolean name) {
         int j;
         boolean flag = true;  // will determine when the sort is finished
@@ -591,6 +618,7 @@ class Utils {
         return plants;
     }
 
+    //sort by outdoor plant or not
     static ArrayList<Plant> sortByOutDoorPlant(ArrayList<Plant> plants, boolean outdoor) {
         ArrayList<Plant> sortedPlants = new ArrayList<>();
         for (Plant plant : plants) {
@@ -607,46 +635,13 @@ class Utils {
         return sortedPlants;
     }
 
-    private static Map<String, Object> toMap(JSONObject object) throws JSONException {
-        Map<String, Object> map = new HashMap<>();
-        Iterator<String> keysItr = object.keys();
-        while (keysItr.hasNext()) {
-            String key = keysItr.next();
-            Object value = object.get(key);
-            if (value instanceof JSONArray) {
-                value = toList((JSONArray) value);
-            } else if (value instanceof JSONObject) {
-                value = toMap((JSONObject) value);
-            }
-            map.put(key, value);
-        }
-        return map;
-    }
-
-    private static List<Object> toList(JSONArray array) {
-        List<Object> list = new ArrayList<>();
-        try {
-            for (int i = 0; i < array.length(); i++) {
-                Object value = array.get(i);
-                if (value instanceof JSONArray) {
-                    value = toList((JSONArray) value);
-                } else if (value instanceof JSONObject) {
-                    value = Utils.toMap((JSONObject) value);
-                }
-                list.add(value);
-            }
-        } catch (Exception ex) {
-            Log.e("Exception", ex.getMessage());
-            Toast.makeText(applicationContext, "That didn't work", Toast.LENGTH_SHORT).show();
-        }
-        return list;
-    }
-
+    //add plant to firebase
     static void addPlant(Plant plant) {
         String userID = Utils.user.getUid();
         Utils.databaseReference.child("users").child(userID).child("plants").child(plant.getPlantID()).setValue(plant);
     }
 
+    //scroll right
     static int scrollRight(int size, int index) {
 
         if (size > index + 1)
@@ -656,6 +651,7 @@ class Utils {
         return index;
     }
 
+    //scroll left
     static int scrollLeft(int size, int index) {
 
         if (index > 0)
@@ -664,5 +660,18 @@ class Utils {
             index = size - 1;
         return index;
     }
+
+    //set language
+    public static void setLocale(String lang) {
+
+        Locale myLocale = new Locale(lang);
+        Locale.setDefault(Locale.ENGLISH);
+        Resources res = applicationContext.getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
+    }
+
 }
 

@@ -11,34 +11,40 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:id="@+id/linear_widget">
-    <Button
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:src="@drawable/my_plant_icon"/>
+    <TextView
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.7"
+        android:text="@string/app_name"
+        android:fontFamily="cursive"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"/>
+    </LinearLayout>
+    <Button
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/widget_click_on_me"
-        android:text="@string/widget_open_app"
         android:textSize="20sp"
         android:fontFamily="sans-serif-smallcaps"
         android:textColor="@color/colorWhite"
         android:textAllCaps="false"
         android:background="@drawable/rounded_button"
         />
-    <Button
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:id="@+id/widget_update"
-        android:layout_below="@id/widget_click_on_me"
-        android:text="@string/widget_refresh_widget"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-smallcaps"
-        android:textColor="@color/colorWhite"
-        android:textAllCaps="false"
-        android:background="@drawable/rounded_button"
-        />
-</LinearLayout>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -46,10 +52,9 @@
         tools:listitem="@layout/widget_list_view_row"
         android:clickable="false"
         android:duplicateParentState="true"
-        android:layout_below="@+id/linear_widget"
         >
 
 
     </ListView>
-
+</LinearLayout>
 </RelativeLayout>

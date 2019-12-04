@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,7 @@ public class RegisterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         emailAddress=findViewById(R.id.email);
         passwordField=findViewById(R.id.password);
@@ -46,6 +48,7 @@ public class RegisterActivity extends Activity {
         });
     }
 
+    //create account with email and password
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!Utils.validateRegistrationForm(emailAddress,passwordField, confirmPasswordField)) {
@@ -90,6 +93,8 @@ public class RegisterActivity extends Activity {
                 });
     }
 
+
+    //send the verification email
     private void sendEmailVerification() {
 
 

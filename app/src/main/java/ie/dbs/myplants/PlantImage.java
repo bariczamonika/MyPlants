@@ -1,6 +1,6 @@
 package ie.dbs.myplants;
 
-
+//plant image class
 class PlantImage {
     private String picturePath;
 
@@ -11,9 +11,10 @@ class PlantImage {
         this.picturePath = picturePath;
     }
 
-    String getPicturePath() {
+    public String getPicturePath() {
         return picturePath;
     }
+
 
 
 

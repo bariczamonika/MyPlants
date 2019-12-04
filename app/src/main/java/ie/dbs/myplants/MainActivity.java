@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -40,6 +41,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         recyclerView = findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),3);
         recyclerView.setLayoutManager(layoutManager);
@@ -81,6 +83,7 @@ public class MainActivity extends Activity {
         displayPlants();
     }
 
+    //display all plants
     private void displayPlants(){
         if(databaseReference!=null){
             databaseReference.addValueEventListener(new ValueEventListener() {
@@ -136,6 +139,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    //search among the plants and returned the results
     private ArrayList<Plant> search(String str){
         ArrayList<Plant> list=new ArrayList<>();
         for(Plant plant:myPlants){
@@ -148,50 +152,7 @@ public class MainActivity extends Activity {
         return list;
     }
 
-  /*  @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.user_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.logout: {
-                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
-                dialog.setTitle("Logout");
-                dialog.setMessage("Are you sure?");
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Utils.mAuth.signOut();
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                break;
-            }
-            case R.id.sortBy:{
-                CreateAlertDialogWithRadioButtons();
-            }
-
-            default:
-                break;
-        }
-        return true;
-    }*/
-
-//
+    //create sort by alertdialog
     private void CreateAlertDialogWithRadioButtons() {
         if(searchView.getQuery()==null)
             filteredPlants=myPlants;

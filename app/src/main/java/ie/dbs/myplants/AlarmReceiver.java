@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+//alarmrecevier class for handling notifications
 public class AlarmReceiver extends BroadcastReceiver {
     final public static String NOTIFICATION_ID = "notification-id";
     final public static String NOTIFICATION = "notification";

@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
+//if the device is rebooted the notifications are rescheduled
 
 public class DeviceBootReceiver extends BroadcastReceiver {
     final private List<Plant> plants=new ArrayList<>();

@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -53,6 +54,7 @@ public class AddPlant extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant2);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         edit_text_plant_name=findViewById(R.id.edit_text_plant_name);
         edit_text_plant_description=findViewById(R.id.edit_text_plant_description);
         edit_text_plant_notes=findViewById(R.id.edit_text_plant_notes);
@@ -202,6 +204,8 @@ public class AddPlant extends Activity {
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(receiver, filter);
     }
+
+    //set the spinners for watering and fertilizing needs and light conditions
     private void setSpinners()
     {
         ArrayAdapter<CharSequence> adapter=new ArrayAdapter<CharSequence>(this,
@@ -215,6 +219,7 @@ public class AddPlant extends Activity {
         spinner_light_conditions.setAdapter(adapter1);
     }
 
+    //save the plant details if the user is leaving the activity to choose picture
     private Plant savePlantDetails()
     {
         if(Utils.plantIterator==null)
@@ -277,6 +282,7 @@ public class AddPlant extends Activity {
     }
 
 
+    //add plant to Firebase
     private void addPlant(Plant myPlant) {
         if(imgProfilePath==null)
             imgProfilePath="";
@@ -300,6 +306,7 @@ public class AddPlant extends Activity {
         unregisterReceiver(receiver);
     }
 
+    //choose a different date for the plant than today
     private void chooseDate() {
         final Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
