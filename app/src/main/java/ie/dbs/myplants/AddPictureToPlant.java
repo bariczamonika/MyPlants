@@ -47,6 +47,7 @@ public class AddPictureToPlant extends Activity {
     private int index=0;
     private Uri photoURI;
     private String mCurrentPhotoPath;
+    private Bitmap bitmap=BitmapFactory.decodeResource(Utils.applicationContext.getResources(), R.drawable.replacement_pic);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +153,7 @@ public class AddPictureToPlant extends Activity {
 
                     try {
 
+
                         if(isProfilePic) {
                             if(!modify) {
                                 Intent intent = new Intent(AddPictureToPlant.this, AddPlant.class);
@@ -244,6 +246,8 @@ public class AddPictureToPlant extends Activity {
                             String dateString = simpleDateFormat1.format(myDate);
                             modify_picture_date.setText(dateString);
                             timeStamp=simpleDateFormat.format(myDate);
+                            Utils.deletePic(mCurrentPhotoPath);
+                            mCurrentPhotoPath=Utils.createDirectoryAndSaveFile(bitmap, AddPictureToPlant.this, timeStamp);
                         }
                     }, year, month, day); // set date picker to current date
             datePicker.getDatePicker().setMaxDate(new Date().getTime());
@@ -280,7 +284,7 @@ public class AddPictureToPlant extends Activity {
                             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                             imageEncoded = cursor.getString(columnIndex);
                             cursor.close();
-                            Bitmap bitmap = BitmapFactory.decodeFile(imageEncoded);
+                            bitmap = BitmapFactory.decodeFile(imageEncoded);
                             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
                             preview.setImageBitmap(bitmap);

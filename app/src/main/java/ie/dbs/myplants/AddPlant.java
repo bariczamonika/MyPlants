@@ -271,6 +271,7 @@ public class AddPlant extends Activity {
             myPlant.setFertilizingNeeds(plant_fertilizing_needs);
             myPlant.setLightCondition(plant_light_conditions);
             myPlant.setName(plant_name);
+            myPlant.setDateAdded(dateAdded);
             myPlant.setNotes(plant_notes);
             myPlant.setOutdoorPlant(plant_outdoor_plant);
             myPlant.setWateringNeeds(plant_watering_needs);

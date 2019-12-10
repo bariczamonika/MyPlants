@@ -99,6 +99,9 @@ public class Plant {
 
     }
 
+    public void setDateAdded(Date dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
     public String getProfilePicPath() {
         return profilePicPath;
